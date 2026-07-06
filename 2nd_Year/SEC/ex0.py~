@@ -1,0 +1,13 @@
+from pwn import *
+11;rgb:1818/1818/1818p = process('./hello')
+p.recvuntil(b': ')
+addr = int(p.recvline().strip(), 16)
+log.info(hex(addr))  # tu dois voir l'adresse de knockknock
+
+
+
+print ("contexte")
+
+elf = ELF('./hello')
+context.binary = elf
+log.info(context.arch)  # doit afficher 'amd64'

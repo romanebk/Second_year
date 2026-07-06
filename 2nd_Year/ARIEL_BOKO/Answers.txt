@@ -1,0 +1,11 @@
+Réponse 1: Un boucle d'événements non bloquante résout le problème de la gestion concurrente de plusieurs clients en même temps. Lorsqu'un serveur utilise un appel la fonction système read() bloquant, il ne peut pas traiter les requêtes d'autres clients tant que le client actuel n'a pas envoyé de données. Un boucle d'événements non bloquante permet de traiter les événements de plusieurs clients sans bloquer le serveur.
+
+Réponse 2: Dans une architecture non bloquante, si un client se connecte mais n'envoie pas de données, cela n'empêche pas le serveur de traiter les requêtes des autres clients. Le serveur peut définir un délai d'attente pour la réception de données d'un client et, si celui-ci n'envoie rien dans le délai imparti, le serveur peut fermer la connexion.
+
+Réponse 3: Un socket d'écoute est un socket qui écoute les connexions entrantes, tandis qu'un socket connecté est un socket qui a établi une connexion avec un client. La fonction système  socket() produit un socket d'écoute, tandis que la fonction système accept() produit un socket connecté.
+
+Réponse 4: Le serveur doit mettre en tampon les données entrantes car il ne peut pas savoir si les données reçues forment un message complet ou non. Le client peut envoyer les données en plusieurs fois, et le serveur doit les rassembler pour former un message complet. Si le serveur traitait chaque appel read() comme un message complet, il risquerait de mal interpréter les données.
+
+Réponse 5: Une machine d'états est un modèle qui permet de gérer les différents états dans lesquels peut se trouver une connexion client ou autres. Par exemple, un client peut être dans l'état "en attente de commande" ou "en traitement de commande". Le serveur peut ainsi donc gérer les différentes étapes de la communication avec le client.
+
+Réponse 6: Le signal SIGINT est envoyé lorsque l'utilisateur appuie sur la combinaison de touches Ctrl+C. Ce signal permet de terminer le processus en cours. Pour intercepter ce signal en C, on utilise la fonction signal() pour définir une fonction de gestion du signal.
