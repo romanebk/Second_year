@@ -1,0 +1,46 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "5678:5678"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      - GENERIC_TIMEZONE=Africa/Porto-Novo
+      - TZ=Africa/Porto-Novo
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
+      - N8N_ENCRYPTION_KEY=gVYwwk42wmkJ05DQgFYl+G6ephyvqx+q
+      - N8N_HOST=localhost
+      - N8N_PROTOCOL=http
+      - N8N_PORT=5678
+      - WEBHOOK_URL=http://localhost:5678/
+      - NODE_FUNCTION_ALLOW_BUILTIN=*
+      - NODE_FUNCTION_ALLOW_EXTERNAL=*
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./data:/data
+      - .:/home/node/persona_me
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: persona-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: persona
+      POSTGRES_PASSWORD: persona_password
+      POSTGRES_DB: persona_memory
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  n8n_data:
+    driver: local
+  postgres_data:
+    driver: local

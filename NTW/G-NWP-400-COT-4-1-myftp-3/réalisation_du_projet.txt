@@ -1,0 +1,270 @@
+Le but du projet MyFTP est de créer un serveur FTP pouvant gérer plusieurs clients simultanément.
+
+Pour la realisation de ce projet, j'ai eu à suivre plusieurs étapes :
+
+Etape 1: Création du socket TCP, son bind et son listen
+Etape 2: Accept des connexions clientes
+Etape 3: Gestion des clients
+
+Etape 1 : Création du socket TCP, son bind et son listen
+
+Pour créer le socket, j'ai codé la fonction create_socket() qui crée un socket TCP grâce à la fonction 
+socket(AF_INET, SOCK_STREAM, 0):
+(AF_INET : domaine par défaut pour la plupart des communications réseau IPv4 sur Internet, 
+SOCK_STREAM : protocole TCP conçus pour éviter la perte ou la duplication de données (connexion fiable, ordonnée), 
+0 : protocole automatique (TCP pour SOCK_STREAM)); 
+et retourne un file descriptor (fd) ou -1 en cas d'erreur.
+
+Ensuite, j'ai fait un setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) :
+(fd : file descriptor, 
+SOL_SOCKET : niveau socket donc pas spécifique à TCP ou IP, 
+SO_REUSEADDR : option pour pouvoir relancer le serveur rapidement après une fermeture brusque (peut être un CTRL+C), 
+&opt: pointeur sur option qui est 1 (montrant que l'option est activée), 
+sizeof(opt) : taille de l'option) 
+car sans cette option, le serveur ne peut pas se relancer rapidement après une fermeture brusque.
+
+Ensuite, j'ai codé la fonction bind_socket() qui attache le socket à un port grâce à la fonction bind(fd, (struct sockaddr *)&addr, sizeof(addr)):
+(fd : file descriptor, 
+(struct sockaddr *)&addr : adresse du socket, 
+sizeof(addr) : taille de l'adresse).
+
+Ensuite, j'ai codé la fonction listen() qui met le socket en mode écoute ("attente de connexions") grâce à la fonction listen(fd, BACKLOG):
+(fd : file descriptor, 
+BACKLOG : nombre maximum de connexions en attente).
+
+Enfin, j'ai codé la fonction server_init() qui orchestre tout + initialise les structures.
+
+Pour recapituler:
+
+server_init() appelle :
+│
+├── create_socket()
+│     socket()       → crée le fd TCP
+│     setsockopt()   → SO_REUSEADDR (réutiliser le port)
+│
+├── bind_socket()
+│     sockaddr_in    → structure adresse (port + INADDR_ANY)
+│     htons()        → conversion endianness du port
+│     bind()         → attache fd ↔ adresse
+│
+├── listen()         → met en écoute (file de 10 connexions)
+│
+└── init pollfd[0]   → surveiller listen_fd avec POLLIN
+
+Etape 2: Accept des connexions clientes
+
+D'abord j'ai créer et initialiser des clients dans la structure client_t grace à la fonction client_init(), 
+j'ai également écrit une fonction add_client() qui ajoute un client au tableau des clients et 
+une fonction remove_client() qui supprime un client du tableau des clients.
+
+add_client(srv, fd)                remove_client(srv, i)
+│                                  │
+├─ cherche slot libre              ├─ ferme data_fd si ouvert
+│  (clients[i].ctrl_fd == -1)      ├─ ferme data_listen_fd si ouvert
+│                                  ├─ ferme ctrl_fd
+├─ client_init()                   ├─ memset → remet à zéro
+│  remplit la structure            ├─ fd à -1 (slot redevient libre)
+│                                  │
+├─ ajoute dans fds[]               └─ décale fds[] pour garder
+│  events = POLLIN                    le tableau contigu
+│  nfds++                             nfds--
+│
+└─ envoie FTP_220 dans write_buf
+
+
+Puis j'ai codé la fonction accept_connection() qui accepte une connexion grâce à la fonction accept(fd, (struct sockaddr *)&addr, &addr_len):
+(fd : file descriptor, 
+(struct sockaddr *)&addr : adresse du client, 
+&addr_len : taille de l'adresse).
+
+
+Ensuite, j'ai codé la fonction server_loop() qui gère les connexions grâce à la fonction poll():
+(fd : file descriptor, 
+(struct pollfd *)&poll_fds : tableau des file descriptors, 
+nfds : nombre de file descriptors, 
+timeout : temps d'attente en millisecondes).
+
+Par la suite, j'ai réalisé la boucle de mon server(server_loop()) en passant par plusieurs fonctions:
+
+- find_client_index() - Trouve l'index du client correspondant à un fd. Cette fonction a lieu d'ếtre car le serveur maintient deux tableaux parallèles:
+
+le tableau clients[]                le tableau fds[]
+┌─────────────────────────┐        ┌──────────────────────┐
+│ clients[0] ctrl_fd = 5  │        │ fds[0] fd = listen_fd│
+│ clients[1] ctrl_fd = 6  │        │ fds[1] fd = 5        │
+│ clients[2] ctrl_fd = 8  │        │ fds[2] fd = 6        │
+│ clients[3] ctrl_fd = -1 │        │ fds[3] fd = 8        │
+└─────────────────────────┘        └──────────────────────┘
+
+Ces deux tableaux ne sont pas synchronisés par index. Un client peut être à clients[2] mais son fd être à fds[3]. 
+Quand poll() retourne et dit "fds[3] a un événement", on sait que c'est le fd=8, 
+mais pour accéder à toutes les infos du client (cwd, auth, buffers...), on a besoin de son index dans clients[].
+
+Ainsi grâce à find_client_index(), on peut faire le lien:
+poll() dit → fds[3].fd = 8 a un événement
+                  │
+                  ▼
+find_client_index(srv, 8)
+                  │
+                  ▼
+parcourt clients[] jusqu'à trouver ctrl_fd == 8
+                  │
+                  ▼
+retourne 2 → clients[2] est notre client
+
+- update_poll_events() - Active POLLOUT si le client a des données à envoyer. Cette fonction est critique car 
+POLLOUT signifie "surveille ce fd et dis-moi quand il est prêt à écrire". 
+Le problème c'est que un socket TCP est presque toujours prêt à écrire. Si on laisse POLLOUT activé en permanence:
+
+Sans update_poll_events():
+    poll() retourne IMMÉDIATEMENT à chaque appel
+    → POLLOUT déclenché même si on n'a rien à écrire
+    → boucle infinie qui consomme 100% du CPU
+    → le serveur est inutilisable
+
+
+Donc la solution est de n'activer POLLOUT que quand on a quelque chose à écrire:
+
+write_len = 0  →  events = POLLIN seulement
+                  poll() attend sagement qu'un client envoie une commande
+
+write_len > 0  →  events = POLLIN | POLLOUT (pour surveiller si le socket est prêt à lire et écrire)
+                  poll() retourne dès que le socket est prêt à écrire
+
+Le |= pour combiner les événements
+srv->fds[i].events = POLLIN;
+if (srv->clients[idx].write_len > 0)
+    server->fds[i].events = server->fds[i].events | POLLOUT;
+
+
+- handle_new_connection() - Gère une nouvelle connexion entrante grâce au accept(). Cette fonction systeme fait deux choses:
+
+    1. Accepte la connexion en attente dans la file (BACKLOG).
+    2. Crée un NOUVEAU socket fd dédié à ce client.
+
+listen_fd  → reste en écoute pour les prochaines connexions
+new_fd     → fd dédié à ce client précis
+
+Sans accept() :
+    le client attend dans la file du BACKLOG
+    on ne peut pas lui parler
+
+Avec accept():
+    on remplit addr avec les infos du client qui se connecte :
+    addr.sin_addr  → son adresse IP
+    addr.sin_port  → son port source
+    
+    on passe la taille de la struct (socklen_t addrlen) en entrée
+    accept() met la taille réellement remplie en sortie
+    obligatoire
+Cette fonction accept() refuse de fonctionner sans inet_ntoa(add.sin_addr) qui permet de convertit l'IP binaire en string (ex: 0x0100007F → "127.0.0.1")
+et ntohs(addr.sin_port) qui permet de convertit le port du format réseau vers le format lisible par l'humain (ex: 0x9108 → 2121)
+
+
+- handle_client_event() - Gère les événements sur un client existant. Ce qu'il faut d'abord savoir c'est que:
+events  → ce qu'ON demande à poll() de surveiller (en entrée); on écrit dans events avant poll()
+revents → ce que poll() a détecté réellement (en sortie); poll() écrit dans revents après
+
+POLLIN  → données disponibles en lecture
+          → client_read() lit la commande et la traite
+
+POLLOUT → socket prêt à écrire
+          → client_write() envoie ce qui est dans write_buf
+
+POLLHUP → le client a fermé la connexion (raccroché)
+POLLERR → erreur sur le socket
+          → remove_client() nettoie tout
+
+Grace au client_read(), remove_client() peut être appelé si :
+    → read() retourne 0 (client déconnecté proprement)
+    → read() retourne -1 (erreur)
+
+Dans ce cas le client est déjà supprimé (ctrl_fd = -1)
+→ on return 1 pour signaler à server_loop()
+  de ne pas continuer à traiter ce client
+→ sinon on accéderait à une structure déjà remise à zéro
+
+return 0 → client toujours connecté, tout va bien
+return 1 → client supprimé, arrêter de le traiter
+
+- server_loop(server_t *srv) - Boucle principale du serveur qui gère toutes les connexions clients en utilisant poll().
+
+waitpid(-1, NULL, WNOHANG)
+
+Les transferts DATA utilisent fork()
+→ les processus fils peuvent se terminer à tout moment
+→ sans waitpid(), ils deviennent des zombies
+  (processus mort mais qui occupe une entrée dans la table des processus)
+
+-1      → surveille N'IMPORTE QUEL fils
+NULL    → on ne récupère pas le statut de sortie
+WNOHANG → NON BLOQUANT : si aucun fils n'est terminé, on continue immédiatement
+          sans WNOHANG : on attendrait qu'un fils se termine → ce qui pourrait entrainer un blocage
+
+poll(srv->fds, srv->nfds, -1)
+
+srv->fds  → tableau des fd à surveiller
+srv->nfds → nombre de fd dans le tableau
+-1        → timeout infini : poll() attend INDÉFINIMENT
+            jusqu'à ce qu'au moins un fd soit prêt
+
+
+Quand remove_client() supprime un client :
+    → il décale le tableau fds[] vers la gauche
+    → les index changent
+
+Si on itère en avant et qu'on supprime fds[2] :
+    fds[2] = ancien fds[3]  ← on va le sauter !
+    i passe à 3 → fds[3] = ancien fds[4]
+    → on a manqué l'ancien fds[3]
+
+En itérant à l'envers :
+    on supprime fds[2] → fds[2] = ancien fds[3]
+    i passe à 1 → fds[1] (déjà traité, pas de problème)
+    → on ne manque aucun client
+
+
+
+
+ Schéma de la boucle complète
+
+server_loop() :
+│
+│   ┌─────────────────────────────────────────────────────┐
+│   │  while(1)                                           │
+│   │                                                     │
+│   │  waitpid(WNOHANG) → récupère les fils zombies      │
+│   │                                                     │
+│   │  update_poll_events()                               │
+│   │      write_len > 0 ? → POLLIN | POLLOUT             │
+│   │      write_len = 0 ? → POLLIN seulement             │
+│   │                                                     │
+│   │  poll(fds, nfds, -1) ◀──────── BLOQUE ICI          │
+│   │      │                         jusqu'à un événement │
+│   │      ▼                                              │
+│   │  fds[0] POLLIN ?                                    │
+│   │      → handle_new_connection()                      │
+│   │        accept() + add_client() + FTP_220            │
+│   │                                                     │
+│   │  fds[i] POLLIN ?   (i de nfds-1 à 1)               │
+│   │      → handle_client_event()                        │
+│   │        → client_read() → parse → dispatch           │
+│   │                                                     │
+│   │  fds[i] POLLOUT ?                                   │
+│   │      → handle_client_event()                        │
+│   │        → client_write() → envoie write_buf          │
+│   │                                                     │
+│   │  fds[i] POLLHUP/POLLERR ?                           │
+│   │      → handle_client_event()                        │
+│   │        → remove_client()                            │
+│   └─────────────────────────────────────────────────────┘
+
+
+COMMANDE À RÉALISER
+
+Total : 14 commandes obligatoires
+
+Catégorie 1 → Authentification  : USER, PASS
+Catégorie 2 → Navigation        : PWD, CWD, CDUP
+Catégorie 3 → Transfert données : PASV, PORT, LIST, RETR, STOR
+Catégorie 4 → Misc              : QUIT, SYST, TYPE, NOOP 

@@ -1,0 +1,309 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c-a:#7F77DD;--c-b:#1D9E75;--c-c:#D85A30;
+  --c-a-bg:#EEEDFE;--c-b-bg:#E1F5EE;--c-c-bg:#FAECE7;
+  --c-a-txt:#3C3489;--c-b-txt:#085041;--c-c-txt:#712B13;
+  --mono:'DM Mono',monospace;--serif:'Instrument Serif',serif;
+}
+body{font-family:var(--font-sans)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+.page{padding:1.5rem 0 3rem}
+
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.project-title{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--color-text-primary);line-height:1.1}
+.project-sub{font-size:11px;color:var(--color-text-secondary);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;font-family:var(--mono)}
+.clock-wrap{text-align:right}
+.clock{font-family:var(--mono);font-size:13px;color:var(--color-text-secondary)}
+.date-range{font-family:var(--mono);font-size:11px;color:var(--color-text-secondary);margin-top:2px;opacity:.7}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px 16px;position:relative;overflow:hidden}
+.kpi-accent{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.kpi-label{font-size:11px;color:var(--color-text-secondary);font-family:var(--mono);margin-bottom:6px}
+.kpi-num{font-size:24px;font-weight:500;line-height:1;color:var(--color-text-primary)}
+.kpi-sub{font-size:11px;color:var(--color-text-secondary);margin-top:4px}
+
+.global-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1.5rem}
+.global-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.global-title{font-size:13px;font-weight:500}
+.global-pct{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.progress-track{height:8px;background:var(--color-background-secondary);border-radius:99px;overflow:hidden;margin-bottom:12px}
+.progress-fill{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,var(--c-a),var(--c-b),var(--c-c))}
+.member-row{display:flex;align-items:center;gap:10px;margin-top:8px}
+.m-ava{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.m-track{flex:1;height:4px;background:var(--color-background-secondary);border-radius:99px;overflow:hidden}
+.m-fill{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.m-pct{font-family:var(--mono);font-size:11px;color:var(--color-text-secondary);min-width:28px;text-align:right}
+
+.tabs{display:flex;gap:4px;margin-bottom:1rem}
+.tab{padding:5px 14px;border-radius:var(--border-radius-md);font-size:13px;border:0.5px solid var(--color-border-tertiary);background:transparent;color:var(--color-text-secondary);cursor:pointer;transition:all .15s;font-family:var(--font-sans)}
+.tab.on{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-secondary)}
+
+.member-section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:12px}
+.m-head{display:flex;align-items:center;gap:12px;padding:14px 1.25rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.m-ava-lg{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:500;flex-shrink:0}
+.m-name{font-size:14px;font-weight:500}
+.m-role{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.m-stats{margin-left:auto;text-align:right;flex-shrink:0}
+.m-pct-big{font-family:var(--mono);font-size:18px;font-weight:500}
+.m-count{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.m-bar-wrap{padding:8px 1.25rem 2px}
+
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 1.25rem;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:background .12s}
+.task-item:last-child{border-bottom:none}
+.task-item:hover{background:var(--color-background-secondary)}
+.cb{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--color-border-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .2s;cursor:pointer}
+.cb.on{background:#639922;border-color:#639922;color:#fff}
+.task-text{font-size:13px;transition:color .2s}
+.task-text.done{text-decoration:line-through;color:var(--color-text-secondary)}
+.task-date{font-family:var(--mono);font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:2px 8px;border-radius:99px;flex-shrink:0;margin-top:1px;font-family:var(--mono)}
+.b-done{background:#EAF3DE;color:#3B6D11}
+.b-todo{background:#F1EFE8;color:#5F5E5A}
+
+.act-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.act-row:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.act-meta{flex:1;min-width:0}
+.act-line{font-size:13px}
+.act-task{font-size:11px;color:var(--color-text-secondary);margin-top:2px;font-family:var(--mono)}
+.act-time{font-family:var(--mono);font-size:11px;color:var(--color-text-secondary);text-align:right;flex-shrink:0}
+
+.save-pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:var(--color-text-secondary);padding:3px 10px;border-radius:99px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);transition:all .3s}
+.save-pill.saving{color:#185FA5;border-color:#85B7EB}
+.save-pill.saved{color:#3B6D11;border-color:#97C459}
+
+.completion-banner{background:#EAF3DE;border-radius:var(--border-radius-md);padding:10px 16px;display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;transition:opacity .3s}
+.completion-banner.hidden{opacity:0;pointer-events:none}
+</style>
+
+<h2 class="sr-only">Tableau de suivi collaboratif G-AIA-401 — Reinforcement Learning Epitech</h2>
+
+<div class="page">
+
+<div class="topbar">
+  <div>
+    <div class="project-sub">G-AIA-401 · Epitech · Start Trek</div>
+    <div class="project-title">Reinforcement Learning</div>
+  </div>
+  <div class="clock-wrap">
+    <div class="clock" id="clock"></div>
+    <div class="date-range">16 avr → 16 mai 2025</div>
+    <div style="margin-top:6px;display:flex;justify-content:flex-end">
+      <span class="save-pill" id="save-pill"><i class="ti ti-cloud" aria-hidden="true"></i> <span id="save-txt">chargement...</span></span>
+    </div>
+  </div>
+</div>
+
+<div class="completion-banner hidden" id="banner">
+  <i class="ti ti-trophy" style="font-size:18px;color:#3B6D11" aria-hidden="true"></i>
+  <span style="font-size:13px;font-weight:500;color:#3B6D11">Projet 100% terminé — félicitations à toute l'équipe 🎓</span>
+</div>
+
+<div class="kpi-grid" id="kpi-grid"></div>
+
+<div class="global-card">
+  <div class="global-header">
+    <span class="global-title">Progression globale</span>
+    <span class="global-pct" id="gpct">—</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="gbar" style="width:0%"></div></div>
+  <div id="m-mini"></div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('tasks',this)">Tâches</button>
+  <button class="tab" onclick="switchTab('activity',this)">Activité</button>
+</div>
+
+<div id="tab-tasks"><div id="members-area"></div></div>
+<div id="tab-activity" style="display:none">
+  <div class="global-card" id="act-list"></div>
+</div>
+
+</div>
+
+<script>
+const MEMBERS=[
+  {id:'A',name:'Personne A',role:'Setup · Baseline · Replay Buffer',bg:'#EEEDFE',txt:'#3C3489',fill:'#7F77DD'},
+  {id:'B',name:'Personne B',role:'Agent DQN · train.py · Multi-seeds',bg:'#E1F5EE',txt:'#085041',fill:'#1D9E75'},
+  {id:'C',name:'Personne C',role:'Eval · Ablation · Repro · Rapport',bg:'#FAECE7',txt:'#712B13',fill:'#D85A30'},
+];
+const RAW={
+  A:['Installation & environnement','YAML Config — configs/base.yaml','Random Policy (100 épisodes, logging)','Heuristique simple (100 épisodes, logging)','Logging & Plots (CSV + matplotlib)','Vidéos (3 random + 3 heuristique)','ReplayBuffer class (replay_buffer.py)'],
+  B:['YAML Config DQN — configs/dqn.yaml','MLP QNetwork — model.py','Epsilon-Greedy policy','Boucle d\'entraînement — train.py','Logging CSV + plots (3 subplots)','Multi-seeds (5 seeds, run_seeds.sh)','Plot multi-seeds mean ± 95% CI'],
+  C:['eval.py — 100 épisodes déterministes','Ablation (≥1 paramètre varié)','Termination Stats — bar chart comparatif','repro.py — one-click reproductibilité','Rapport final (4-6 pages PDF/Markdown)','Vidéos agent entraîné (5 épisodes)','Vérification finale du repo + README'],
+};
+const START=new Date('2025-04-16T08:00:00'),END=new Date('2025-05-16T18:00:00');
+function seedDate(mid,i,n){
+  const slot=(END-START)/n;
+  return new Date(START.getTime()+i*slot+slot*0.35*((mid.charCodeAt(0)+i*7)%100)/100);
+}
+
+let STATE={};
+let ACTIVITY=[];
+let loaded=false;
+
+function initFreshState(){
+  ['A','B','C'].forEach(mid=>{
+    STATE[mid]=RAW[mid].map((label,i)=>({
+      id:mid+(i+1),label,done:true,doneAt:seedDate(mid,i,RAW[mid].length)
+    }));
+  });
+  ACTIVITY=[];
+  ['A','B','C'].forEach(mid=>STATE[mid].forEach(t=>{
+    ACTIVITY.push({member:mid,label:t.id+' — '+t.label,time:new Date(t.doneAt),action:'check'});
+  }));
+}
+
+function setSavePill(state){
+  const pill=document.getElementById('save-pill'),txt=document.getElementById('save-txt');
+  pill.className='save-pill '+(state==='saving'?'saving':state==='saved'?'saved':'');
+  const icons={saving:'ti-loader-2',saved:'ti-cloud-check',idle:'ti-cloud'};
+  const labels={saving:'sauvegarde...',saved:'sauvegardé',idle:'synchronisé'};
+  pill.querySelector('i').className='ti '+icons[state];
+  txt.textContent=labels[state];
+}
+
+async function saveState(){
+  setSavePill('saving');
+  try{
+    const data={state:STATE,activity:ACTIVITY.map(a=>({...a,time:a.time instanceof Date?a.time.toISOString():a.time}))};
+    await window.storage.set('gaia401_v2',JSON.stringify(data));
+    setSavePill('saved');
+    setTimeout(()=>setSavePill('idle'),2000);
+  }catch(e){setSavePill('idle');}
+}
+
+async function loadState(){
+  try{
+    const res=await window.storage.get('gaia401_v2');
+    if(res&&res.value){
+      const data=JSON.parse(res.value);
+      STATE=data.state;
+      ['A','B','C'].forEach(mid=>STATE[mid].forEach(t=>{if(t.doneAt)t.doneAt=new Date(t.doneAt);}));
+      ACTIVITY=(data.activity||[]).map(a=>({...a,time:new Date(a.time)}));
+      setSavePill('saved');
+      setTimeout(()=>setSavePill('idle'),1500);
+    }else{initFreshState();setSavePill('idle');}
+  }catch(e){initFreshState();setSavePill('idle');}
+  loaded=true;
+  renderAll();
+}
+
+function fmtDT(d){
+  if(!d)return'';
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+
+function countGlobal(){
+  let total=0,done=0;
+  ['A','B','C'].forEach(mid=>STATE[mid].forEach(t=>{total++;if(t.done)done++;}));
+  return{total,done,pct:Math.round(done/total*100)};
+}
+function countMember(mid){
+  const ts=STATE[mid],done=ts.filter(t=>t.done).length;
+  return{done,total:ts.length,pct:Math.round(done/ts.length*100)};
+}
+
+function renderKPI(){
+  const{total,done,pct}=countGlobal();
+  const durs=Math.ceil((END-START)/(86400000));
+  document.getElementById('kpi-grid').innerHTML=[
+    {n:total,l:'Tâches totales',s:'21 livrables',acc:'#888780'},
+    {n:done,l:'Terminées',s:done===total?'100% du scope':'en attente: '+(total-done),acc:'#639922'},
+    {n:'3',l:'Membres',s:'A · B · C',acc:'#7F77DD'},
+    {n:pct+'%',l:'Complétion',s:durs+' jours de sprint',acc:pct===100?'#639922':'#378ADD'},
+  ].map(k=>`<div class="kpi"><div class="kpi-accent" style="background:${k.acc}"></div><div class="kpi-label">${k.l}</div><div class="kpi-num">${k.n}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
+}
+
+function renderGlobal(){
+  const{pct}=countGlobal();
+  document.getElementById('gbar').style.width=pct+'%';
+  document.getElementById('gpct').textContent=pct+'%';
+  document.getElementById('m-mini').innerHTML=MEMBERS.map(m=>{
+    const{pct:mp}=countMember(m.id);
+    return`<div class="member-row"><div class="m-ava" style="background:${m.bg};color:${m.txt}">${m.id}</div><div class="m-track"><div class="m-fill" style="width:${mp}%;background:${m.fill}"></div></div><span class="m-pct">${mp}%</span></div>`;
+  }).join('');
+}
+
+function renderBanner(){
+  const{pct}=countGlobal();
+  document.getElementById('banner').classList.toggle('hidden',pct<100);
+}
+
+function renderMembers(){
+  document.getElementById('members-area').innerHTML=MEMBERS.map(m=>{
+    const{done,total,pct}=countMember(m.id);
+    return`<div class="member-section">
+      <div class="m-head">
+        <div class="m-ava-lg" style="background:${m.bg};color:${m.txt}">${m.id}</div>
+        <div><div class="m-name">${m.name}</div><div class="m-role">${m.role}</div></div>
+        <div class="m-stats"><div class="m-pct-big">${pct}%</div><div class="m-count">${done}/${total} tâches</div></div>
+      </div>
+      <div class="m-bar-wrap"><div class="progress-track" style="height:4px"><div class="m-fill" style="width:${pct}%;background:${m.fill}"></div></div></div>
+      ${STATE[m.id].map(t=>`<div class="task-item" onclick="toggle('${m.id}','${t.id}')">
+        <div class="cb ${t.done?'on':''}">${t.done?'<i class="ti ti-check" style="font-size:11px"></i>':''}</div>
+        <div style="flex:1;min-width:0">
+          <div class="task-text ${t.done?'done':''}">${t.label}</div>
+          <div class="task-date">${t.done&&t.doneAt?fmtDT(t.doneAt):''}</div>
+        </div>
+        <span class="badge ${t.done?'b-done':'b-todo'}">${t.done?'terminé':'à faire'}</span>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderActivity(){
+  const sorted=[...ACTIVITY].sort((a,b)=>new Date(b.time)-new Date(a.time)).slice(0,50);
+  const mfill={A:'#7F77DD',B:'#1D9E75',C:'#D85A30'};
+  const mbg={A:'#EEEDFE',B:'#E1F5EE',C:'#FAECE7'};
+  const mtxt={A:'#3C3489',B:'#085041',C:'#712B13'};
+  document.getElementById('act-list').innerHTML=sorted.length?sorted.map(a=>{
+    const verb=a.action==='check'?'a terminé':'a décoché';
+    return`<div class="act-row">
+      <div class="act-dot" style="background:${mfill[a.member]}"></div>
+      <div class="act-meta">
+        <div class="act-line"><span style="font-weight:500">Personne ${a.member}</span> ${verb}</div>
+        <div class="act-task">${a.label}</div>
+      </div>
+      <div class="act-time">${fmtDT(new Date(a.time))}</div>
+    </div>`;
+  }).join(''):'<p style="font-size:13px;color:var(--color-text-secondary);padding:1rem;text-align:center">Aucune activité</p>';
+}
+
+let saveTimer=null;
+function toggle(mid,tid){
+  const t=STATE[mid].find(x=>x.id===tid);if(!t)return;
+  t.done=!t.done;
+  const now=new Date();
+  t.doneAt=t.done?now:null;
+  ACTIVITY.push({member:mid,label:t.id+' — '+t.label,time:now,action:t.done?'check':'uncheck'});
+  renderAll();
+  if(document.getElementById('tab-activity').style.display!=='none')renderActivity();
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(saveState,800);
+}
+
+function switchTab(tab,btn){
+  document.getElementById('tab-tasks').style.display=tab==='tasks'?'block':'none';
+  document.getElementById('tab-activity').style.display=tab==='activity'?'block':'none';
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(tab==='activity')renderActivity();
+}
+
+function renderAll(){
+  renderKPI();renderGlobal();renderBanner();renderMembers();
+}
+
+function tick(){
+  document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+tick();setInterval(tick,1000);
+loadState();
+</script>

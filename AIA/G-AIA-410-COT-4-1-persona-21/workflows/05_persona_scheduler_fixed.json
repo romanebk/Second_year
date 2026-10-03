@@ -1,0 +1,133 @@
+{
+  "name": "Persona — Scheduler",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "connections": {
+    "Every Hour": {
+      "main": [
+        [
+          {
+            "node": "Get Active Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Users": {
+      "main": [
+        [
+          {
+            "node": "Filter Due Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Due Users": {
+      "main": [
+        [
+          {
+            "node": "Send To Each User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "e1f6b8c4-286a-46de-bfea-2394f7a9bbc5",
+      "name": "Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6c4eefe3-a973-4ab2-8d3f-c7e6a025d7b6",
+      "name": "Get Active Users",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [224, 0],
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "keyValue": "active"
+            }
+          ]
+        },
+        "returnAll": true
+      }
+    },
+    {
+      "id": "f5eddda1-a08a-4b57-8044-4d693b06eb3e",
+      "name": "Filter Due Users",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [448, 0],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const rows = $input.all().map(function(i) { return i.json; });\nconst out = [];\nfor (const u of rows) {\n  const tz = (u.preferences && u.preferences.timezone) ? u.preferences.timezone : (u.timezone || 'Africa/Porto-Novo');\n  let hourNow;\n  try {\n    hourNow = Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: tz }).format(new Date()));\n  } catch(e) {\n    hourNow = new Date().getUTCHours();\n  }\n  if (hourNow === 24) hourNow = 0;\n  // Support both flat field (send_hour) and nested preferences.schedule\n  let sh = null;\n  if (u.send_hour !== null && u.send_hour !== undefined && u.send_hour !== '') {\n    sh = Number(u.send_hour);\n  } else if (u.preferences && u.preferences.schedule) {\n    const parts = String(u.preferences.schedule).split(':');\n    sh = parseInt(parts[0], 10);\n  }\n  if (sh !== null && !isNaN(sh) && sh === hourNow) {\n    // Support both flat fields and nested preferences object\n    const interests = u.interests\n      ? (Array.isArray(u.interests) ? u.interests.join(',') : String(u.interests))\n      : (u.preferences && u.preferences.interests\n          ? (Array.isArray(u.preferences.interests) ? u.preferences.interests.join(',') : String(u.preferences.interests))\n          : '');\n    const nb = u.nb_articles !== undefined ? Number(u.nb_articles)\n      : (u.preferences && u.preferences.articleCount ? Number(u.preferences.articleCount) : 6);\n    const tone = u.tone || (u.preferences && u.preferences.tone) || '';\n    const format = u.format || (u.preferences && u.preferences.format) || '';\n    out.push({ json: {\n      email: u.email,\n      interests: interests,\n      unsubscribe_token: u.unsubscribe_token || '',\n      nb_articles: isNaN(nb) ? 6 : nb,\n      tone: String(tone),\n      format: String(format)\n    }});\n  }\n}\nif (out.length === 0) {\n  // No users due — return empty item so workflow ends gracefully\n  return [{ json: { _skip: true, message: 'Aucun utilisateur a cette heure' } }];\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "93154c41-740d-40b5-b68e-1b54cb9b71bf",
+      "name": "Send To Each User",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [672, 0],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "apUZ1MEvsrSFbCZV"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $json.email }}",
+            "interests": "={{ $json.interests }}",
+            "unsubscribe_token": "={{ $json.unsubscribe_token }}",
+            "nb_articles": "={{ $json.nb_articles }}",
+            "tone": "={{ $json.tone }}",
+            "format": "={{ $json.format }}"
+          },
+          "schema": [
+            { "id": "email", "displayName": "email", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": false },
+            { "id": "interests", "displayName": "interests", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": false },
+            { "id": "unsubscribe_token", "displayName": "unsubscribe_token", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": false },
+            { "id": "nb_articles", "displayName": "nb_articles", "type": "number", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": false },
+            { "id": "tone", "displayName": "tone", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": false },
+            { "id": "format", "displayName": "format", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": false }
+          ]
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    }
+  ]
+}

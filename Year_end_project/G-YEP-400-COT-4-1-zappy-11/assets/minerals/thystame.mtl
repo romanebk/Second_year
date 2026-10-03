@@ -1,0 +1,7 @@
+# Matériau généré pour le minéral : thystame
+newmtl thystame
+Kd 0.9412 0.0784 0.2353
+Ka 0.2824 0.0235 0.0706
+Ks 0.25 0.25 0.25
+Ns 32.0
+d 1.0

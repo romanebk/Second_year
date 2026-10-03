@@ -1,0 +1,9 @@
+*.o
+zappy_server
+test_buffer
+test_gui_protocol
+build/
+dispatch.md
+guide_MOMO.md
+revision_MOMO.md
+PROGRESS_MOMO.md

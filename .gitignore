@@ -1,0 +1,17 @@
+# Dependencies / environments
+node_modules/
+venv_of_me/
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Build artifacts
+dist/
+build/
+*.o
+*.a
+
+# Editor / OS junk
+.~lock.*#
+.DS_Store

@@ -1,0 +1,324 @@
+#!/usr/bin/env python3
+"""
+Zappy AI — client autonome
+Usage: ./zappy_ai -p port -n team_name [-h host]
+"""
+
+import socket
+import sys
+import argparse
+import random
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Tableau des conditions d'incantation (niveau 1→2 … 7→8)
+# ─────────────────────────────────────────────────────────────────────────────
+INCANTATION_REQ = {
+    1: {"players": 1, "linemate": 1, "deraumere": 0, "sibur": 0,
+        "mendiane": 0, "phiras": 0, "thystame": 0},
+    2: {"players": 2, "linemate": 1, "deraumere": 1, "sibur": 1,
+        "mendiane": 0, "phiras": 0, "thystame": 0},
+    3: {"players": 2, "linemate": 2, "deraumere": 0, "sibur": 1,
+        "mendiane": 0, "phiras": 2, "thystame": 0},
+    4: {"players": 4, "linemate": 1, "deraumere": 1, "sibur": 2,
+        "mendiane": 0, "phiras": 1, "thystame": 0},
+    5: {"players": 4, "linemate": 1, "deraumere": 2, "sibur": 1,
+        "mendiane": 3, "phiras": 0, "thystame": 0},
+    6: {"players": 6, "linemate": 1, "deraumere": 2, "sibur": 3,
+        "mendiane": 0, "phiras": 1, "thystame": 0},
+    7: {"players": 6, "linemate": 2, "deraumere": 2, "sibur": 2,
+        "mendiane": 2, "phiras": 2, "thystame": 1},
+}
+
+RESOURCES = ["food", "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"]
+STONES    = ["linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Parsers
+# ─────────────────────────────────────────────────────────────────────────────
+def parse_inventory(line: str) -> dict:
+    """Parse '[food 10, linemate 2, ...]' → dict."""
+    inv = {r: 0 for r in RESOURCES}
+    line = line.strip().strip("[]")
+    for part in line.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        tokens = part.split()
+        if len(tokens) == 2:
+            name, qty = tokens[0], tokens[1]
+            if name in inv:
+                try:
+                    inv[name] = int(qty)
+                except ValueError:
+                    pass
+    return inv
+
+
+def parse_look(line: str) -> list[list[str]]:
+    """Parse '[player food, linemate, ...]' → list of tile-content lists."""
+    line = line.strip().strip("[]")
+    tiles = []
+    for tile_str in line.split(","):
+        tile_str = tile_str.strip()
+        contents = tile_str.split() if tile_str else []
+        tiles.append(contents)
+    return tiles
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  AI class
+# ─────────────────────────────────────────────────────────────────────────────
+class ZappyAI:
+    def __init__(self, host: str, port: int, team: str):
+        self._host   = host
+        self._port   = port
+        self._team   = team
+        self._sock   = None
+        self._file   = None
+        self._level  = 1
+        self._inv    = {r: 0 for r in RESOURCES}
+        self._map_w  = 0
+        self._map_h  = 0
+        self._pending = 0          # nb de commandes envoyées sans réponse
+        self._MAX_PENDING = 9      # le serveur accepte jusqu'à 10 en file
+        self._dead   = False
+
+    # ── Réseau ───────────────────────────────────────────────────────────────
+    def connect(self):
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._sock.connect((self._host, self._port))
+        self._file = self._sock.makefile("r")
+
+        welcome = self._readline()
+        if "WELCOME" not in welcome:
+            raise RuntimeError(f"Handshake inattendu : {welcome!r}")
+
+        self._send(self._team)
+        slots_line = self._readline()
+        size_line  = self._readline()
+
+        try:
+            self._map_w, self._map_h = map(int, size_line.strip().split())
+        except Exception:
+            pass
+
+        print(f"[AI] Connecté — team={self._team} slots={slots_line.strip()} "
+              f"map={self._map_w}x{self._map_h}", flush=True)
+
+    def _send(self, cmd: str):
+        self._sock.sendall((cmd + "\n").encode())
+
+    def _readline(self) -> str:
+        line = self._file.readline()
+        if not line:
+            self._dead = True
+            return ""
+        return line.strip()
+
+    # ── Commandes avec file de pending ───────────────────────────────────────
+    def _cmd(self, cmd: str):
+        """Envoie une commande et lit la réponse immédiatement."""
+        self._send(cmd)
+        return self._readline()
+
+    def forward(self)  -> str: return self._cmd("Forward")
+    def turn_right(self) -> str: return self._cmd("Right")
+    def turn_left(self)  -> str: return self._cmd("Left")
+    def look(self)     -> list: return parse_look(self._cmd("Look"))
+    def inventory(self) -> dict:
+        r = parse_inventory(self._cmd("Inventory"))
+        self._inv = r
+        return r
+    def take(self, obj: str) -> str: return self._cmd(f"Take {obj}")
+    def set_down(self, obj: str) -> str: return self._cmd(f"Set {obj}")
+    def incantation(self) -> str: return self._cmd("Incantation")
+    def broadcast(self, msg: str) -> str: return self._cmd(f"Broadcast {msg}")
+    def fork(self) -> str: return self._cmd("Fork")
+    def connect_nbr(self) -> str: return self._cmd("Connect_nbr")
+
+    # ── Logique de décision ───────────────────────────────────────────────────
+    def _needs_food(self) -> bool:
+        return self._inv.get("food", 0) < 5
+
+    def _missing_stones(self) -> list[str]:
+        """Retourne la liste des pierres manquantes pour le niveau actuel."""
+        if self._level >= 8:
+            return []
+        req = INCANTATION_REQ.get(self._level, {})
+        missing = []
+        for stone in STONES:
+            needed = req.get(stone, 0)
+            have   = self._inv.get(stone, 0)
+            if have < needed:
+                missing.extend([stone] * (needed - have))
+        return missing
+
+    def _can_incant(self, tiles: list) -> bool:
+        """Vérifie si la tuile courante (tiles[0]) permet l'incantation."""
+        if self._level >= 8:
+            return False
+        req = INCANTATION_REQ.get(self._level, {})
+        tile0 = tiles[0] if tiles else []
+        # Compter les joueurs présents
+        nb_players = tile0.count("player") + 1  # +1 pour soi-même
+        if nb_players < req.get("players", 1):
+            return False
+        # Compter les pierres au sol
+        for stone in STONES:
+            if tile0.count(stone) < req.get(stone, 0):
+                return False
+        return True
+
+    def _collect_visible(self, tiles: list) -> bool:
+        """Essaie de ramasser des ressources utiles dans le champ de vision.
+        Retourne True si on a avancé vers une ressource."""
+        missing = self._missing_stones()
+        need_food = self._needs_food()
+
+        # Tuile 0 = sous nos pieds — ramasser directement
+        if tiles:
+            for obj in tiles[0][:]:
+                if obj == "food" and need_food:
+                    r = self.take("food")
+                    if r == "ok":
+                        self._inv["food"] = self._inv.get("food", 0) + 1
+                        need_food = self._needs_food()
+                elif obj in missing:
+                    r = self.take(obj)
+                    if r == "ok":
+                        self._inv[obj] = self._inv.get(obj, 0) + 1
+                        missing = self._missing_stones()
+
+        # Tuile 1 = devant nous — avancer si elle contient qqch d'utile
+        if len(tiles) > 1:
+            tile1 = tiles[1]
+            for obj in tile1:
+                if (obj == "food" and need_food) or obj in missing:
+                    self.forward()
+                    return True
+
+        return False
+
+    def _wander(self):
+        """Déplacement aléatoire pour explorer."""
+        action = random.choice(["forward", "forward", "forward",
+                                "right", "left"])
+        if action == "forward":
+            self.forward()
+        elif action == "right":
+            self.turn_right()
+        else:
+            self.turn_left()
+
+    # ── Boucle principale ─────────────────────────────────────────────────────
+    def run(self):
+        self.connect()
+        step = 0
+
+        while not self._dead:
+            step += 1
+
+            # Inventaire toutes les 10 étapes
+            if step % 10 == 0:
+                self.inventory()
+                if self._dead:
+                    break
+
+            # Survie en priorité absolue
+            if self._needs_food():
+                tiles = self.look()
+                if self._dead:
+                    break
+                # Chercher de la food dans le champ de vision
+                found = False
+                for i, tile in enumerate(tiles):
+                    if "food" in tile:
+                        # Avancer vers la nourriture (approximation simple)
+                        for _ in range(i):
+                            self.forward()
+                            if self._dead:
+                                break
+                        self.take("food")
+                        self._inv["food"] = self._inv.get("food", 0) + 1
+                        found = True
+                        break
+                if not found:
+                    self._wander()
+                continue
+
+            # Regarder autour
+            tiles = self.look()
+            if self._dead:
+                break
+
+            # Tenter l'incantation si les conditions sont remplies
+            if self._can_incant(tiles):
+                resp = self.incantation()
+                if self._dead:
+                    break
+                if resp == "Elevation underway":
+                    # Lire la deuxième réponse (niveau actuel ou ko)
+                    resp2 = self._readline()
+                    if self._dead:
+                        break
+                    if resp2.startswith("Current level:"):
+                        try:
+                            self._level = int(resp2.split(":")[1].strip())
+                            print(f"[AI] Niveau {self._level} !", flush=True)
+                        except Exception:
+                            pass
+                continue
+
+            # Collecter ressources visibles
+            self._collect_visible(tiles)
+            if self._dead:
+                break
+
+            # Si on a tout ce qu'il faut → chercher partenaires via broadcast
+            if not self._missing_stones() and self._level < 8:
+                self.broadcast(f"incant_lvl{self._level}")
+
+            # Explorer
+            self._wander()
+
+        print("[AI] Mort ou déconnecté.", flush=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Point d'entrée
+# ─────────────────────────────────────────────────────────────────────────────
+def main():
+    parser = argparse.ArgumentParser(
+        description="Zappy AI client",
+        usage="./zappy_ai -p port -n name [-h host]"
+    )
+    parser.add_argument("-p", type=int, required=True, help="port number")
+    parser.add_argument("-n", required=True,            help="team name")
+    parser.add_argument("-H", "--host", default="localhost",
+                        dest="host",                   help="server hostname")
+    # Compatibilité avec '-h machine' (le -h par défaut est --help, on le masque)
+    args, unknown = parser.parse_known_args()
+
+    # Support de la syntaxe '-h machine' (sans tiret double)
+    host = args.host
+    i = 0
+    while i < len(unknown):
+        if unknown[i] == "-h" and i + 1 < len(unknown):
+            host = unknown[i + 1]
+            i += 2
+        else:
+            i += 1
+
+    try:
+        ai = ZappyAI(host, args.p, args.n)
+        ai.run()
+    except KeyboardInterrupt:
+        print("\n[AI] Interruption utilisateur.", flush=True)
+    except Exception as e:
+        print(f"[AI] Erreur : {e}", file=sys.stderr)
+        sys.exit(84)
+
+
+if __name__ == "__main__":
+    main()

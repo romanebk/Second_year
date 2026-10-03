@@ -1,0 +1,7 @@
+# Matériau généré pour le minéral : sibur
+newmtl sibur
+Kd 0.9412 0.3922 0.0784
+Ka 0.2824 0.1176 0.0235
+Ks 0.25 0.25 0.25
+Ns 32.0
+d 1.0

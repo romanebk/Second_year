@@ -1,0 +1,23 @@
+*.o
+
+# Binaires finaux (produits par le Makefile racine)
+/bin/
+
+# Binaires produits dans chaque module
+zappy_gui/zappy_gui
+zappy_server/zappy_server
+zappy_server/docs
+zappy_server/test_buffer
+zappy_server/test_gui_protocol
+zappy_server/docs/dispatch.md
+zappy_server/docs/explications
+# Caches Python de l'IA
+zappy_ai/__pycache__/
+
+# Logs locaux de dev
+.run/
+
+build/
+__pycache__/
+*.pyc
+explications/

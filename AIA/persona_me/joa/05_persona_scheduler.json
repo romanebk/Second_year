@@ -1,0 +1,191 @@
+{
+  "name": "Persona — Scheduler",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "connections": {
+    "Every Hour": {
+      "main": [
+        [
+          {
+            "node": "Get Active Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Users": {
+      "main": [
+        [
+          {
+            "node": "Filter Due Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Due Users": {
+      "main": [
+        [
+          {
+            "node": "Send To Each User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "e1f6b8c4-286a-46de-bfea-2394f7a9bbc5",
+      "name": "Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "xxsg3ZkTLLGrnJ6a"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "keyValue": "active"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "id": "6c4eefe3-a973-4ab2-8d3f-c7e6a025d7b6",
+      "name": "Get Active Users",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst out = [];\nfor (const u of rows) {\n  const tz = u.timezone || 'Africa/Porto-Novo';\n  let hourNow;\n  try {\n    hourNow = Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: tz }).format(new Date()));\n  } catch (e) {\n    hourNow = new Date().getUTCHours();\n  }\n  if (hourNow === 24) hourNow = 0;\n  const sh = (u.send_hour !== null && u.send_hour !== undefined && u.send_hour !== '') ? Number(u.send_hour) : null;\n  if (sh !== null && sh === hourNow) {\n    out.push({ json: {\n      email: u.email,\n      interests: u.interests || '',\n      unsubscribe_token: u.unsubscribe_token || '',\n      nb_articles: (u.nb_articles !== null && u.nb_articles !== undefined && u.nb_articles !== '') ? Number(u.nb_articles) : null,\n      tone: u.tone || '',\n      format: u.format || ''\n    } });\n  }\n}\nreturn out;"
+      },
+      "id": "f5eddda1-a08a-4b57-8044-4d693b06eb3e",
+      "name": "Filter Due Users",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "5aV4qxScZCv6w1Bc"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $json.email }}",
+            "interests": "={{ $json.interests }}",
+            "unsubscribe_token": "={{ $json.unsubscribe_token }}",
+            "nb_articles": "={{ $json.nb_articles }}",
+            "tone": "={{ $json.tone }}",
+            "format": "={{ $json.format }}"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "interests",
+              "displayName": "interests",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "unsubscribe_token",
+              "displayName": "unsubscribe_token",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "nb_articles",
+              "displayName": "nb_articles",
+              "type": "number",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "tone",
+              "displayName": "tone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "format",
+              "displayName": "format",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "93154c41-740d-40b5-b68e-1b54cb9b71bf",
+      "name": "Send To Each User",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        0
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+# --- Rust / Cargo ---
+# Contient les binaires, les bibliothèques compilées et les dépendances locales
+/target/
+
+# Si tu utilises 'cargo bench' ou 'cargo test', ces fichiers peuvent apparaître
+**/*.rs.bk
+
+# --- IDEs & Editeurs ---
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains (IntelliJ, RustRover)
+.idea/
+
+# Vim / Emacs
+*~
+*.swp
+*.swo
+
+# --- Système ---
+.DS_Store
+Thumbs.db

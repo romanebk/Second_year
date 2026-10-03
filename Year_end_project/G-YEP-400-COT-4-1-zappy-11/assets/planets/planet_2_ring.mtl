@@ -1,0 +1,7 @@
+# Materiau de repli (utilise si aucune texture n'est appliquee)
+newmtl planet_2_ring
+Kd 0.7059 0.6471 0.5490
+Ka 0.2118 0.1941 0.1647
+Ks 0.1 0.1 0.1
+Ns 16.0
+d 1.0

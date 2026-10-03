@@ -1,0 +1,7 @@
+# Materiau de repli (utilise si aucune texture n'est appliquee)
+newmtl planet_2
+Kd 0.8235 0.7451 0.5882
+Ka 0.2471 0.2235 0.1765
+Ks 0.1 0.1 0.1
+Ns 16.0
+d 1.0

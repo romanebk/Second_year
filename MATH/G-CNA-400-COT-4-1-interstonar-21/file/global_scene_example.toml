@@ -1,0 +1,20 @@
+[[body]]
+name = "Sun"
+position = {x = 1.81899e8, y = 9.83630e8, z = -1.58778e8}
+direction = {x = -1.12474e1, y = 7.54876e0, z = 2.68723e-1}
+mass = 1.98854e30
+radius = 696342000
+
+[[body]]
+name = "Mercury"
+position = {x = -5.67576e10, y = -2.73592e10, z = 2.89173e9}
+direction = {x = 1.16497e4, y = -4.14793e4, z = -4.45952e3}
+mass = 3.30200e23
+radius = 2439000
+
+[[body]]
+name = "Venus"
+position = {x = 4.28480e10, y = 1.00073e11, z = -1.11872e9}
+direction = {x = -3.22930e4, y = 1.36960e4, z = 2.05091e3}
+mass = 4.86850e24
+radius = 6051000

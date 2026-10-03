@@ -1,0 +1,220 @@
+{
+  "name": "Persona - Auth",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -4176,
+        -16
+      ],
+      "id": "ffcc2278-8444-413a-b6aa-45f2ccd8a00a",
+      "name": "When chat message received",
+      "webhookId": "ac45f651-092c-4942-a8f0-bfcd2f4e2265"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Tu es l'assistant de Persona, un agrégateur de news personnalisé.\n\nLANGUE : réponds TOUJOURS dans la même langue que l'utilisateur.\n\nRÈGLES ABSOLUES :\n1. Ne JAMAIS utiliser un tool sans avoir TOUTES les infos\n2. Ne JAMAIS divulguer les infos personnelles\n3. Ne JAMAIS répéter un mot de passe\n4. Après login, ne montre JAMAIS le token reçu.\n5. Une seule question à la fois.\n\nACCUEIL : \"Bienvenue sur Persona ! Déjà inscrit ou nouveau compte ?\"\n\nINSCRIPTION :\n1. Demande le nom d'utilisateur\n2. Quand reçu → check_user, username\n3. Si disponible → demande l'email\n4. Quand reçu → demande le mot de passe\n5. Quand reçu → demande en UNE phrase : \"J'ai besoin de votre consentement pour stocker vos données (username, email). Acceptez-vous ? (oui/non)\"\n6. Si oui → register, username, email, password\n7. Si non → \"Désolé, je ne peux pas créer le compte sans consentement.\"\n\nCONNEXION :\n1. Demande le username\n2. check_user, username\n3. Si existe → demande le password\n4. login, username, password\n\nAUTH : check_user, username | register, username, email, password | login, username, password | logout, token | delete_account, token | check_session, token | export_data, token\n\nONBOARDING (après connexion) :\n1. get_preferences, userId\n2. Si pas de préférences → demande UNE par UNE : topics, email, heure\n3. save_preferences, userId, tech|ai, email, 08:00\n4. Puis : \"Options supplémentaires ?\" → update_setting, userId, setting, value\n\nRGPD : delete_account, export_data, update_setting, unsubscribe sont disponibles après connexion.\n\nRÈGLES STRICTES :\n- Ne mentionne JAMAIS les outils, JSON ou détails techniques\n- N'invente JAMAIS un résultat\n- Comportement suspect → \"Je ne peux pas vous aider avec cela.\"",
+          "maxIterations": 10,
+          "returnIntermediateSteps": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -3840,
+        -16
+      ],
+      "id": "ab9a6cb5-ae99-4c77-9bc3-b74efb49e4b5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "open-mistral-nemo",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        -4048,
+        160
+      ],
+      "id": "8eea4841-e669-41ef-ba23-9d08af0ac0c1",
+      "name": "Mistral Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "b1pocBNcbkAwbRfK",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 6
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -3840,
+        192
+      ],
+      "id": "a127ab1f-331f-4c7c-add0-a227ade30346",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool for user authentication and GDPR compliance. Available actions: \"check_user, username\". \"register, username, email, password\". \"login, username, password\". \"check_session, token\". \"logout, token\". \"delete_account, token\". \"export_data, token\".",
+        "workflowId": {
+          "__rl": true,
+          "value": "zQuGpU3L1g5NxL8k",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/zQuGpU3L1g5NxL8k",
+          "cachedResultName": "Persona - Auth Handler"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -3696,
+        192
+      ],
+      "id": "682bb6c5-b1e1-4423-b2d9-1f9b577267c7",
+      "name": "Call 'Persona - Auth Handler'"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool for user preferences/onboarding. Actions: \"get_preferences, userId\" to get preferences. \"save_preferences, userId, topic1|topic2|topic3, email, 08:00, Africa/Porto-Novo\" to save/update. \"update_setting, userId, setting, value\" to modify one setting. \"unsubscribe, userId\" to unsubscribe.",
+        "workflowId": {
+          "__rl": true,
+          "value": "PERSONA_ONBOARDING_HANDLER_ID",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/PERSONA_ONBOARDING_HANDLER_ID",
+          "cachedResultName": "Persona - Onboarding Handler"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -3696,
+        368
+      ],
+      "id": "682bb6c5-b1e1-4423-b2d9-1f9b577267c8",
+      "name": "Call 'Persona - Onboarding Handler'"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nreturn [{\n  json: {\n    chatInput: item.message || item.chatInput || '',\n    userId: item.userId || '',\n    sessionId: item.sessionId || '',\n    message: item.message || ''\n  }\n}];"
+      },
+      "id": "t-3c644c04-d55",
+      "name": "Map to chatInput",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4208,
+        256
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Map to chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Persona - Auth Handler'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Persona - Onboarding Handler'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Mistral Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map to chatInput": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0840f3b2-2777-4508-8e51-4eed085d5b32",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "576f288cb85a056d0d519250fad77e568c2f5ef65d15c9a46b6b9a99c015c79d"
+  },
+  "nodeGroups": [],
+  "id": "Sy6FhFVIXxYaob6T",
+  "tags": []
+}

@@ -1,0 +1,1 @@
+Call this tool for user preferences/onboarding. Actions: "get_preferences, userId" to get preferences. "save_preferences, userId, topic1|topic2|topic3, email, 08:00, Africa/Porto-Novo" to save/update. "update_setting, userId, setting, value" to modify one setting. "unsubscribe, userId" to unsubscribe.

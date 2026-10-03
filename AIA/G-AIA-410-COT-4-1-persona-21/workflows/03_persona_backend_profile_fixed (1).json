@@ -1,0 +1,1268 @@
+{
+  "name": "Persona — Backend (Profile)",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "connections": {
+    "Profile Trigger": {
+      "main": [
+        [
+          {
+            "node": "Resolve Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Session": {
+      "main": [
+        [
+          {
+            "node": "Check Auth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Auth": {
+      "main": [
+        [
+          {
+            "node": "Authenticated?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Authenticated?": {
+      "main": [
+        [
+          {
+            "node": "Profile Action",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply Not Auth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Profile Action": {
+      "main": [
+        [
+          {
+            "node": "Get User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Interests",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsubscribe User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resubscribe User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get User For NL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get User Prefs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User": {
+      "main": [
+        [
+          {
+            "node": "Reply Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Interests": {
+      "main": [
+        [
+          {
+            "node": "Reply Interests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Schedule": {
+      "main": [
+        [
+          {
+            "node": "Reply Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsubscribe User": {
+      "main": [
+        [
+          {
+            "node": "Reply Unsub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resubscribe User": {
+      "main": [
+        [
+          {
+            "node": "Reply Resub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User For NL": {
+      "main": [
+        [
+          {
+            "node": "Call Newsletter Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Newsletter Builder": {
+      "main": [
+        [
+          {
+            "node": "Reply Newsletter Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Prefs": {
+      "main": [
+        [
+          {
+            "node": "Build Prefs Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prefs Update": {
+      "main": [
+        [
+          {
+            "node": "Update Preferences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Preferences": {
+      "main": [
+        [
+          {
+            "node": "Reply Preferences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "4b47d776-e1f7-46a1-9b55-fd93bcccf7fc",
+      "name": "Profile Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        608
+      ],
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "action",
+              "type": "string"
+            },
+            {
+              "name": "sessionId",
+              "type": "string"
+            },
+            {
+              "name": "interests",
+              "type": "string"
+            },
+            {
+              "name": "send_hour",
+              "type": "number"
+            },
+            {
+              "name": "timezone",
+              "type": "string"
+            },
+            {
+              "name": "nb_articles",
+              "type": "number"
+            },
+            {
+              "name": "tone",
+              "type": "string"
+            },
+            {
+              "name": "format",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a8c8b1b4-953c-4e4b-862d-3d9656f9f103",
+      "name": "Resolve Session",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        608
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "D8Vdg78qLuWu3YDg"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.sessionId }}"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1,
+        "orderBy": true,
+        "orderByColumn": "createdAt",
+        "orderByDirection": "DESC"
+      }
+    },
+    {
+      "id": "c93035ba-f207-4019-b38c-1d13286b3282",
+      "name": "Check Auth",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        608
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const t = $('Profile Trigger').first().json;\nconst rows = $input.all();\nconst now = Date.now();\nlet authenticated = false;\nlet email = '';\nif (rows.length) {\n  const s = rows[0].json;\n  const verified = (s.verified === true || s.verified === 'true' || s.verified === 1);\n  const notExpired = !s.expires_at || new Date(s.expires_at).getTime() > now;\n  if (verified && notExpired) { authenticated = true; email = String(s.email || ''); }\n}\nreturn [{ json: {\n  authenticated,\n  email,\n  action: String(t.action || ''),\n  interests: t.interests != null ? String(t.interests) : '',\n  send_hour: t.send_hour != null && t.send_hour !== '' ? Number(t.send_hour) : null,\n  timezone: t.timezone != null ? String(t.timezone) : '',\n  nb_articles: t.nb_articles != null && t.nb_articles !== '' ? Number(t.nb_articles) : null,\n  tone: t.tone != null ? String(t.tone) : '',\n  format: t.format != null ? String(t.format) : ''\n} }];"
+      }
+    },
+    {
+      "id": "5887ca70-2cea-44e6-a47d-e29d13598d7e",
+      "name": "Authenticated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        608
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.authenticated }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "0604236c-23db-4b8e-a04d-cbdbef214402",
+      "name": "Profile Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        416
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "renameOutput": true,
+              "outputKey": "get_profile",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "get_profile"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "renameOutput": true,
+              "outputKey": "set_interests",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "set_interests"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "renameOutput": true,
+              "outputKey": "set_schedule",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "set_schedule"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "renameOutput": true,
+              "outputKey": "unsubscribe",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "unsubscribe"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "renameOutput": true,
+              "outputKey": "resubscribe",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "resubscribe"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "renameOutput": true,
+              "outputKey": "send_newsletter",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "send_newsletter"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "renameOutput": true,
+              "outputKey": "set_preferences",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "set_preferences"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "unknown"
+        }
+      }
+    },
+    {
+      "id": "2ee0f945-23c1-45eb-bc6a-d94b85f2ec47",
+      "name": "Get User",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      }
+    },
+    {
+      "id": "f8232a7f-ce4e-4b06-856e-d25b3417f71d",
+      "name": "Reply Profile",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "result",
+              "value": "=Voici vos reglages actuels — interets: {{ $json.interests || 'non definis' }} ; heure d'envoi: {{ $json.send_hour != null ? $json.send_hour + 'h' : 'non definie' }} ; fuseau: {{ $json.timezone || 'non defini' }} ; articles par newsletter: {{ $json.nb_articles != null && $json.nb_articles !== '' ? $json.nb_articles : 'defaut (6)' }} ; ton: {{ $json.tone || 'par defaut' }} ; format: {{ $json.format || 'par defaut' }} ; statut: {{ $json.status }}.",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d96bf5a9-2e1c-4ebd-aca2-7f2bf823cbc3",
+      "name": "Update Interests",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        192
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "interests": "={{ $json.interests }}"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "interests",
+              "displayName": "interests",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dfd582fb-950b-41d4-a48c-ac096ae47f0e",
+      "name": "Reply Interests",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        192
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "result",
+              "value": "=Vos centres d'interet ont ete enregistres: {{ $('Check Auth').first().json.interests }}.",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6fc02f2b-1e8a-4dce-a559-93236ab5fa1b",
+      "name": "Update Schedule",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        384
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "send_hour": "={{ $json.send_hour }}",
+            "timezone": "={{ $json.timezone }}"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "send_hour",
+              "displayName": "send_hour",
+              "type": "number",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "timezone",
+              "displayName": "timezone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "44a01e18-74e3-4199-9b9f-bf3f5e6bc126",
+      "name": "Reply Schedule",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        384
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "result",
+              "value": "=Votre creneau d'envoi a ete enregistre: {{ $('Check Auth').first().json.send_hour }}h ({{ $('Check Auth').first().json.timezone || 'fuseau par defaut' }}).",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d65d559f-0212-4543-bff1-0be5037c88f2",
+      "name": "Unsubscribe User",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        576
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "unsubscribed"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "46295cb5-13d2-4e0e-bea9-2e33b2e86232",
+      "name": "Reply Unsub",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        576
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "result",
+              "value": "Vous etes desabonne. Vos newsletters sont stoppees. Dites resabonne-moi pour reactiver.",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a3fa8818-8956-41a3-92ba-f3911cb1e1aa",
+      "name": "Resubscribe User",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        768
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "active"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "16f6c904-17f7-49a5-806f-93b3d487cc91",
+      "name": "Reply Resub",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        768
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "result",
+              "value": "Vous etes de nouveau abonne. Vos newsletters reprendront a votre horaire habituel.",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b9471380-c18d-4185-9ae5-5dbae38e5e69",
+      "name": "Get User For NL",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        960
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      }
+    },
+    {
+      "id": "8dcac099-cea2-4fb9-97a9-c4d6c35c615d",
+      "name": "Call Newsletter Builder",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1344,
+        960
+      ],
+      "parameters": {
+        "source": "database",
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "apUZ1MEvsrSFbCZV"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $json.email }}",
+            "format": "={{ $json.format }}",
+            "interests": "={{ $json.interests }}",
+            "nb_articles": "={{ $json.nb_articles }}",
+            "tone": "={{ $json.tone }}",
+            "unsubscribe_token": "={{ $json.unsubscribe_token }}"
+          },
+          "schema": [
+            {
+              "canBeUsedToMatch": false,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "email",
+              "id": "email",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": false,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "interests",
+              "id": "interests",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": false,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "unsubscribe_token",
+              "id": "unsubscribe_token",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": false,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "nb_articles",
+              "id": "nb_articles",
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": false,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "tone",
+              "id": "tone",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": false,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "format",
+              "id": "format",
+              "required": false,
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "554861df-89ea-40cc-ab11-f5f175a90be8",
+      "name": "Reply Newsletter Sent",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        960
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "result",
+              "value": "Votre newsletter vient d etre generee et envoyee a votre adresse email. Verifiez votre boite (et les spams).",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "48bd5ccf-3238-4716-90b4-1414fff4f1e0",
+      "name": "Reply Not Auth",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        736
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "not_authenticated",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "result",
+              "value": "Action impossible: utilisateur non authentifie. Demande-lui de se connecter (email + code) avant toute action.",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0e4ef127-9b31-4e50-937b-408fa3c90cd2",
+      "name": "Get User Prefs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        1152
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      }
+    },
+    {
+      "id": "0d18d9a7-a939-472f-a82a-9afabf6072c7",
+      "name": "Build Prefs Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        1152
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const cur = $input.first() ? $input.first().json : {};\nconst req = $('Check Auth').first().json;\nconst email = String(req.email || '');\nlet nbFinal;\nif (req.nb_articles != null && !isNaN(Number(req.nb_articles))) { nbFinal = Number(req.nb_articles); }\nelse if (cur.nb_articles != null && cur.nb_articles !== '' && !isNaN(Number(cur.nb_articles))) { nbFinal = Number(cur.nb_articles); }\nelse { nbFinal = 6; }\nif (nbFinal < 1) { nbFinal = 1; }\nif (nbFinal > 10) { nbFinal = 10; }\nconst reqTone = String(req.tone || '').trim();\nconst toneFinal = reqTone ? reqTone : String(cur.tone || '');\nconst reqFmt = String(req.format || '').trim();\nconst fmtFinal = reqFmt ? reqFmt : String(cur.format || '');\nreturn [{ json: { email: email, nb_articles: nbFinal, tone: toneFinal, format: fmtFinal } }];"
+      }
+    },
+    {
+      "id": "2da7821e-f218-4a0c-8c34-79f04611bcac",
+      "name": "Update Preferences",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        1152
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "cOrEEDTlwwvn9wAb"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nb_articles": "={{ $json.nb_articles }}",
+            "tone": "={{ $json.tone }}",
+            "format": "={{ $json.format }}"
+          },
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nb_articles",
+              "displayName": "nb_articles",
+              "type": "number",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "tone",
+              "displayName": "tone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "format",
+              "displayName": "format",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "11f1f2ef-2c86-4a40-aa53-c37dc080e327",
+      "name": "Reply Preferences",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1792,
+        1152
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "result",
+              "value": "=Vos preferences ont ete enregistrees — articles par newsletter: {{ $('Build Prefs Update').first().json.nb_articles }} ; ton: {{ $('Build Prefs Update').first().json.tone || 'par defaut' }} ; format: {{ $('Build Prefs Update').first().json.format || 'par defaut' }}.",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

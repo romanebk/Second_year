@@ -1,0 +1,16 @@
+; ---------------
+; - example . bde -
+; ---------------
+push int 32 33
+push int 32 42
+add
+display ; probably 75
+push float 32 44.55
+mul
+display ; something like 3341.25
+push float 64 42.5
+push int 32 42
+pop
+display ; logically 42.5
+assert float 64 42.5
+exit

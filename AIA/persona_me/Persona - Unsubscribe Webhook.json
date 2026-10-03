@@ -1,0 +1,94 @@
+{
+  "name": "Persona - Unsubscribe Webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "unsubscribe",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -960,
+        -16
+      ],
+      "id": "unsub-webhook-0000-0000-000000000001",
+      "name": "Webhook",
+      "webhookId": "unsubscribe"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\n\nconst PREFS_FILE = '/home/node/.n8n/preferences.json';\n\nfunction loadJSON(filePath, defaultData) {\n  try {\n    if (fs.existsSync(filePath)) {\n      return JSON.parse(fs.readFileSync(filePath, 'utf8'));\n    }\n  } catch(e) {}\n  return defaultData;\n}\n\nfunction saveJSON(filePath, data) {\n  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));\n}\n\nconst userId = $input.first().json.query.userId;\n\nif (!userId) {\n  return [{ json: { status: 'error', message: 'Param\u00e8tre userId manquant' } }];\n}\n\nconst data = loadJSON(PREFS_FILE, { preferences: [] });\nconst pref = data.preferences.find(p => p.userId === userId);\n\nif (!pref) {\n  return [{ json: { status: 'not_found', message: 'Utilisateur inconnu' } }];\n}\n\npref.active = false;\nsaveJSON(PREFS_FILE, data);\n\nreturn [{\n  json: {\n    status: 'unsubscribed',\n    html: `<html><body style=\"font-family: Arial, sans-serif; text-align: center; padding: 50px;\">\n      <h1 style=\"color: #28a745;\">✓ D\u00e9sinscription r\u00e9ussie</h1>\n      <p>Vous ne recevrez plus de newsletters Persona.</p>\n      <p style=\"color: #6c757d; font-size: 12px;\">Vous pouvez vous r\u00e9abonner \u00e0 tout moment depuis le chatbot.</p>\n    </body></html>`\n  }\n}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        -16
+      ],
+      "id": "unsub-code-0000-0000-000000000002",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        -16
+      ],
+      "id": "unsub-respond-0000-0000-000000000003",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "576f288cb85a056d0d519250fad77e568c2f5ef65d15c9a46b6b9a99c015c79d"
+  },
+  "nodeGroups": [],
+  "id": "unsub-workflow-id-000000000001",
+  "tags": []
+}

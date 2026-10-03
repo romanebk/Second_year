@@ -1,0 +1,24 @@
+# Executable
+raytracer
+
+# Object files
+*.o
+src/**/*.o
+
+# Temporary files
+*~
+*#
+src/**/*~
+src/**/*#
+
+# IDE files
+.vscode/
+*.swp
+*.swo
+
+# Build directories
+build/
+dist/
+
+# Output files
+*.ppm

@@ -1,0 +1,20 @@
+ZAPPY
+
+Zappy est un jeu reseau ou plusieurs equipes s'affrontent sur une carte
+remplie de ressources. L'objectif : faire atteindre le niveau d'elevation
+maximal a au moins six joueurs de la meme equipe.
+
+Le monde, nomme Trantor, est une planete plate qui boucle sur elle-meme :
+sortir d'un cote de la carte fait reapparaitre de l'autre.
+
+Les habitants, appeles Trantoriens, sont pacifiques. Ils passent leur temps
+a se nourrir et a rechercher six types de pierres : linemate, deraumere,
+sibur, mendiane, phiras et thystame.
+
+En combinant les bonnes quantites de pierres et le bon nombre de joueurs
+du meme niveau sur une meme case, un rituel d'elevation peut etre lance
+pour faire progresser tout le groupe vers le niveau superieur.
+
+Ce projet a ete realise dans le cadre du cursus Epitech et se compose de
+trois programmes : un serveur, un client IA autonome, et cette interface
+graphique permettant d'observer la partie en temps reel.

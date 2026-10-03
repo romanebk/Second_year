@@ -1,0 +1,451 @@
+{
+  "name": "Persona - Auth v2",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {},
+        "webhookId": "ac45f651-092c-4942-a8f0-bfcd2f4e2265"
+      },
+      "id": "c8100f40",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -4480,
+        240
+      ],
+      "webhookId": "d8ae02cb-fd2c-4504-b444-30ae47ff2114"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "0-0",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "login",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            },
+            {
+              "id": "0-1",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "register",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ]
+        },
+        "combineOperation": "or"
+      },
+      "id": "73da30b2",
+      "name": "Login Attempt",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -4128,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { DatabaseSync } = require('node:sqlite');\nconst crypto = require('crypto');\nconst fs = require('fs');\n\nconst input = $input.first().json;\nconst message = (input.message || '').trim();\n\n// Support both formats: \"command, param1, param2\" and \"command param1, param2\"\nconst commaParts = message.split(',').map(p => p.trim());\nconst firstWord = commaParts[0].split(' ')[0].toLowerCase();\nconst restOfFirst = commaParts[0].split(' ').slice(1).join(' ');\n\nconst action = firstWord;\nconst username = commaParts[1] || restOfFirst || '';\nconst password = commaParts[2] || '';\nconst email = commaParts[3] || '';\n\nconst result = {\n  chatInput: message,\n  userId: input.userId || '',\n  sessionId: input.sessionId || '',\n  authResult: null,\n  authMessage: '',\n  authData: null\n};\n\nif (!['login', 'register'].includes(action) || !username) {\n  return [{ json: result }];\n}\n\ntry {\n  const db = new DatabaseSync('/home/node/.n8n/auth.db');\n  const user = db.prepare('SELECT * FROM users WHERE LOWER(username) = LOWER(?)').get(username);\n\n  if (action === 'login') {\n    if (!user) {\n      result.authResult = 'user_not_found';\n      result.authMessage = \"L'utilisateur \" + username + \" n'existe pas.\";\n    } else if (!user.active) {\n      result.authResult = 'account_disabled';\n      result.authMessage = 'Compte désactivé.';\n    } else {\n      const pwHash = crypto.createHash('sha256').update((password || '').trim()).digest('hex');\n      if (user.password === pwHash) {\n        result.authResult = 'login_ok';\n        result.authMessage = 'Connexion réussie !';\n        result.authData = { id: user.id, username: user.username, email: user.email };\n      } else {\n        result.authResult = 'wrong_password';\n        result.authMessage = 'Mot de passe incorrect.';\n      }\n    }\n  }\n\n  if (action === 'register') {\n    if (user) {\n      result.authResult = 'user_exists';\n      result.authMessage = \"Nom d'utilisateur déjà pris.\";\n    } else if (!email || !password || password.length < 6) {\n      result.authResult = 'missing_fields';\n      result.authMessage = 'Email et mot de passe (6+ car.) requis.';\n    } else {\n      const id = crypto.randomUUID();\n      const now = new Date().toISOString();\n      const pwHash = crypto.createHash('sha256').update(password.trim()).digest('hex');\n      db.prepare(\"INSERT INTO users (id, username, email, password, token, createdAt, gdpr_consent, active) VALUES (?, ?, ?, ?, ?, ?, 1, 1)\").run(id, username, email, pwHash, null, now);\n      \n      try {\n        const usersFile = '/home/node/.n8n/users.json';\n        let usersData = { users: [] };\n        if (fs.existsSync(usersFile)) usersData = JSON.parse(fs.readFileSync(usersFile, 'utf8'));\n        usersData.users.push({ id, username, email, password: pwHash, createdAt: now, gdpr_consent: 1, active: true });\n        fs.writeFileSync(usersFile, JSON.stringify(usersData, null, 2));\n      } catch(e) {}\n      \n      result.authResult = 'register_ok';\n      result.authMessage = 'Compte créé avec succès !';\n      result.authData = { id, username, email };\n    }\n  }\n} catch(e) {\n  result.authResult = 'error';\n  result.authMessage = 'Erreur technique: ' + e.message;\n}\n\nreturn [{ json: result }];"
+      },
+      "id": "74307100",
+      "name": "Hash & Lookup",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3760,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Tu es l'assistant de Persona, un agrégateur de news personnalisé.\n\nLANGUE : réponds TOUJOURS dans la même langue que l'utilisateur.\n\nRÈGLES :\n- Ne mentionne JAMAIS les outils, JSON ou détails techniques\n- N'invente JAMAIS un résultat\n- Réponds de manière naturelle et conversationnelle\n\nL'utilisateur peut être en train de :\n1. Se connecter ou s'inscrire (authentification)\n2. Parler normalement\n3. Se désabonner\n\nLe champ authResult contient le résultat de l'authentification :\n- authResult = 'login_ok' : connexion réussie, accueille l'utilisateur\n- authResult = 'register_ok' : inscription réussie, félicite et demande les centres d'intérêt\n- authResult = 'user_not_found' : utilisateur inconnu, propose de créer un compte\n- authResult = 'wrong_password' : mot de passe invalide\n- authResult = 'user_exists' : nom déjà pris\n- authResult = 'account_disabled' : compte désactivé\n- authResult = null : conversation normale\n\nSi l'utilisateur demande à se désabonner, réponds que c'est pris en charge.\n\nPour les utilisateurs connectés, salue-les par leur nom (authData.username).\n\nAPRÈS UNE INSCRIPTION RÉUSSIE, demande les centres d'intérêt de l'utilisateur : Technologie, Intelligence Artificielle, Science, Santé, Business, Sport, Divertissement, Politique, Environnement.",
+          "maxIterations": 10,
+          "returnIntermediateSteps": false
+        }
+      },
+      "id": "53b650fc",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -3408,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "model": "open-mistral-nemo",
+        "options": {}
+      },
+      "id": "785152c0",
+      "name": "Mistral Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        -3840,
+        832
+      ],
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "b1pocBNcbkAwbRfK",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "96cf37c1",
+      "name": "Window Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -3392,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "outputs": [
+          "registration",
+          "unsubscribe",
+          "general"
+        ],
+        "dataType": 5,
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "0-0",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              },
+              "singleValue": "inscri"
+            },
+            {
+              "id": "0-1",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              },
+              "singleValue": "register"
+            },
+            {
+              "id": "0-2",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              },
+              "singleValue": "compte cr"
+            }
+          ]
+        }
+      },
+      "id": "96111bb3",
+      "name": "Keyword Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -3040,
+        240
+      ],
+      "outputs": [
+        "registration",
+        "unsubscribe",
+        "general"
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst message = input.output || input.message?.content || 'Bienvenue !';\nreturn [{ json: { response: message } }];"
+      },
+      "id": "2a5e6419",
+      "name": "Registration Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2688,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c80915d8",
+      "name": "Respond Saved",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { DatabaseSync } = require('node:sqlite');\nconst fs = require('fs');\n\nconst input = $input.first().json;\nconst userId = input.authData?.id || input.userId || '';\n\nif (userId) {\n  try {\n    const db = new DatabaseSync('/home/node/.n8n/auth.db');\n    db.prepare('UPDATE users SET active = 0 WHERE id = ?').run(userId);\n  } catch(e) {}\n  try {\n    const prefsFile = '/home/node/.n8n/preferences.json';\n    if (fs.existsSync(prefsFile)) {\n      let data = JSON.parse(fs.readFileSync(prefsFile, 'utf8'));\n      const pref = data.preferences?.find(p => p.userId === userId);\n      if (pref) pref.active = false;\n      fs.writeFileSync(prefsFile, JSON.stringify(data, null, 2));\n    }\n  } catch(e) {}\n}\n\nconst html = '<html><body style=\"font-family: Arial;text-align:center;padding:50px\"><h1 style=\"color:#28a745;\">✓ Désinscription réussie</h1><p>Vous ne recevrez plus de newsletters.</p></body></html>';\nreturn [{ json: { html, response: html } }];"
+      },
+      "id": "f3e23924",
+      "name": "Unsubscribe Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2688,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "6c6cdd1f",
+      "name": "Respond Unsubscribed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst response = input.output || input.message?.content || '';\nreturn [{ json: { response } }];"
+      },
+      "id": "18c10912",
+      "name": "General Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2688,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a166567b",
+      "name": "Respond AI",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst message = item.message || '';\nconst cats = ['technologie','ia','intelligence artificielle','science','sante','santé','business','sport','divertissement','politique','environnement'];\nconst lower = message.toLowerCase();\nconst sessionId = item.sessionId || '';\nconst interests = cats.filter(c => lower.includes(c));\nif (interests.length > 0 && sessionId) {\n  try {\n    const fs = require('fs');\n    const pFile = '/home/node/.n8n/preferences.json';\n    let prefs = { preferences: [] };\n    if (fs.existsSync(pFile)) prefs = JSON.parse(fs.readFileSync(pFile, 'utf8'));\n    prefs.preferences.push({ userId: sessionId, interests, updatedAt: new Date().toISOString() });\n    fs.writeFileSync(pFile, JSON.stringify(prefs, null, 2));\n  } catch(e) {}\n}\nreturn [{json: {...item, chatInput: message}}];"
+      },
+      "name": "Map to chatInput",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        -3800,
+        240
+      ],
+      "id": "35d45a3a-3b43-4dab-95ca-6529d9a6c476"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nreturn [{ json: { output: input.output || '' } }];"
+      },
+      "name": "Save Preferences",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        -3980,
+        600
+      ],
+      "id": "2ba9a62e-cd92-4d09-9080-add887c9c8e1"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Login Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Login Attempt": {
+      "main": [
+        [
+          {
+            "node": "Hash & Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Map to chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hash & Lookup": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Save Preferences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Router": {
+      "main": [
+        [
+          {
+            "node": "Registration Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsubscribe Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "General Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registration Handler": {
+      "main": [
+        [
+          {
+            "node": "Respond Saved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsubscribe Handler": {
+      "main": [
+        [
+          {
+            "node": "Respond Unsubscribed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "General Handler": {
+      "main": [
+        [
+          {
+            "node": "Respond AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map to chatInput": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Preferences": {
+      "main": [
+        [
+          {
+            "node": "Keyword Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "984cbdcb-3b2d-47be-8fe1-ea900362e6f3"
+}

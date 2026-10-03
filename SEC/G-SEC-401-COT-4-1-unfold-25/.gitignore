@@ -1,0 +1,9 @@
+*.pdf
+venv_of_me/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+build/

@@ -1,0 +1,36 @@
+Étape 1 — Fenêtre SFML + contexte OpenGL 3.3
+          sf::ContextSettings + glewInit()
+
+Étape 2 — Shaders
+          tile.vert  → positionne les tuiles via MVP
+          tile.frag  → colorie selon les ressources
+
+Étape 3 — Géométrie d'une tuile
+          un carré plat = 2 triangles = 6 vertices
+          stocké dans VAO/VBO envoyé au GPU une seule fois
+
+Étape 4 — Grille de N×M tuiles
+          boucle sur state.mapWidth × state.mapHeight
+          pour chaque tuile → matrix model translate(x, 0, y)
+          → shader dessine au bon endroit
+
+Étape 5 — Caméra libre
+          yaw + pitch + radius autour du centre de la map
+          clic droit = rotation
+          molette = zoom
+          getView() → glm::lookAt()
+          getProjection() → glm::perspective()
+
+Étape 6 — Couleur selon ressources
+          tile vide    → sable #C8A040
+          food         → teinte verte
+          thystame     → teinte rouge (rare)
+          etc.
+
+Étape 7 — Joueurs
+          cube 3D au dessus de la tuile
+          couleur selon équipe (Empire=blanc, Rébellion=orange)
+
+Étape 8 — HUD SFML par dessus OpenGL
+          sf::Text pour les infos joueurs
+          minimap en coin

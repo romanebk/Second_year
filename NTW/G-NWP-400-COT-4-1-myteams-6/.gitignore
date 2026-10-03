@@ -1,0 +1,10 @@
+*.~
+*.#
+src/client/*.o
+src/client/*#
+src/client/*~
+src/server/*#
+src/server/*~
+src/server/*.o
+myteams_cli
+myteams_server

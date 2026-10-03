@@ -1,0 +1,45 @@
+{
+  "name": "Persona - Onboarding Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough",
+        "returnOutput": "allRuns"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -240,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\n\nconst PREFS_FILE = '/home/node/.n8n/preferences.json';\n\nfunction loadJSON(filePath, defaultData) {\n  if (!fs.existsSync(filePath)) {\n    fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2));\n    return defaultData;\n  }\n  return JSON.parse(fs.readFileSync(filePath, 'utf8'));\n}\n\nfunction saveJSON(filePath, data) {\n  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));\n}\n\nfunction isValidEmail(email) {\n  return /^[a-zA-Z0-9][a-zA-Z0-9._-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\\.[a-zA-Z]{2,}$/.test(email);\n}\n\nfunction containsGarbage(val) {\n  if (!val) return false;\n  if (val.includes('|')) return true;\n  if (val.includes(',')) return true;\n  if (/save_preferences|get_preferences|update_setting|unsubscribe/.test(val)) return true;\n  return false;\n}\n\nconst VALID_TOPICS = [\n  'tech', 'ai', 'science', 'sport', 'politique', 'economie', 'sante',\n  'culture', 'environnement', 'espace', 'startup', 'dev', 'securite',\n  'jeux-video', 'musique', 'cinema', 'education', 'international'\n];\n\nconst VALID_SOURCES = [\n  'techcrunch', 'bbc', 'the-verge', 'nasa', 'hacker-news',\n  'le-monde', 'wired', 'ars-technica', 'reuters', 'associated-press'\n];\n\nconst VALID_FREQUENCIES = ['daily', 'weekly', 'weekdays'];\n\nconst VALID_FORMATS = ['html', 'plaintext'];\n\nconst input = $input.first().json;\nconst rawQuery = (input.query || '').toString().split('|')[0];\nconst params = rawQuery.split(',').map(p => p.trim());\nconst action = params[0];\nconst userId = params[1];\n\nconst data = loadJSON(PREFS_FILE, { preferences: [] });\n\n// --- GET PREFERENCES ---\nif (action === 'get_preferences') {\n  if (!userId) return [{ json: { response: 'ERROR: userId required' } }];\n  const prefs = data.preferences.find(p => p.userId === userId);\n  if (!prefs) return [{ json: { response: 'NO_PREFERENCES', data: null } }];\n  return [{\n    json: {\n      response: 'FOUND',\n      data: {\n        topics: prefs.topics || [],\n        email: prefs.email || '',\n        scheduleTime: prefs.scheduleTime || '',\n        timezone: prefs.timezone || 'Africa/Porto-Novo',\n        articleCount: prefs.articleCount || 5,\n        frequency: prefs.frequency || 'daily',\n        sources: prefs.sources || [],\n        emailFormat: prefs.emailFormat || 'html',\n        customPrompt: prefs.customPrompt || '',\n        active: prefs.active !== false\n      }\n    }\n  }];\n}\n\n// --- SAVE CORE PREFERENCES ---\nif (action === 'save_preferences') {\n  const topics = params[2] ? params[2].split('|').map(t => t.trim().toLowerCase()).filter(t => t) : [];\n  const email = params[3];\n  const scheduleTime = params[4];\n  const timezone = params[5] || 'Africa/Porto-Novo';\n\n  if (!userId) return [{ json: { response: 'ERROR: userId required' } }];\n  if (!email || containsGarbage(email) || !isValidEmail(email)) return [{ json: { response: 'ERROR: valid email required (got: ' + (email || '') + ')' } }];\n  if (!scheduleTime || containsGarbage(scheduleTime) || !/^\\d{2}:\\d{2}$/.test(scheduleTime)) return [{ json: { response: 'ERROR: scheduleTime must be HH:MM (got: ' + (scheduleTime || '') + ')' } }];\n  if (topics.length === 0) return [{ json: { response: 'ERROR: at least one topic required. Valid topics: ' + VALID_TOPICS.join(', ') } }];\n\n  const existing = data.preferences.findIndex(p => p.userId === userId);\n  const entry = {\n    userId,\n    topics,\n    email: email.trim().toLowerCase(),\n    scheduleTime,\n    timezone,\n    articleCount: 5,\n    frequency: 'daily',\n    sources: [],\n    emailFormat: 'html',\n    customPrompt: '',\n    active: true,\n    updatedAt: new Date().toISOString()\n  };\n\n  if (existing >= 0) {\n    data.preferences[existing] = { ...data.preferences[existing], ...entry, createdAt: data.preferences[existing].createdAt };\n  } else {\n    entry.createdAt = new Date().toISOString();\n    data.preferences.push(entry);\n  }\n\n  saveJSON(PREFS_FILE, data);\n  return [{ json: { response: 'SUCCESS: Core preferences saved', data: entry } }];\n}\n\n// --- UPDATE INDIVIDUAL SETTING ---\nif (action === 'update_setting') {\n  const setting = params[2];\n  const value = params.slice(3).join(',');\n\n  if (!userId || !setting) return [{ json: { response: 'ERROR: userId and setting name required' } }];\n  if (containsGarbage(value)) return [{ json: { response: 'ERROR: value contains invalid characters (| or , or action keywords)' } }];\n\n  let existing = data.preferences.findIndex(p => p.userId === userId);\n  if (existing < 0) return [{ json: { response: 'ERROR: no preferences found. Save core prefs first.' } }];\n\n  const aliases = { heure: 'scheduleTime' };\n  const resolvedSetting = aliases[setting] || setting;\n\n  const validSettings = ['topics', 'email', 'scheduleTime', 'timezone', 'articleCount', 'frequency', 'sources', 'emailFormat', 'customPrompt'];\n\n  if (!validSettings.includes(resolvedSetting)) {\n    return [{ json: { response: 'ERROR: invalid setting. Valid: ' + validSettings.join(', ') + '. Aliases: heure=scheduleTime' } }];\n  }\n\n  let parsedValue = value;\n\n  if (resolvedSetting === 'topics' || resolvedSetting === 'sources') {\n    parsedValue = value.split('|').map(v => v.trim().toLowerCase()).filter(v => v);\n  }\n  if (resolvedSetting === 'articleCount') {\n    const n = parseInt(value);\n    if (isNaN(n) || n < 1 || n > 20) return [{ json: { response: 'ERROR: articleCount must be between 1 and 20' } }];\n    parsedValue = n;\n  }\n  if (resolvedSetting === 'frequency') {\n    if (!VALID_FREQUENCIES.includes(value.toLowerCase())) return [{ json: { response: 'ERROR: frequency must be daily, weekly, or weekdays' } }];\n    parsedValue = value.toLowerCase();\n  }\n  if (resolvedSetting === 'emailFormat') {\n    if (!VALID_FORMATS.includes(value.toLowerCase())) return [{ json: { response: 'ERROR: emailFormat must be html or plaintext' } }];\n    parsedValue = value.toLowerCase();\n  }\n  if (resolvedSetting === 'email') {\n    if (containsGarbage(value) || !isValidEmail(value)) return [{ json: { response: 'ERROR: valid email required' } }];\n    parsedValue = value.trim().toLowerCase();\n  }\n  if (resolvedSetting === 'scheduleTime') {\n    if (!/^\\d{2}:\\d{2}$/.test(value)) return [{ json: { response: 'ERROR: scheduleTime must be HH:MM' } }];\n    parsedValue = value;\n  }\n\n  data.preferences[existing][resolvedSetting] = parsedValue;\n  data.preferences[existing].updatedAt = new Date().toISOString();\n  saveJSON(PREFS_FILE, data);\n\n  return [{ json: { response: 'SUCCESS: ' + resolvedSetting + ' updated to ' + JSON.stringify(parsedValue) } }];\n}\n\n// --- UNSUBSCRIBE ---\nif (action === 'unsubscribe') {\n  if (!userId) return [{ json: { response: 'ERROR: userId required' } }];\n  const prefs = data.preferences.find(p => p.userId === userId);\n  if (prefs) {\n    prefs.active = false;\n    prefs.updatedAt = new Date().toISOString();\n    saveJSON(PREFS_FILE, data);\n  }\n  return [{ json: { response: 'SUCCESS: Unsubscribed' } }];\n}\n\nreturn [{ json: { response: 'ERROR: unknown action. Available: get_preferences, save_preferences, update_setting, unsubscribe' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        160
+      ],
+      "id": "23e84b0b-8572-48fc-92e0-dca65d37fefa",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
