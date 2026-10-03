@@ -1,0 +1,307 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CITOYEN
+  PROFESSIONNEL
+  REGIE
+  FORMATEUR
+  AUTORITE
+  ADMIN
+}
+
+enum SubscriptionPlan {
+  FREE
+  PREMIUM
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+model User {
+  id             String           @id @default(uuid())
+  fullName       String
+  email          String           @unique
+  phone          String?
+  city           String?
+  passwordHash   String?
+  role           UserRole         @default(CITOYEN)
+  subscription   SubscriptionPlan @default(FREE)
+  emailVerified  Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  refreshTokens  RefreshToken[]
+  enrollments    FormationEnrollment[]
+  payments       FormationPayment[]
+  badges         FormationBadge[]
+  oauthAccounts  OAuthAccount[]
+  oauthExchanges OAuthExchange[]
+  forfait        UserSubscription?
+}
+
+// Forfaits AANID (Amateur / Professionnel / Régie) — module beni-momo-adnan
+model UserSubscription {
+  userId      String   @id
+  plan        String
+  activatedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model OAuthAccount {
+  id             String   @id @default(uuid())
+  provider       String
+  providerUserId String
+  userId         String
+  email          String?
+  avatarUrl      String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([provider, providerUserId])
+  @@unique([provider, userId])
+}
+
+model OAuthAttempt {
+  id           String   @id @default(uuid())
+  stateHash    String   @unique
+  provider     String
+  codeVerifier String?
+  redirectUri  String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+}
+
+model OAuthExchange {
+  id        String   @id @default(uuid())
+  codeHash  String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+enum FormationCategory {
+  PANNEAUTIQUE
+  ENVIRONNEMENT
+  SANTE
+  INFRASTRUCTURE
+}
+
+model Formation {
+  id            String              @id
+  title         String
+  description   String
+  category      FormationCategory
+  imageUrl      String?
+  duration      String?
+  capacity      Int                 @default(50)
+  enrolledCount Int                 @default(0)
+  price         Float               @default(0)
+  currency      String              @default("XOF")
+  isFree        Boolean             @default(true)
+  version       String?
+  pdfUrl        String?
+  modules       Json
+  paymentPlan   Json?
+  createdAt     DateTime            @default(now())
+  enrollments   FormationEnrollment[]
+  payments      FormationPayment[]
+  badges        FormationBadge[]
+}
+
+model FormationEnrollment {
+  id               String    @id @default(uuid())
+  userId           String
+  formationId      String
+  modulesCompleted Json      @default("[]")
+  enrolledAt       DateTime  @default(now())
+  completedAt      DateTime?
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formation        Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, formationId])
+}
+
+model FormationPayment {
+  id          String    @id @default(uuid())
+  userId      String
+  formationId String
+  phone       String?
+  amount      Float
+  currency    String    @default("XOF")
+  provider    String    @default("simulation")
+  tranche     String?
+  paidAt      DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formation   Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+
+  // Une même tranche ne peut être payée qu'une fois par utilisateur
+  @@unique([userId, formationId, tranche])
+  @@index([userId, formationId])
+}
+
+model FormationBadge {
+  id             String    @id @default(uuid())
+  userId         String
+  formationId    String
+  formationTitle String
+  type           String    @default("completion")
+  label          String
+  earnedAt       DateTime  @default(now())
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formation      Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+}
+
+model Ville {
+  id            String @id
+  nom           String
+  pays          String
+  region        String?
+  lat           Float
+  lng           Float
+  description   String?
+  population    Int?
+  superficie    Int?
+  couleur       String?
+  favorisCount  Int    @default(0)
+  rubriques     Json?
+  stats         Json?
+}
+
+enum SignalementType {
+  DEGRADE
+  OBSOLETE
+  DANGEREUX
+  ILLEGAL
+  TRAVAUX
+  BON_ETAT
+}
+
+enum SignalementStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+  RESOLVED
+}
+
+model Signalement {
+  id          String            @id
+  type        SignalementType
+  description String
+  lat         Float
+  lng         Float
+  imageUrl    String?
+  status      SignalementStatus @default(PENDING)
+  votesCount  Int               @default(0)
+  villeId     String?
+  createdAt   DateTime          @default(now())
+}
+
+enum PanelType {
+  CLASSIQUE
+  DIGITAL
+  ABRIBUS
+  TOTEM
+  AUTRE
+}
+
+enum PanelStatus {
+  DISPONIBLE
+  LOUE
+  MAINTENANCE
+}
+
+model Panneau {
+  id        String      @id
+  type      PanelType
+  format    String      @default("4x3")
+  regime    String      @default("prive")
+  etat      PanelStatus @default(DISPONIBLE)
+  lat       Float
+  lng       Float
+  price     Float?
+  imageUrl  String?
+  villeId   String?
+  createdAt DateTime    @default(now())
+}
+
+model Zone {
+  id       String @id
+  name     String
+  type     String @default("commerciale")
+  boundary Json
+  villeId  String?
+}
+
+model Post {
+  id       String   @id
+  author   String
+  avatar   String?
+  time     String?
+  location String?
+  text     String
+  image    String?
+  likes    Int      @default(0)
+  comments Json     @default("[]")
+  shares   Int      @default(0)
+  theme    String?
+  ville    String?
+  createdAt DateTime @default(now())
+}
+
+// Signalements du module États des Lieux (bryan-fanou) — taxonomie propre au module
+model EtatSignalement {
+  id          String   @id
+  titre       String
+  zone        String
+  categorie   String
+  description String   @default("")
+  type        String?
+  statut      String   @default("Nouveau")
+  createdAt   DateTime @default(now())
+}
+
+model ConsultationRequest {
+  id          String   @id
+  serviceType String
+  clientType  String
+  ville       String
+  description String
+  budget      String?
+  email       String
+  telephone   String
+  status      String   @default("en_attente")
+  createdAt   DateTime @default(now())
+}

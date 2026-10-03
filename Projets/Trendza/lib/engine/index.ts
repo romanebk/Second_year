@@ -1,0 +1,17 @@
+export * from "./types";
+export * from "./errors";
+export { runAnalysis } from "./pipeline";
+export { computeFinancial, defaultFinancialInput } from "./financial";
+export { buildSeasonality, COMMERCIAL_EVENTS } from "./seasonality";
+export { compareSuppliers } from "./suppliers";
+export { predict } from "./prediction";
+export { analyzeCompetition } from "./competition";
+export { analyzeMarket, scoreCountry } from "./market";
+export { buildAlerts } from "./alerts";
+export { buildRecommendation, marketComparisonProse, scoreWhyText } from "./nlg";
+export { collectSignals, ALL_SOURCES } from "./sources";
+export { SOURCES } from "./sources/registry";
+export { parseIntent, answerQuestion } from "./chat";
+export { buildDashboardInsights, type DashboardInsights } from "./dashboard";
+export { TtlCache } from "./cache";
+export { countryFactors, COUNTRY_FACTORS } from "./country-data";

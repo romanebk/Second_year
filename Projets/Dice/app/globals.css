@@ -1,0 +1,255 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   THEME TOKENS
+   Light = "Pop Désir"  ·  Dark = "Néon Noir"
+   ============================================ */
+
+:root,
+[data-theme="light"] {
+  --bg: 253 243 231;          /* cream */
+  --surface: 255 255 255;
+  --ink: 26 5 16;             /* deep ink */
+  --muted: 90 21 53;          /* plum */
+  --accent: 255 61 139;       /* hot pink */
+  --accent2: 232 90 60;       /* terracotta */
+  --warm: 232 184 53;         /* mustard */
+  --border: 26 5 16;
+}
+
+[data-theme="dark"] {
+  --bg: 5 5 7;                /* neon bg */
+  --surface: 20 20 26;
+  --ink: 240 238 232;         /* bone */
+  --muted: 0 184 196;         /* dim cyan */
+  --accent: 255 0 122;        /* neon pink */
+  --accent2: 0 240 255;       /* neon cyan */
+  --warm: 212 255 0;          /* acid */
+  --border: 255 0 122;
+}
+
+/* Auto fallback if no data-theme set */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: 5 5 7;
+    --surface: 20 20 26;
+    --ink: 240 238 232;
+    --muted: 0 184 196;
+    --accent: 255 0 122;
+    --accent2: 0 240 255;
+    --warm: 212 255 0;
+    --border: 255 0 122;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  min-height: 100vh;
+  overscroll-behavior: none;
+}
+
+body {
+  background:
+    radial-gradient(circle 800px at 90% 10%, rgb(var(--warm) / 0.35) 0%, transparent 60%),
+    radial-gradient(circle 700px at 10% 90%, rgb(var(--accent) / 0.18) 0%, transparent 60%),
+    rgb(var(--bg));
+  background-attachment: fixed;
+  transition: background 0.6s ease, color 0.4s ease;
+}
+
+[data-theme="dark"] body {
+  background:
+    radial-gradient(circle 800px at 90% 10%, rgb(var(--accent) / 0.18) 0%, transparent 60%),
+    radial-gradient(circle 700px at 10% 90%, rgb(var(--accent2) / 0.1) 0%, transparent 60%),
+    rgb(var(--bg));
+  background-attachment: fixed;
+}
+
+/* subtle dotted texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgb(var(--ink) / 0.04) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+[data-theme="dark"] body::before {
+  background-image: radial-gradient(circle at 1px 1px, rgb(var(--accent) / 0.06) 1px, transparent 1px);
+}
+
+/* ============================================
+   COMPONENT STYLES
+   ============================================ */
+
+@layer components {
+
+  /* === BUTTONS === */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 cursor-pointer
+      font-body font-bold transition-all duration-150 select-none
+      border-2 border-ink text-base px-6 py-3 rounded-full
+      shadow-pop hover:-translate-y-0.5 hover:-translate-x-0.5
+      hover:shadow-pop-lg active:translate-y-1 active:translate-x-1 active:shadow-none;
+  }
+
+  [data-theme="dark"] .btn {
+    @apply rounded border-accent shadow-neon font-unbounded font-black tracking-wider;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-white;
+  }
+  [data-theme="dark"] .btn-primary {
+    @apply bg-accent text-bg shadow-neon;
+  }
+
+  .btn-secondary {
+    @apply btn bg-surface text-ink;
+  }
+  [data-theme="dark"] .btn-secondary {
+    @apply bg-transparent text-accent2 border-accent2;
+    box-shadow: 0 0 15px rgb(var(--accent2) / 0.3);
+  }
+
+  .btn-dark {
+    @apply btn bg-ink text-bg;
+  }
+
+  /* === PILLS === */
+  .pill {
+    @apply inline-flex items-center gap-2 px-4 py-1.5
+      bg-ink text-bg rounded-full
+      text-xs font-semibold tracking-widest uppercase;
+  }
+  [data-theme="dark"] .pill {
+    @apply rounded-sm bg-accent text-bg font-unbounded font-black;
+    box-shadow: 0 0 20px rgb(var(--accent) / 0.6);
+  }
+
+  .pill-dot {
+    @apply w-2 h-2 rounded-full bg-accent animate-pulse-dot;
+  }
+  [data-theme="dark"] .pill-dot {
+    @apply bg-bg;
+  }
+
+  /* === CARDS === */
+  .card {
+    @apply bg-surface border-2 border-ink rounded-pop-lg shadow-pop-lg p-5;
+  }
+  [data-theme="dark"] .card {
+    @apply rounded border-accent shadow-neon;
+  }
+
+  /* === DISPLAY HEADINGS === */
+  .display {
+    font-family: var(--font-fraunces), Georgia, serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+  }
+  [data-theme="dark"] .display {
+    font-family: var(--font-unbounded), sans-serif;
+    font-weight: 900;
+    font-variation-settings: normal;
+  }
+
+  .display em {
+    @apply text-accent not-italic;
+    font-style: italic;
+  }
+  [data-theme="dark"] .display em {
+    font-style: normal;
+    text-shadow: 0 0 20px rgb(var(--accent));
+  }
+
+  .display .pop {
+    color: rgb(var(--accent2));
+    font-family: var(--font-bagel), cursive;
+    font-style: normal;
+    font-weight: normal;
+    font-variation-settings: normal;
+  }
+  [data-theme="dark"] .display .pop {
+    font-family: var(--font-unbounded), sans-serif;
+    text-shadow: 0 0 20px rgb(var(--accent2));
+  }
+
+  /* === STAMP / RIBBON === */
+  .stamp {
+    @apply inline-block bg-accent text-white border-2 border-ink
+      rounded-full px-3 py-1 text-xs font-fat;
+    box-shadow: 2px 2px 0 rgb(var(--ink));
+    transform: rotate(-3deg);
+  }
+  [data-theme="dark"] .stamp {
+    @apply rounded-sm font-unbounded font-black;
+    transform: none;
+    box-shadow: 0 0 20px rgb(var(--accent) / 0.6);
+  }
+
+  /* === INPUT === */
+  .player-input {
+    @apply bg-surface border-2 border-ink rounded-pop-lg p-4 shadow-pop block w-full;
+  }
+  [data-theme="dark"] .player-input {
+    @apply rounded border-accent;
+    box-shadow: 0 0 20px rgb(var(--accent) / 0.3);
+  }
+
+  .player-input label {
+    @apply block text-[0.65rem] font-bold uppercase tracking-widest;
+    color: rgb(var(--accent2));
+  }
+  [data-theme="dark"] .player-input label {
+    @apply font-mono;
+    color: rgb(var(--accent2));
+  }
+
+  .player-input input {
+    @apply bg-transparent border-0 text-ink w-full outline-none mt-1;
+    font-family: var(--font-fraunces), Georgia, serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+  }
+  [data-theme="dark"] .player-input input {
+    font-family: var(--font-unbounded), sans-serif;
+    font-weight: 700;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .glow {
+    text-shadow: 0 0 20px rgb(var(--accent));
+  }
+  .glow-cyan {
+    text-shadow: 0 0 20px rgb(var(--accent2));
+  }
+  .underline-mustard {
+    background: rgb(var(--warm));
+    padding: 0 6px;
+    border-radius: 4px;
+    color: rgb(var(--ink));
+    font-style: normal;
+  }
+  [data-theme="dark"] .underline-mustard {
+    background: transparent;
+    color: rgb(var(--accent2));
+    text-shadow: 0 0 10px rgb(var(--accent2));
+    padding: 0;
+  }
+}

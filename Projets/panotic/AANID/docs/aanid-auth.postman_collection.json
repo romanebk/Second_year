@@ -1,0 +1,522 @@
+{
+  "info": {
+    "name": "AANID — Authentification & Profil (Partie 8)",
+    "description": "Collection Postman complète pour tester l'API Auth & Profil de Will-David.\n\n**Ordre de test recommandé :**\n1. Register → 2. Verify Email (token dans les logs dev) → 3. Login → 4. Get Profile → 5. Update Profile → 6. Change Password → 7. Get Subscription → 8. Refresh Token → 9. Logout\n\n**Variables d'environnement à configurer :**\n- `base_url` : http://localhost:3000\n- `access_token` : rempli automatiquement après Login\n- `refresh_token` : rempli automatiquement après Login\n- `user_id` : rempli automatiquement après Login",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" },
+    { "key": "user_id", "value": "", "type": "string" },
+    { "key": "verify_token", "value": "", "type": "string" },
+    { "key": "reset_token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Santé",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health",
+            "description": "Vérifie que le serveur est opérationnel."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Service AANID', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('ok');",
+                  "  pm.expect(json.service).to.eql('aanid-auth');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Authentification",
+      "item": [
+        {
+          "name": "1. Inscription",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Kofi Mensah\",\n  \"email\": \"kofi@exemple.com\",\n  \"password\": \"TestAANID1!\",\n  \"role\": \"CITOYEN\"\n}"
+            },
+            "description": "Crée un nouveau compte. Regarder les logs du serveur en mode DEV pour récupérer le token de vérification email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('userId présent', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.userId).to.be.a('string');",
+                  "  pm.collectionVariables.set('user_id', json.userId);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Vérifier email (token depuis logs)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/verify-email/{{verify_token}}",
+            "description": "Copiez le token affiché dans les logs serveur (ligne [AANID:DEV] Verification token...) dans la variable de collection `verify_token`, puis envoyez."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Email vérifié', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.message).to.include('vérifié');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Connexion",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kofi@exemple.com\",\n  \"password\": \"TestAANID1!\"\n}"
+            },
+            "description": "Authentifie l'utilisateur. Capture automatiquement accessToken et refreshToken dans les variables de collection."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Tokens présents', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.accessToken).to.be.a('string');",
+                  "  pm.expect(json.refreshToken).to.be.a('string');",
+                  "  pm.expect(json.user).to.be.an('object');",
+                  "  pm.collectionVariables.set('access_token', json.accessToken);",
+                  "  pm.collectionVariables.set('refresh_token', json.refreshToken);",
+                  "  pm.collectionVariables.set('user_id', json.user.id);",
+                  "});",
+                  "pm.test('emailVerified true', () => {",
+                  "  pm.expect(pm.response.json().user.emailVerified).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Rafraîchir les tokens",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/refresh",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "description": "Renouvelle le couple de tokens. L'ancien refreshToken est invalidé (rotation). Les nouvelles valeurs sont capturées automatiquement."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Nouveaux tokens', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.accessToken).to.be.a('string');",
+                  "  pm.expect(json.refreshToken).to.be.a('string');",
+                  "  pm.collectionVariables.set('access_token', json.accessToken);",
+                  "  pm.collectionVariables.set('refresh_token', json.refreshToken);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Déconnexion",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/logout",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "description": "Invalide le refreshToken côté serveur et efface les variables de collection."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('access_token', '');",
+                  "pm.collectionVariables.set('refresh_token', '');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Renvoi vérification email",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/resend-verification",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kofi@exemple.com\"\n}"
+            },
+            "description": "Renvoie le lien de vérification. Toujours 200 même si l'email n'existe pas (anti-énumération)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Message générique', () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7. Mot de passe oublié",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/forgot-password",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kofi@exemple.com\"\n}"
+            },
+            "description": "Initie la réinitialisation. Regarder les logs serveur pour le reset_token."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "8. Réinitialiser mot de passe",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/reset-password",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{reset_token}}\",\n  \"newPassword\": \"NouveauMDP2@\"\n}"
+            },
+            "description": "Collez le token depuis les logs dans la variable `reset_token` avant d'envoyer."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Profil",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/profile",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "description": "Retourne le profil de l'utilisateur connecté."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Profil complet', () => {",
+                  "  const user = pm.response.json().user;",
+                  "  pm.expect(user.id).to.be.a('string');",
+                  "  pm.expect(user.fullName).to.be.a('string');",
+                  "  pm.expect(user.email).to.be.a('string');",
+                  "  pm.expect(user.passwordHash).to.be.undefined;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/profile",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Kofi Yaw Mensah\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Nom mis à jour', () => {",
+                  "  pm.expect(pm.response.json().user.fullName).to.eql('Kofi Yaw Mensah');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/profile/password",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"TestAANID1!\",\n  \"newPassword\": \"NouveauAANID2@\"\n}"
+            },
+            "description": "Invalide tous les refresh tokens actifs de l'utilisateur."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Subscription",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/profile/subscription",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Détails abonnement', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.subscription).to.be.a('string');",
+                  "  pm.expect(json.details.label).to.be.a('string');",
+                  "  pm.expect(json.details.features).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Subscription (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/profile/subscription",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"subscription\": \"PREMIUM\"\n}"
+            },
+            "description": "Requiert un access token avec role ADMIN. Retourne 403 sinon."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('403 si pas ADMIN', () => {",
+                  "  if (pm.response.code === 403) {",
+                  "    pm.expect(pm.response.json().error).to.include('droits insuffisants');",
+                  "  } else {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cas d'erreur",
+      "item": [
+        {
+          "name": "Login — email inexistant",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"inexistant@exemple.com\",\n  \"password\": \"TestAANID1!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Message générique (anti-énumération)', () => {",
+                  "  pm.expect(pm.response.json().error).to.eql('Identifiants incorrects');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register — mot de passe faible",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test User\",\n  \"email\": \"test2@exemple.com\",\n  \"password\": \"123456\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Message validation mot de passe', () => {",
+                  "  pm.expect(pm.response.json().error).to.include('mot de passe');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Accès protégé sans token",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/profile"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh — token invalide",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/refresh",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"token.invalide.ici\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register — email déjà utilisé",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Kofi Mensah\",\n  \"email\": \"kofi@exemple.com\",\n  \"password\": \"TestAANID1!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

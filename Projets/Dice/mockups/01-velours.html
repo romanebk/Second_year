@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposition 1 — Velours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cormorant+Infant:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --wine: #2a0612;
+    --wine-deep: #1a0309;
+    --burgundy: #4a0e1f;
+    --rose: #d4a5a5;
+    --blush: #f4d8d0;
+    --champagne: #e8d4a8;
+    --gold: #c9a661;
+    --gold-bright: #e8c87c;
+    --cream: #f5ebd6;
+    --ink: #1a0309;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--wine-deep);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* film grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.08;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  }
+
+  .label {
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    font-size: 0.7rem;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .display {
+    font-family: 'Italiana', serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 0.95;
+  }
+
+  .italic {
+    font-family: 'Cormorant Infant', serif;
+    font-style: italic;
+  }
+
+  /* ==== SECTION SHARED ==== */
+  section {
+    min-height: 100vh;
+    padding: 4rem 3rem;
+    position: relative;
+    border-bottom: 1px solid rgba(201,166,97,0.15);
+  }
+
+  .section-label {
+    position: absolute;
+    top: 2rem;
+    left: 3rem;
+    z-index: 5;
+  }
+  .section-label .num {
+    font-family: 'Italiana', serif;
+    font-size: 1rem;
+    color: var(--gold);
+    margin-right: 0.7rem;
+  }
+
+  /* ==== SCENE 1 — HERO / ENTRÉE ==== */
+  .hero {
+    background:
+      radial-gradient(ellipse 80% 60% at 30% 30%, rgba(74,14,31,0.7) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at 70% 80%, rgba(42,6,18,0.9) 0%, transparent 60%),
+      var(--wine-deep);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 4rem;
+    overflow: hidden;
+  }
+
+  .hero-art {
+    position: relative;
+    aspect-ratio: 1;
+    max-width: 520px;
+    margin-left: auto;
+  }
+
+  /* art nouveau frame */
+  .frame-deco {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+  }
+  .frame-deco::before, .frame-deco::after {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(201,166,97,0.3);
+    border-radius: 50%;
+  }
+  .frame-deco::after {
+    inset: 30px;
+    border-style: dashed;
+    opacity: 0.4;
+  }
+
+  .heart-svg {
+    position: absolute;
+    inset: 8%;
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+
+  .ornament-top, .ornament-bottom {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--gold);
+    font-family: 'Italiana', serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.5em;
+  }
+  .ornament-top { top: -20px; background: var(--wine-deep); padding: 0 1rem; }
+  .ornament-bottom { bottom: -20px; background: var(--wine-deep); padding: 0 1rem; }
+
+  .hero-content {
+    padding-left: 2rem;
+    max-width: 540px;
+  }
+
+  .hero h1 {
+    font-size: clamp(4rem, 8vw, 7rem);
+    margin: 1.5rem 0 1rem;
+    color: var(--cream);
+  }
+  .hero h1 .accent {
+    color: var(--gold-bright);
+    font-style: italic;
+    font-family: 'Cormorant Infant', serif;
+    font-weight: 300;
+  }
+
+  .hero .tagline {
+    font-size: 1.3rem;
+    color: var(--rose);
+    line-height: 1.5;
+    max-width: 420px;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  .player-cards {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .player-card {
+    background: rgba(244,216,208,0.04);
+    border: 1px solid rgba(201,166,97,0.3);
+    padding: 1.2rem 1.4rem;
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+  .player-card .label { display: block; margin-bottom: 0.4rem; font-size: 0.6rem; }
+  .player-card input {
+    background: transparent;
+    border: none;
+    color: var(--cream);
+    font-family: 'Italiana', serif;
+    font-size: 1.6rem;
+    width: 100%;
+    outline: none;
+    border-bottom: 1px solid rgba(201,166,97,0.2);
+    padding-bottom: 0.3rem;
+  }
+  .player-card .corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--gold);
+  }
+  .player-card .c-tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .player-card .c-tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+  .player-card .c-bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+  .player-card .c-br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  .ampersand {
+    font-family: 'Cormorant Infant', serif;
+    font-style: italic;
+    font-size: 3rem;
+    color: var(--gold-bright);
+  }
+
+  .btn-enter {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 2.5rem;
+    background: var(--gold);
+    color: var(--wine-deep);
+    font-family: 'Italiana', serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.4s ease;
+    position: relative;
+  }
+  .btn-enter:hover {
+    background: var(--gold-bright);
+    letter-spacing: 0.4em;
+  }
+  .btn-enter .arrow { font-family: 'Cormorant Infant', serif; font-size: 1.5rem; }
+
+  .age-warning {
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: rgba(244,216,208,0.5);
+    text-transform: uppercase;
+  }
+  .age-warning .seal {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    font-family: 'Italiana', serif;
+    color: var(--gold);
+    margin-right: 1rem;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    letter-spacing: 0;
+  }
+
+  /* ==== SCENE 2 — MODES ==== */
+  .modes {
+    background: linear-gradient(180deg, var(--wine-deep) 0%, var(--wine) 100%);
+    padding-top: 7rem;
+  }
+
+  .modes-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+  .modes-header h2 {
+    font-size: clamp(3rem, 6vw, 5rem);
+    color: var(--cream);
+    margin-top: 1rem;
+  }
+  .modes-header h2 .italic {
+    color: var(--gold-bright);
+  }
+  .modes-header .subtitle {
+    color: var(--rose);
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .mode-card {
+    aspect-ratio: 0.65;
+    border: 1px solid rgba(201,166,97,0.3);
+    padding: 2rem 1.5rem;
+    background: rgba(74,14,31,0.4);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  .mode-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.5;
+  }
+
+  .mode-card:hover {
+    transform: translateY(-8px);
+    background: rgba(74,14,31,0.7);
+    border-color: var(--gold);
+  }
+  .mode-card:hover .mode-num { color: var(--gold-bright); }
+
+  .mode-num {
+    font-family: 'Italiana', serif;
+    font-size: 1rem;
+    color: var(--gold);
+    transition: color 0.3s;
+  }
+
+  .mode-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin: 1rem 0;
+    filter: sepia(0.3) saturate(1.2);
+  }
+
+  .mode-name {
+    font-family: 'Italiana', serif;
+    font-size: 2rem;
+    text-align: center;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+
+  .mode-desc {
+    text-align: center;
+    color: var(--rose);
+    font-size: 0.95rem;
+    font-style: italic;
+    line-height: 1.4;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+
+  .mode-meter {
+    margin-top: 1rem;
+  }
+  .mode-meter .label-mini {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: rgba(244,216,208,0.5);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    text-align: center;
+  }
+  .meter-dots {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+  }
+  .meter-dots span {
+    width: 18px;
+    height: 1px;
+    background: rgba(201,166,97,0.2);
+  }
+  .meter-dots span.on {
+    background: var(--gold-bright);
+    box-shadow: 0 0 8px var(--gold-bright);
+  }
+
+  /* mode color variants */
+  .mode-card[data-mode="warm"] .mode-icon { color: #f4d8d0; }
+  .mode-card[data-mode="sensual"] { background: linear-gradient(180deg, rgba(74,14,31,0.4) 0%, rgba(120,30,60,0.5) 100%); }
+  .mode-card[data-mode="hot"] { background: linear-gradient(180deg, rgba(74,14,31,0.4) 0%, rgba(160,20,40,0.6) 100%); }
+  .mode-card[data-mode="kama"] { background: linear-gradient(180deg, rgba(74,14,31,0.4) 0%, rgba(110,80,30,0.5) 100%); }
+  .mode-card[data-mode="cresc"] {
+    background: linear-gradient(180deg, rgba(244,216,208,0.1) 0%, rgba(200,30,50,0.5) 50%, rgba(20,5,10,0.8) 100%);
+    border-color: var(--gold);
+  }
+
+  /* ==== SCENE 3 — JEU ==== */
+  .game {
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 50%, rgba(160,20,60,0.3) 0%, transparent 70%),
+      var(--wine-deep);
+    padding-top: 7rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .game-header {
+    margin-bottom: 3rem;
+  }
+  .game-mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1.5rem;
+    border: 1px solid var(--gold);
+    border-radius: 100px;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold-bright);
+  }
+  .game-turn {
+    font-family: 'Italiana', serif;
+    font-size: 3rem;
+    margin-top: 2rem;
+    color: var(--cream);
+  }
+  .game-turn .name { color: var(--gold-bright); font-style: italic; font-family: 'Cormorant Infant', serif; }
+
+  .dice-stage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4rem;
+    margin: 3rem 0;
+    perspective: 1000px;
+  }
+
+  .die {
+    width: 180px;
+    height: 180px;
+    background: linear-gradient(145deg, var(--blush) 0%, var(--champagne) 100%);
+    border-radius: 24px;
+    position: relative;
+    box-shadow:
+      inset -20px -20px 60px rgba(74,14,31,0.2),
+      inset 20px 20px 60px rgba(255,255,255,0.4),
+      0 30px 60px rgba(0,0,0,0.4),
+      0 0 0 1px var(--gold);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: rotateX(-15deg) rotateY(20deg);
+    animation: float 6s ease-in-out infinite;
+  }
+  .die-2 { animation-delay: -3s; transform: rotateX(-15deg) rotateY(-20deg); }
+
+  @keyframes float {
+    0%, 100% { transform: rotateX(-15deg) rotateY(20deg) translateY(0); }
+    50% { transform: rotateX(-10deg) rotateY(15deg) translateY(-15px); }
+  }
+  .die-2 {
+    animation: float2 6s ease-in-out infinite;
+  }
+  @keyframes float2 {
+    0%, 100% { transform: rotateX(-15deg) rotateY(-20deg) translateY(0); }
+    50% { transform: rotateX(-10deg) rotateY(-15deg) translateY(-15px); }
+  }
+
+  .die-label-mini {
+    position: absolute;
+    top: -25px;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .die-content {
+    text-align: center;
+    color: var(--wine-deep);
+    padding: 1rem;
+  }
+  .die-content .verb {
+    font-family: 'Italiana', serif;
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .die-content .icon {
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .die-corners span {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--gold);
+  }
+  .die-corners span:nth-child(1) { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .die-corners span:nth-child(2) { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+  .die-corners span:nth-child(3) { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+  .die-corners span:nth-child(4) { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+  .game-result {
+    margin-top: 3rem;
+    padding: 2.5rem 3rem;
+    border: 1px solid var(--gold);
+    max-width: 700px;
+    margin: 3rem auto 0;
+    background: rgba(244,216,208,0.04);
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+  .game-result .label { display: block; margin-bottom: 1rem; }
+  .game-result .action-text {
+    font-family: 'Italiana', serif;
+    font-size: 2.8rem;
+    color: var(--cream);
+    line-height: 1.2;
+  }
+  .game-result .action-text em {
+    color: var(--gold-bright);
+    font-family: 'Cormorant Infant', serif;
+    font-style: italic;
+  }
+  .game-result .timer {
+    margin-top: 1.5rem;
+    color: var(--rose);
+    font-size: 1.1rem;
+    letter-spacing: 0.2em;
+  }
+
+  .game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .ctrl-btn {
+    padding: 1rem 2rem;
+    background: transparent;
+    border: 1px solid rgba(201,166,97,0.4);
+    color: var(--cream);
+    font-family: 'Italiana', serif;
+    font-size: 1rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .ctrl-btn:hover { border-color: var(--gold); color: var(--gold-bright); }
+  .ctrl-btn.primary { background: var(--gold); color: var(--wine-deep); border-color: var(--gold); }
+  .ctrl-btn.primary:hover { background: var(--gold-bright); }
+
+  /* ==== SCENE 4 — KAMASUTRA ==== */
+  .kama {
+    background:
+      radial-gradient(ellipse 70% 60% at 70% 30%, rgba(120,80,30,0.3) 0%, transparent 70%),
+      linear-gradient(180deg, var(--wine-deep) 0%, var(--wine) 100%);
+    padding-top: 7rem;
+  }
+
+  .kama-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  .kama-header h2 {
+    font-size: clamp(3rem, 6vw, 5rem);
+    color: var(--cream);
+    margin-top: 0.5rem;
+  }
+  .kama-header h2 em { color: var(--gold-bright); font-family: 'Cormorant Infant', serif; }
+  .kama-header .note {
+    color: var(--rose);
+    font-style: italic;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .kama-stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    align-items: center;
+  }
+
+  .kama-card {
+    aspect-ratio: 0.72;
+    background: var(--cream);
+    border-radius: 4px;
+    padding: 2rem;
+    position: relative;
+    box-shadow:
+      0 40px 80px rgba(0,0,0,0.5),
+      0 0 0 1px var(--gold),
+      0 0 0 6px var(--cream),
+      0 0 0 7px var(--gold);
+    color: var(--wine-deep);
+    overflow: hidden;
+  }
+
+  .kama-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    background:
+      radial-gradient(circle at 20% 50%, var(--gold) 1px, transparent 1px),
+      radial-gradient(circle at 80% 50%, var(--gold) 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.15;
+  }
+
+  .kama-card .corner-orn {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    color: var(--gold);
+    font-family: 'Italiana', serif;
+    font-size: 1.5rem;
+    text-align: center;
+    line-height: 40px;
+  }
+  .kama-card .corner-orn.tl { top: 12px; left: 12px; }
+  .kama-card .corner-orn.tr { top: 12px; right: 12px; }
+  .kama-card .corner-orn.bl { bottom: 12px; left: 12px; }
+  .kama-card .corner-orn.br { bottom: 12px; right: 12px; }
+
+  .kama-card-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  .kama-num-card {
+    font-family: 'Italiana', serif;
+    font-size: 0.9rem;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    margin-bottom: 1rem;
+  }
+
+  .kama-illust {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+
+  /* Watercolor-style illustration via SVG */
+  .kama-illust svg {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+  }
+
+  .kama-name {
+    font-family: 'Italiana', serif;
+    font-size: 2.5rem;
+    text-align: center;
+    color: var(--wine-deep);
+    margin: 1rem 0 0.3rem;
+    line-height: 1;
+  }
+  .kama-name-jp {
+    font-family: 'Cormorant Infant', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .kama-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0.5rem auto 1rem;
+    position: relative;
+  }
+  .kama-divider::before {
+    content: '◆';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--cream);
+    padding: 0 6px;
+    color: var(--gold);
+    font-size: 0.7rem;
+  }
+
+  .kama-desc {
+    font-size: 1rem;
+    text-align: center;
+    color: rgba(26,3,9,0.75);
+    line-height: 1.5;
+    font-style: italic;
+    max-width: 280px;
+  }
+
+  .kama-meta {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(201,166,97,0.4);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--burgundy);
+  }
+  .kama-meta strong { color: var(--gold); display: block; margin-top: 3px; font-family: 'Italiana', serif; font-size: 1rem; letter-spacing: 0.1em; }
+
+  .kama-info {
+    color: var(--cream);
+    padding-right: 2rem;
+  }
+  .kama-info .label { display: block; margin-bottom: 1rem; }
+  .kama-info h3 {
+    font-family: 'Italiana', serif;
+    font-size: 4rem;
+    color: var(--gold-bright);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .kama-info h3 em { color: var(--cream); font-family: 'Cormorant Infant', serif; }
+  .kama-info p {
+    font-size: 1.15rem;
+    color: var(--rose);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+  .kama-info .note-italic {
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1rem;
+    border-left: 1px solid var(--gold);
+    padding-left: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  /* indicator about illustration style */
+  .style-marker {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--wine-deep);
+    border: 1px solid var(--gold);
+    padding: 1rem 1.5rem;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    max-width: 280px;
+  }
+  .style-marker .num {
+    font-family: 'Italiana', serif;
+    color: var(--gold-bright);
+    font-size: 1.5rem;
+  }
+  .style-marker .name {
+    font-family: 'Italiana', serif;
+    font-size: 1.2rem;
+    color: var(--cream);
+    margin: 0.3rem 0;
+  }
+  .style-marker .tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--rose);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1100px) {
+    .modes-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero { grid-template-columns: 1fr; }
+    .kama-stage { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== STYLE MARKER (fixed badge) ===== -->
+<div class="style-marker">
+  <div class="num">№ 01</div>
+  <div class="name">Velours</div>
+  <div class="tag">Boudoir · Art Nouveau · Watercolor</div>
+</div>
+
+<!-- ===== SCENE 1 — HERO ===== -->
+<section class="hero">
+  <div class="section-label">
+    <span class="num">I.</span>
+    <span class="label">Vestibule</span>
+  </div>
+
+  <div class="hero-content">
+    <span class="label">— Une invitation au jeu</span>
+    <h1>Tirez vos<br><span class="accent">désirs</span> au sort.</h1>
+    <p class="tagline">Deux dés. Un soir. Mille possibilités. Une expérience pensée pour les amants qui osent.</p>
+
+    <div class="player-cards">
+      <div class="player-card">
+        <span class="c-tl corner"></span><span class="c-tr corner"></span>
+        <span class="c-bl corner"></span><span class="c-br corner"></span>
+        <span class="label">Lui</span>
+        <input type="text" value="Léon" />
+      </div>
+      <div class="ampersand">&amp;</div>
+      <div class="player-card">
+        <span class="c-tl corner"></span><span class="c-tr corner"></span>
+        <span class="c-bl corner"></span><span class="c-br corner"></span>
+        <span class="label">Elle</span>
+        <input type="text" value="Camille" />
+      </div>
+    </div>
+
+    <button class="btn-enter">
+      <span>Entrer</span>
+      <span class="arrow">→</span>
+    </button>
+
+    <div class="age-warning">
+      <span class="seal">18</span>
+      <span>Réservé aux adultes consentants</span>
+    </div>
+  </div>
+
+  <div class="hero-art">
+    <span class="ornament-top">❦ ❦ ❦</span>
+    <span class="ornament-bottom">❦ ❦ ❦</span>
+    <div class="frame-deco"></div>
+    <svg class="heart-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="rose-glow" cx="50%" cy="40%" r="50%">
+          <stop offset="0%" stop-color="#f4d8d0" stop-opacity="0.9"/>
+          <stop offset="60%" stop-color="#d4a5a5" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#4a0e1f" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="gold-stroke" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e8c87c"/>
+          <stop offset="100%" stop-color="#c9a661"/>
+        </linearGradient>
+      </defs>
+      <circle cx="100" cy="100" r="90" fill="url(#rose-glow)" />
+      <!-- Art Nouveau botanical heart -->
+      <path d="M100 145 C 60 110, 45 80, 65 60 C 80 45, 100 55, 100 80 C 100 55, 120 45, 135 60 C 155 80, 140 110, 100 145 Z"
+            fill="none" stroke="url(#gold-stroke)" stroke-width="0.8" opacity="0.9"/>
+      <!-- vines -->
+      <path d="M100 145 Q 90 160, 80 175 Q 75 180, 70 178" fill="none" stroke="url(#gold-stroke)" stroke-width="0.5" opacity="0.7"/>
+      <path d="M100 145 Q 110 160, 120 175 Q 125 180, 130 178" fill="none" stroke="url(#gold-stroke)" stroke-width="0.5" opacity="0.7"/>
+      <!-- leaves -->
+      <ellipse cx="65" cy="170" rx="6" ry="3" fill="none" stroke="url(#gold-stroke)" stroke-width="0.4" transform="rotate(-30 65 170)"/>
+      <ellipse cx="135" cy="170" rx="6" ry="3" fill="none" stroke="url(#gold-stroke)" stroke-width="0.4" transform="rotate(30 135 170)"/>
+      <!-- ornamental flourishes around heart -->
+      <path d="M40 60 Q 30 80, 40 100 M 160 60 Q 170 80, 160 100" fill="none" stroke="url(#gold-stroke)" stroke-width="0.4" opacity="0.6"/>
+      <circle cx="30" cy="80" r="1.5" fill="#e8c87c"/>
+      <circle cx="170" cy="80" r="1.5" fill="#e8c87c"/>
+      <!-- petals -->
+      <g opacity="0.5" fill="#d4a5a5">
+        <circle cx="50" cy="40" r="3"/>
+        <circle cx="150" cy="40" r="3"/>
+        <circle cx="40" cy="120" r="2"/>
+        <circle cx="160" cy="120" r="2"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+
+<!-- ===== SCENE 2 — MODES ===== -->
+<section class="modes">
+  <div class="section-label">
+    <span class="num">II.</span>
+    <span class="label">Antichambre</span>
+  </div>
+
+  <div class="modes-header">
+    <span class="label">— Choisissez votre humeur</span>
+    <h2>Cinq <span class="italic">tableaux</span>, une nuit.</h2>
+    <p class="subtitle">De la caresse la plus douce à l'audace la plus folle. Chaque mode déploie ses propres dés, ses propres règles, ses propres illusions.</p>
+  </div>
+
+  <div class="modes-grid">
+    <div class="mode-card" data-mode="warm">
+      <span class="mode-num">№ I</span>
+      <div>
+        <div class="mode-icon">🌹</div>
+        <h3 class="mode-name">Échauffement</h3>
+        <p class="mode-desc">Premiers regards, premiers frissons, premières caresses</p>
+      </div>
+      <div class="mode-meter">
+        <div class="label-mini">Intensité</div>
+        <div class="meter-dots"><span class="on"></span><span></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="mode-card" data-mode="sensual">
+      <span class="mode-num">№ II</span>
+      <div>
+        <div class="mode-icon">🍷</div>
+        <h3 class="mode-name">Sensuel</h3>
+        <p class="mode-desc">La langue, les dents, la peau qui se découvre</p>
+      </div>
+      <div class="mode-meter">
+        <div class="label-mini">Intensité</div>
+        <div class="meter-dots"><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="mode-card" data-mode="hot">
+      <span class="mode-num">№ III</span>
+      <div>
+        <div class="mode-icon">🔥</div>
+        <h3 class="mode-name">Brasier</h3>
+        <p class="mode-desc">Sans tabou. Chaque centimètre. Chaque envie. Sans retenue.</p>
+      </div>
+      <div class="mode-meter">
+        <div class="label-mini">Intensité</div>
+        <div class="meter-dots"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div>
+      </div>
+    </div>
+
+    <div class="mode-card" data-mode="kama">
+      <span class="mode-num">№ IV</span>
+      <div>
+        <div class="mode-icon">🪷</div>
+        <h3 class="mode-name">Kāma</h3>
+        <p class="mode-desc">Les positions ancestrales, illustrées et expliquées</p>
+      </div>
+      <div class="mode-meter">
+        <div class="label-mini">Difficulté</div>
+        <div class="meter-dots"><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="mode-card" data-mode="cresc">
+      <span class="mode-num">№ V</span>
+      <div>
+        <div class="mode-icon">💫</div>
+        <h3 class="mode-name">Crescendo</h3>
+        <p class="mode-desc">Du frisson à l'extase. Le jeu monte, lui-même, à votre rythme.</p>
+      </div>
+      <div class="mode-meter">
+        <div class="label-mini">Évolutif</div>
+        <div class="meter-dots"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== SCENE 3 — JEU ===== -->
+<section class="game">
+  <div class="section-label">
+    <span class="num">III.</span>
+    <span class="label">Le salon</span>
+  </div>
+
+  <div class="game-header">
+    <div class="game-mode-badge">
+      <span>♦</span>
+      <span>Mode Sensuel</span>
+      <span>♦</span>
+    </div>
+    <div class="game-turn">À <span class="name">Camille</span> de jouer</div>
+  </div>
+
+  <div class="dice-stage">
+    <div class="die die-1">
+      <span class="die-label-mini">— Action —</span>
+      <div class="die-corners"><span></span><span></span><span></span><span></span></div>
+      <div class="die-content">
+        <div class="verb">Embrasser</div>
+        <div class="icon">💋</div>
+      </div>
+    </div>
+    <div class="die die-2">
+      <span class="die-label-mini">— Zone —</span>
+      <div class="die-corners"><span></span><span></span><span></span><span></span></div>
+      <div class="die-content">
+        <div class="verb">La nuque</div>
+        <div class="icon">✦</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-result">
+    <span class="label">— Vous avez tiré —</span>
+    <div class="action-text">Camille doit <em>embrasser</em><br>la nuque de Léon</div>
+    <div class="timer">⌛ 1 minute · 30 secondes</div>
+  </div>
+
+  <div class="game-controls">
+    <button class="ctrl-btn">⤺ Re-tirer</button>
+    <button class="ctrl-btn primary">Tour suivant →</button>
+    <button class="ctrl-btn">✕ Quitter</button>
+  </div>
+</section>
+
+
+<!-- ===== SCENE 4 — KAMASUTRA ===== -->
+<section class="kama">
+  <div class="section-label">
+    <span class="num">IV.</span>
+    <span class="label">Bibliothèque</span>
+  </div>
+
+  <div class="kama-header">
+    <span class="label">— Mode Kāma · Carte tirée</span>
+    <h2>Une <em>position</em> par soir.</h2>
+    <p class="note">Illustration style aquarelle peinte à la main · Description complète · Niveau de difficulté</p>
+  </div>
+
+  <div class="kama-stage">
+    <div class="kama-info">
+      <span class="label">— Proposition d'illustration A</span>
+      <h3>Aquarelles<br><em>peintes</em></h3>
+      <p>Chaque position est une planche illustrée à la manière des manuscrits anciens. Lignes fines à l'encre dorée, lavis d'aquarelle dans les tons de la peau et du velours.</p>
+      <p>L'esthétique reste élégante, suggestive plutôt qu'explicite — pour un objet visuellement assumé, jamais vulgaire.</p>
+      <div class="note-italic">
+        Les illustrations peuvent être créées sur mesure (DALL·E, Midjourney en style watercolor + line art) puis converties en SVG hybrides.
+      </div>
+    </div>
+
+    <div class="kama-card">
+      <span class="corner-orn tl">❦</span>
+      <span class="corner-orn tr">❦</span>
+      <span class="corner-orn bl">❦</span>
+      <span class="corner-orn br">❦</span>
+
+      <div class="kama-card-inner">
+        <div class="kama-num-card">CARTE № VII / XVIII</div>
+
+        <div class="kama-illust">
+          <!-- Watercolor-style illustration -->
+          <svg viewBox="0 0 280 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="skin1" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#f4d8d0" stop-opacity="0.7"/>
+                <stop offset="100%" stop-color="#d4a5a5" stop-opacity="0.2"/>
+              </radialGradient>
+              <radialGradient id="skin2" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#e8b896" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#a8765a" stop-opacity="0.15"/>
+              </radialGradient>
+              <linearGradient id="ink-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c9a661"/>
+                <stop offset="100%" stop-color="#7a5a30"/>
+              </linearGradient>
+              <filter id="watercolor">
+                <feTurbulence baseFrequency="0.04" numOctaves="2" />
+                <feDisplacementMap in="SourceGraphic" scale="3"/>
+              </filter>
+            </defs>
+
+            <!-- decorative arch / background -->
+            <ellipse cx="140" cy="120" rx="100" ry="100" fill="url(#skin1)" opacity="0.3"/>
+
+            <!-- watercolor wash blobs -->
+            <ellipse cx="140" cy="135" rx="85" ry="80" fill="url(#skin1)" filter="url(#watercolor)" opacity="0.5"/>
+            <ellipse cx="155" cy="125" rx="55" ry="50" fill="url(#skin2)" filter="url(#watercolor)" opacity="0.4"/>
+
+            <!-- ink lines — two intertwined silhouettes (artistic, abstract) -->
+            <g fill="none" stroke="url(#ink-gold)" stroke-width="1.2" stroke-linecap="round">
+              <!-- person 1 — reclining -->
+              <path d="M 60 160 Q 90 130, 140 120 Q 200 105, 220 125 Q 230 145, 215 165"/>
+              <!-- back curve -->
+              <path d="M 70 165 Q 80 155, 100 158 Q 130 150, 160 145"/>
+              <!-- arm -->
+              <path d="M 95 160 Q 100 170, 110 180"/>
+              <!-- person 2 — embracing -->
+              <path d="M 175 100 Q 180 115, 190 130 Q 200 145, 205 160"/>
+              <path d="M 180 105 Q 195 100, 215 110 Q 225 120, 220 135"/>
+              <!-- intertwined arm -->
+              <path d="M 175 105 Q 165 115, 155 125 Q 145 130, 135 128"/>
+              <!-- hair flowing -->
+              <path d="M 60 160 Q 50 175, 55 195 Q 65 200, 75 195" opacity="0.6"/>
+              <!-- subtle body curves -->
+              <path d="M 110 165 Q 130 168, 150 160" opacity="0.7"/>
+            </g>
+
+            <!-- gold accent dots and details -->
+            <g fill="#e8c87c" opacity="0.7">
+              <circle cx="140" cy="110" r="1.5"/>
+              <circle cx="180" cy="120" r="1"/>
+              <circle cx="100" cy="155" r="1"/>
+            </g>
+
+            <!-- decorative botanical frame -->
+            <g fill="none" stroke="url(#ink-gold)" stroke-width="0.5" opacity="0.6">
+              <path d="M 30 30 Q 45 40, 50 55"/>
+              <path d="M 250 30 Q 235 40, 230 55"/>
+              <path d="M 30 210 Q 45 200, 50 185"/>
+              <path d="M 250 210 Q 235 200, 230 185"/>
+              <ellipse cx="40" cy="40" rx="3" ry="1.5" transform="rotate(45 40 40)"/>
+              <ellipse cx="240" cy="40" rx="3" ry="1.5" transform="rotate(-45 240 40)"/>
+            </g>
+          </svg>
+        </div>
+
+        <h3 class="kama-name">L'Étreinte du Lotus</h3>
+        <div class="kama-name-jp">Padmāsana</div>
+
+        <div class="kama-divider"></div>
+
+        <p class="kama-desc">Assise face à lui, jambes croisées autour de sa taille. Vos fronts se touchent, vos souffles se mêlent. Une position de connexion totale.</p>
+
+        <div class="kama-meta">
+          <div>Difficulté<strong>II / V</strong></div>
+          <div>Intimité<strong>V / V</strong></div>
+          <div>Endurance<strong>III / V</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

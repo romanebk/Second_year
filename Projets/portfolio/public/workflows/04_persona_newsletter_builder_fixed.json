@@ -1,0 +1,245 @@
+{
+  "name": "Persona — Newsletter Builder",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "connections": {
+    "Build Newsletter Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Feed URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Feed URLs": {
+      "main": [
+        [
+          {
+            "node": "Fetch RSS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch RSS": {
+      "main": [
+        [
+          {
+            "node": "Select & Rank",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select & Rank": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "Summarize Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Articles": {
+      "main": [
+        [
+          {
+            "node": "Apply Summaries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarize Articles",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Summaries": {
+      "main": [
+        [
+          {
+            "node": "Build Email Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Email Body": {
+      "main": [
+        [
+          {
+            "node": "Send Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "8d6a2eee-383e-4c0b-a05b-0df4dcd10f23",
+      "name": "Build Newsletter Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 112],
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            { "name": "email", "type": "string" },
+            { "name": "interests", "type": "string" },
+            { "name": "unsubscribe_token", "type": "string" },
+            { "name": "nb_articles", "type": "number" },
+            { "name": "tone", "type": "string" },
+            { "name": "format", "type": "string" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6fb5577d-6c42-41c6-aec0-c84e3c76ac3d",
+      "name": "Build Feed URLs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [224, 112],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const t = $('Build Newsletter Trigger').first().json;\nconst interests = String(t.interests || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean).slice(0, 4);\nconst out = [];\nfor (const it of interests) {\n  out.push({ json: { url: 'https://news.google.com/rss/search?q=' + encodeURIComponent(it) + '&hl=fr&gl=FR&ceid=FR:fr' } });\n}\nout.push({ json: { url: 'https://feeds.bbci.co.uk/news/world/rss.xml' } });\nout.push({ json: { url: 'https://hnrss.org/frontpage' } });\nif (!interests.length) { out.push({ json: { url: 'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr' } }); }\nreturn out;"
+      }
+    },
+    {
+      "id": "401a2e83-93df-4f9a-afd2-680e65c3e301",
+      "name": "Fetch RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [448, 112],
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": { "ignoreSSL": false }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "c551f6e2-1c31-488f-95a0-b3b8c4bf338c",
+      "name": "Select & Rank",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [672, 112],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const t = $('Build Newsletter Trigger').first().json;\nconst DIAC = new RegExp('[' + String.fromCharCode(768) + '-' + String.fromCharCode(879) + ']', 'g');\nconst norm = function(s){ return String(s || '').normalize('NFD').replace(DIAC, '').toLowerCase(); };\nconst interests = String(t.interests || '').split(',').map(function(s){ return norm(s).trim(); }).filter(Boolean);\nconst items = $input.all().map(function(i){ return i.json; });\nconst seen = new Set();\nconst all = [];\nfor (const a of items) {\n  const title = String(a.title || '').trim();\n  const link = String(a.link || a.guid || '').trim();\n  if (!title || !link) continue;\n  const key = title.toLowerCase();\n  if (seen.has(key)) continue;\n  seen.add(key);\n  let snippet = String(a.contentSnippet || a.content || a.summary || '').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim();\n  if (snippet.length > 220) snippet = snippet.slice(0, 220) + '...';\n  let source = '';\n  try { source = new URL(link).hostname.replace('www.', ''); } catch(e) {}\n  const hay = norm(title + ' ' + snippet);\n  const matched = interests.filter(function(kw){ return kw && hay.indexOf(kw) !== -1; });\n  all.push({ title: title, link: link, snippet: snippet, source: source, score: matched.length, matched: matched, date: a.isoDate || a.pubDate || '' });\n}\nall.sort(function(x, y){ return new Date(y.date || 0) - new Date(x.date || 0); });\nlet LIMIT = parseInt(t.nb_articles, 10);\nif (isNaN(LIMIT) || LIMIT < 1) { LIMIT = 6; }\nif (LIMIT > 10) { LIMIT = 10; }\nlet top = [];\nif (interests.length) {\n  const used = new Set();\n  const byInterest = {};\n  for (const kw of interests) { byInterest[kw] = all.filter(function(a){ return a.matched.indexOf(kw) !== -1; }); }\n  let added = true;\n  while (top.length < LIMIT && added) {\n    added = false;\n    for (const kw of interests) {\n      const arr = byInterest[kw];\n      while (arr.length) {\n        const cand = arr.shift();\n        if (!used.has(cand.link)) { used.add(cand.link); top.push(cand); added = true; break; }\n      }\n      if (top.length >= LIMIT) break;\n    }\n  }\n  if (top.length < LIMIT) { for (const a of all) { if (top.length >= LIMIT) break; if (!used.has(a.link)) { used.add(a.link); top.push(a); } } }\n} else { top = all.slice(0, LIMIT); }\nconst tone = String(t.tone || '').trim();\nconst fmt = String(t.format || '').trim();\nconst styleParts = [];\nif (tone) { styleParts.push('Adopte un ton ' + tone + '.'); }\nif (fmt) { styleParts.push('Respecte cette consigne de format pour chaque resume: ' + fmt + '.'); }\nconst style_instruction = styleParts.join(' ');\nreturn [{ json: { email: String(t.email || ''), unsubscribe_token: String(t.unsubscribe_token || ''), interests: String(t.interests || ''), tone: tone, format: fmt, style_instruction: style_instruction, articles: top, count: top.length } }];"
+      }
+    },
+    {
+      "id": "a1b2c3d4-0000-0000-0000-111111111111",
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [896, 112],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const d = $input.first().json;\nconst style = d.style_instruction ? String(d.style_instruction) : 'aucune consigne particuliere, reste neutre et factuel';\nconst articlesForPrompt = (d.articles || []).map(function(a, i) {\n  return { i: i, titre: String(a.title || ''), source: String(a.source || '') };\n});\nconst prompt = 'Tu es un journaliste francophone. Voici des articles au format JSON. Pour chaque article, ecris un resume factuel et neutre en francais de 25 mots maximum, qui apporte du contexte sans repeter le titre mot pour mot. Ecris aussi une courte phrase d intro engageante pour la newsletter.\\n\\nConsigne de personnalisation a respecter: ' + style + '\\n\\nReponds UNIQUEMENT avec un objet JSON valide, sans texte ni balises autour, exactement a ce format: {\"intro\": \"...\", \"items\": [{\"i\": 0, \"resume\": \"...\"}]}\\n\\nArticles:\\n' + JSON.stringify(articlesForPrompt);\nreturn [{ json: Object.assign({}, d, { prompt: prompt }) }];"
+      }
+    },
+    {
+      "id": "0a2902ca-69e8-4d29-b60b-4341e9a298da",
+      "name": "Summarize Articles",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [1120, 112],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}"
+      }
+    },
+    {
+      "id": "f86747fe-c98e-45a6-9f73-da45d8a6d785",
+      "name": "Summarize Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [1200, 336],
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": { "temperature": 0.3 }
+      },
+      "credentials": {
+        "groqApi": { "name": "Groq account" }
+      }
+    },
+    {
+      "id": "982a154a-dff9-4770-beca-7a6b14fb568b",
+      "name": "Apply Summaries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1472, 112],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const sel = $('Select & Rank').first().json;\nconst articles = (sel.articles || []).slice();\nlet intro = '';\nlet parsed = null;\ntry {\n  let raw = $json.text;\n  if (raw == null) raw = $json.response;\n  if (typeof raw !== 'string') raw = JSON.stringify(raw || '');\n  // Strip markdown code fences if present\n  raw = raw.replace(/^```[\\w]*\\n?/m, '').replace(/\\n?```$/m, '').trim();\n  const m = raw.match(/\\{[\\s\\S]*\\}/);\n  if (m) parsed = JSON.parse(m[0]);\n} catch(e) { parsed = null; }\nif (parsed) {\n  if (parsed.intro) intro = String(parsed.intro);\n  const list = Array.isArray(parsed.items) ? parsed.items : [];\n  for (const it of list) {\n    const idx = Number(it.i);\n    if (!isNaN(idx) && articles[idx] && it.resume) {\n      articles[idx] = Object.assign({}, articles[idx], { snippet: String(it.resume) });\n    }\n  }\n}\nreturn [{ json: { email: sel.email, unsubscribe_token: sel.unsubscribe_token, interests: sel.interests, intro: intro, articles: articles, count: articles.length } }];"
+      }
+    },
+    {
+      "id": "b83c55b7-c9a7-4212-a5b7-e9544d77c129",
+      "name": "Build Email Body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1696, 112],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const d = $input.first().json;\nconst articles = d.articles || [];\nconst intro = d.intro ? String(d.intro) : '';\nconst today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });\nlet items = '';\nif (!articles.length) {\n  items = '<tr><td style=\"color:#475569;font-size:15px;\">Aucune actualit\\u00e9 pertinente pour vos centres d\\'int\\u00e9r\\u00eat aujourd\\'hui. Revenez demain !</td></tr>';\n} else {\n  for (let i = 0; i < articles.length; i++) {\n    const a = articles[i];\n    const src = a.source ? '<span style=\"color:#94a3b8;font-size:12px;\"> &middot; ' + a.source + '</span>' : '';\n    const sn = a.snippet ? '<p style=\"margin:6px 0 0;color:#475569;font-size:14px;line-height:1.55;\">' + a.snippet + '</p>' : '';\n    items += '<tr><td style=\"padding:0 0 18px 0;border-bottom:1px solid #eef2f7;\"><a href=\"' + a.link + '\" style=\"color:#1d4ed8;text-decoration:none;font-size:16px;font-weight:600;line-height:1.4;\">' + (i + 1) + '. ' + a.title + '</a>' + src + sn + '</td></tr><tr><td style=\"height:16px;\"></td></tr>';\n  }\n}\nconst introHtml = intro ? '<p style=\"margin:0 0 18px 0;color:#334155;font-size:15px;line-height:1.6;font-style:italic;\">' + intro + '</p>' : '';\nconst html = '<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"utf-8\"></head><body style=\"margin:0;padding:24px 12px;background:#f1f5f9;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;\"><table role=\"presentation\" align=\"center\" width=\"600\" style=\"max-width:600px;width:100%;border-collapse:collapse;background:#ffffff;border-radius:16px;overflow:hidden;\"><tr><td style=\"background:#1d4ed8;padding:26px 30px;\"><h1 style=\"margin:0;color:#ffffff;font-size:23px;\">Persona</h1><p style=\"margin:6px 0 0;color:#dbeafe;font-size:13px;\">Votre actualit\\u00e9 du ' + today + '</p></td></tr><tr><td style=\"padding:26px 30px;\">' + introHtml + '<table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;\">' + items + '</table></td></tr><tr><td style=\"padding:16px 30px;background:#f8fafc;border-top:1px solid #eef2f7;color:#94a3b8;font-size:12px;line-height:1.6;\">Vous recevez cet email car vous \\u00eates inscrit \\u00e0 Persona avec ' + d.email + '.<br>Pour vous d\\u00e9sabonner, \\u00e9crivez \\u00ab\\u00a0d\\u00e9sabonne-moi\\u00a0\\u00bb dans le chatbot Persona.</td></tr></table></body></html>';\nconst subject = articles.length ? ('\\uD83D\\uDDDE\\uFE0F Votre actu Persona \\u2014 ' + articles.length + ' \\u00e0 la une') : 'Persona \\u2014 pas d\\'actu aujourd\\'hui';\nreturn [{ json: { email: d.email, subject: subject, body: html } }];"
+      }
+    },
+    {
+      "id": "2224cfc6-0332-444e-87e4-852cc312b9dc",
+      "name": "Send Newsletter",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [1920, 112],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.body }}",
+        "options": { "appendAttribution": false }
+      },
+      "credentials": {
+        "gmailOAuth2": { "name": "Gmail account" }
+      }
+    }
+  ]
+}

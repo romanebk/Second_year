@@ -1,0 +1,16 @@
+---
+const { sideBarActiveItemID } = Astro.props;
+const activeClass = "menu-active-neon"; // Styled in global.css (neon accent)
+---
+
+<ul class="menu grow shrink menu-md overflow-y-auto px-3">
+    <li><a class="py-3 text-base font-body rounded-lg transition-all duration-200 hover:bg-[rgba(0,240,255,0.05)] hover:text-[#00f0ff]" id="home" href="/">Home</a></li>
+    <li><a class="py-3 text-base font-body rounded-lg transition-all duration-200 hover:bg-[rgba(0,240,255,0.05)] hover:text-[#00f0ff]" id="projects" href="/projects">Projects</a></li>
+    <li><a class="py-3 text-base font-body rounded-lg transition-all duration-200 hover:bg-[rgba(0,240,255,0.05)] hover:text-[#00f0ff]" id="cv" href="/cv">CV</a></li>
+    <li><a class="py-3 text-base font-body rounded-lg transition-all duration-200 hover:bg-[rgba(0,240,255,0.05)] hover:text-[#00f0ff]" id="contact" href="/contact">Contact</a></li>
+</ul>
+
+<script data-astro-rerun define:vars={{ sideBarActiveItemID: sideBarActiveItemID, activeClass: activeClass }}>
+const activeItemElem = document.getElementById(sideBarActiveItemID);
+activeItemElem && activeItemElem.classList.add(activeClass);
+</script>

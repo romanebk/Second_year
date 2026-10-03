@@ -1,0 +1,102 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import TimeLineElement from "../components/cv/TimeLine.astro";
+---
+
+<BaseLayout title="Resume" sideBarActiveItemID="cv">
+  <div class="mb-5 reveal reveal-delay-1">
+    <div class="text-3xl w-full font-heading font-bold">Profile</div>
+  </div>
+
+  <div class="mb-10 reveal reveal-delay-2 font-body leading-relaxed text-base-content/70">
+    Développeur polyvalent spécialisé en C, C++, Python et Rust, avec une forte expérience en développement web,
+    intelligence artificielle et cybersécurité. Passionné par les défis techniques, je m'adapte rapidement
+    à tout langage ou technologie. Actuellement étudiant à EPITECH, je travaille sur des projets ambitieux
+    allant du low-level (réseau, kernel) aux architectures modernes (React, Electron, IA).
+  </div>
+
+  <div class="mb-5 reveal reveal-delay-3">
+    <div class="text-3xl w-full font-heading font-bold">Education</div>
+  </div>
+
+  <div class="time-line-container grid gap-4 mb-10 reveal reveal-delay-1">
+    <TimeLineElement
+      title="EPITECH - European Institute of Technology"
+      subtitle="2024 to present at EPITECH, Cotonou, Benin"
+    />
+  </div>
+
+  <div class="mb-5 reveal reveal-delay-1">
+    <div class="text-3xl w-full font-heading font-bold">Experience</div>
+  </div>
+
+  <div class="time-line-container mb-10 reveal reveal-delay-2">
+    <TimeLineElement
+      title="Développeur IA - Projet Startrek"
+      subtitle="2025 at EPITECH"
+    >
+      Apprentissage par renforcement (DQN) pour le contrôle d'atterrissage lunaire. Implémentation en Python avec PyTorch et Gymnasium. Entraînement d'agents avec politique epsilon-greedy.
+    </TimeLineElement>
+    <TimeLineElement
+      title="Développeur C++ - Projet Arcade"
+      subtitle="2025 at EPITECH"
+    >
+      Plateforme de jeux dynamique avec plugins .so. Architecture modulaire, 3 jeux et 3 bibliothèques graphiques (NCurses, SDL2, SFML).
+    </TimeLineElement>
+    <TimeLineElement
+      title="Développeur C++ - Projet Raytracer"
+      subtitle="2025 at EPITECH"
+    >
+      Moteur de rendu 3D avec multithreading. Support de multiples primitives géométriques, parsing de scènes, éclairage et ombres.
+    </TimeLineElement>
+    <TimeLineElement
+      title="Développeur C - Projet myTeams / myFTP"
+      subtitle="2025 at EPITECH"
+    >
+      Implémentation de protocoles réseau : serveur FTP conforme RFC 959 et plateforme collaborative Teams-like avec protocole JSON/TCP.
+    </TimeLineElement>
+    <TimeLineElement
+      title="Développeur Sécurité - CTF Bug Bounty"
+      subtitle="2025 at EPITECH"
+    >
+      11 challenges d'exploitation binaire : stack overflow, ASLR bypass, heap overflow, Use-After-Free. Write-ups et PoCs en Python/C.
+    </TimeLineElement>
+    <TimeLineElement
+      title="Développeur Fullstack - Level Up RPG"
+      subtitle="2025 at EPITECH"
+    >
+      Jeu éducatif RPG avec React 19, Electron, TailwindCSS. Système de combat basé sur des défis pédagogiques (mathématiques, lecture).
+    </TimeLineElement>
+  </div>
+
+  <div class="mb-5">
+    <div class="text-3xl w-full font-heading font-bold">Skills</div>
+  </div>
+
+  <ul class="flex flex-wrap gap-2">
+    {
+      [
+        "C",
+        "C++",
+        "Python",
+        "Rust",
+        "TypeScript",
+        "React",
+        "Node.js",
+        "Astro",
+        "TailwindCSS",
+        "Docker",
+        "Git",
+        "Linux",
+        "Réseau (TCP/IP)",
+        "Sécurité",
+        "IA / ML",
+        "PyTorch",
+      ].map((skill) => (
+        <li class="px-3 py-1.5 rounded-full text-sm font-body border border-base-content/10 bg-white/[0.03] text-base-content/70 transition-colors duration-200 hover:border-[rgba(0,240,255,0.3)] hover:text-[#00f0ff]">
+          {skill}
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

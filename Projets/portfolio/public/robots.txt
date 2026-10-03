@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://portfolio-eight-flax-7y00bgkgpe.vercel.app/sitemap-index.xml

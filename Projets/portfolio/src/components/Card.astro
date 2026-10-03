@@ -1,0 +1,24 @@
+---
+const { title, img, desc, url, badge, tags, target = "_blank" } = Astro.props;
+import { Image } from "astro:assets";
+---
+
+<div class="md:w-1/3 w-full">
+  <a href={url} target={target}>
+    <div class="card bg-base-200/40 glass glass-hover transition-all duration-300 mx-6 my-2 reveal overflow-hidden group">
+      <div class="overflow-hidden">
+        <Image width={750} height={422} format="webp" src={img} alt={title} class="transition-transform duration-500 group-hover:scale-105" />
+      </div>
+      <div class="card-body">
+        <h2 class="card-title font-heading group-hover:gradient-text transition-all duration-300">
+          {title}
+          {badge && <div class="badge border-0 bg-secondary/20 text-secondary font-medium">{badge}</div>}
+        </h2>
+        <p class="text-base-content/60 font-body">{desc}</p>
+        <div class="card-actions justify-end">
+          {tags && tags.map((tag) => <div class="badge badge-outline border-base-content/20 text-base-content/50 text-xs">{tag}</div>)}
+        </div>
+      </div>
+    </div>
+  </a>
+</div>

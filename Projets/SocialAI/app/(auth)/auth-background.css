@@ -1,0 +1,157 @@
+/* =====================================================================
+   Décor de fond du portail d'authentification.
+   Orbes dégradés qui flottent + fine grille — piloté par les tokens
+   de marque, donc s'adapte au light/dark automatiquement.
+   ===================================================================== */
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Fine grille en pointillé, très discrète, pour donner de la profondeur */
+.auth-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(hsl(var(--foreground) / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--foreground) / 0.04) 1px, transparent 1px);
+  background-size: 46px 46px;
+  /* Fond plus dense au centre, fondu vers les bords */
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 75%);
+}
+
+.auth-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.auth-orb-1 {
+  width: 460px;
+  height: 460px;
+  top: -120px;
+  left: -80px;
+  background: radial-gradient(circle at 30% 30%, hsl(var(--primary) / 0.55), transparent 70%);
+  animation: orb-drift-1 22s ease-in-out infinite;
+}
+
+.auth-orb-2 {
+  width: 520px;
+  height: 520px;
+  bottom: -160px;
+  right: -120px;
+  background: radial-gradient(circle at 30% 30%, hsl(var(--accent) / 0.5), transparent 70%);
+  animation: orb-drift-2 26s ease-in-out infinite;
+}
+
+.auth-orb-3 {
+  width: 360px;
+  height: 360px;
+  top: 45%;
+  left: 55%;
+  background: radial-gradient(circle at 30% 30%, hsl(160 84% 39% / 0.4), transparent 70%);
+  animation: orb-drift-3 30s ease-in-out infinite;
+}
+
+.dark .auth-orb {
+  opacity: 0.4;
+}
+
+@keyframes orb-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(60px, 40px) scale(1.08); }
+  66%      { transform: translate(20px, 80px) scale(0.96); }
+}
+
+@keyframes orb-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(-70px, -30px) scale(1.05); }
+  66%      { transform: translate(-30px, -70px) scale(0.94); }
+}
+
+@keyframes orb-drift-3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-58%, -42%) scale(1.12); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Icônes de plateformes qui flottent                                  */
+/* ------------------------------------------------------------------ */
+
+.auth-badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22px;
+  /* Glyphe blanc sur la tuile de marque */
+  color: #fff;
+  box-shadow: 0 14px 34px hsl(222 47% 11% / 0.22);
+  will-change: transform;
+}
+
+.auth-badge svg {
+  width: 52%;
+  height: 52%;
+}
+
+/* Couleurs officielles des réseaux sociaux */
+.auth-badge--instagram {
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+}
+.auth-badge--facebook {
+  background: #1877f2;
+}
+.auth-badge--tiktok {
+  background: #010101;
+  border: 1px solid hsl(0 0% 100% / 0.14);
+}
+
+/* Chaque badge : position, taille, rotation de repos et rythme propres,
+   pour un flottement désynchronisé et naturel. */
+.auth-badge-1 { top: 14%; left: 11%;  width: 68px; height: 68px; animation: badge-float-a 15s ease-in-out infinite; }
+.auth-badge-2 { top: 24%; right: 13%; width: 84px; height: 84px; animation: badge-float-b 19s ease-in-out infinite; }
+.auth-badge-3 { bottom: 16%; left: 16%; width: 76px; height: 76px; animation: badge-float-c 17s ease-in-out infinite; }
+.auth-badge-4 { bottom: 20%; right: 12%; width: 60px; height: 60px; animation: badge-float-a 21s ease-in-out infinite; }
+.auth-badge-5 { top: 52%; left: 6%;   width: 54px; height: 54px; animation: badge-float-b 23s ease-in-out infinite; }
+.auth-badge-6 { top: 62%; right: 7%;  width: 70px; height: 70px; animation: badge-float-c 18s ease-in-out infinite; }
+
+@keyframes badge-float-a {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  50%      { transform: translateY(-26px) rotate(6deg); }
+}
+@keyframes badge-float-b {
+  0%, 100% { transform: translateY(0) rotate(7deg); }
+  50%      { transform: translateY(-32px) rotate(-6deg); }
+}
+@keyframes badge-float-c {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50%      { transform: translateY(-22px) rotate(10deg); }
+}
+
+/* Sur petits écrans, on masque les badges les plus centraux pour ne pas
+   surcharger derrière le portail. */
+@media (max-width: 767px) {
+  .auth-badge-5,
+  .auth-badge-6 {
+    display: none;
+  }
+  .auth-badge {
+    transform: scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-orb,
+  .auth-badge {
+    animation: none !important;
+  }
+}

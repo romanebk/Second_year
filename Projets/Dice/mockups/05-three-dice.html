@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dice Désir — Three.js (3D réel)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..900,0..100;1,9..144,400..900,0..100&family=Bagel+Fat+One&family=Outfit:wght@300;400;500;600;700;900&family=Unbounded:wght@300;400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+  :root {
+    --cream: #fdf3e7;
+    --cream-deep: #f5e8d4;
+    --peach: #ffd4b0;
+    --terracotta: #e85a3c;
+    --hot-pink: #ff3d8b;
+    --pink-deep: #d92668;
+    --magenta: #b8276f;
+    --plum: #5a1535;
+    --mustard: #e8b835;
+    --ink: #2a0a18;
+    --black: #1a0510;
+    --neon-bg: #050507;
+    --neon-pink: #ff007a;
+    --neon-cyan: #00f0ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 3rem 2rem;
+    background:
+      radial-gradient(circle 800px at 90% 10%, var(--peach) 0%, transparent 60%),
+      radial-gradient(circle 700px at 10% 90%, rgba(255,61,139,0.15) 0%, transparent 60%),
+      var(--cream);
+    background-attachment: fixed;
+    transition: background 0.6s ease;
+  }
+
+  body[data-theme="dark"] {
+    background:
+      radial-gradient(circle 800px at 90% 10%, rgba(255,0,122,0.18) 0%, transparent 60%),
+      radial-gradient(circle 700px at 10% 90%, rgba(0,240,255,0.1) 0%, transparent 60%),
+      var(--neon-bg);
+    color: #f0eee8;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(42,10,24,0.04) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+  body[data-theme="dark"]::before {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255,0,122,0.06) 1px, transparent 1px);
+  }
+
+  .wrap { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+
+  .top-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .top-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0.5rem 1.2rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  body[data-theme="dark"] .pill {
+    background: var(--neon-pink);
+    color: var(--neon-bg);
+    box-shadow: 0 0 20px rgba(255,0,122,0.6);
+    border-radius: 4px;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+  }
+  .pill .dot {
+    width: 8px; height: 8px;
+    background: var(--hot-pink);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  body[data-theme="dark"] .pill .dot { background: var(--neon-bg); }
+  @keyframes pulse { 50% { transform: scale(1.5); opacity: 0.5; } }
+
+  .theme-toggle {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    padding: 0.5rem 1.2rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: all 0.15s;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .theme-toggle:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+  body[data-theme="dark"] .theme-toggle {
+    background: transparent;
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0,240,255,0.4);
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 4px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    transition: color 0.4s;
+  }
+  body[data-theme="dark"] h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    color: #f0eee8;
+  }
+  h1 em { color: var(--hot-pink); font-style: italic; }
+  body[data-theme="dark"] h1 em {
+    color: var(--neon-pink);
+    text-shadow: 0 0 20px var(--neon-pink);
+    font-style: normal;
+  }
+  h1 .pop {
+    color: var(--terracotta);
+    font-family: 'Bagel Fat One', cursive;
+    font-style: normal;
+    font-weight: normal;
+    font-variation-settings: normal;
+  }
+  body[data-theme="dark"] h1 .pop {
+    color: var(--neon-cyan);
+    font-family: 'Unbounded', sans-serif;
+    text-shadow: 0 0 20px var(--neon-cyan);
+  }
+
+  .top-header p {
+    font-size: 1.1rem;
+    color: var(--plum);
+    margin-top: 1rem;
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  body[data-theme="dark"] .top-header p {
+    color: var(--neon-cyan);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+  }
+
+  /* ======= STAGE ======== */
+  .stage {
+    background: white;
+    border: 4px solid var(--ink);
+    border-radius: 32px;
+    padding: 0;
+    box-shadow: 10px 10px 0 var(--ink);
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s;
+  }
+  body[data-theme="dark"] .stage {
+    background: var(--neon-bg);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 60px rgba(255,0,122,0.4), 10px 10px 0 var(--neon-pink);
+  }
+
+  .stage-tag {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    z-index: 10;
+    text-transform: uppercase;
+  }
+  body[data-theme="dark"] .stage-tag {
+    background: var(--neon-pink);
+    color: var(--neon-bg);
+    box-shadow: 0 0 20px rgba(255,0,122,0.6);
+    border-radius: 4px;
+  }
+
+  .stage-info {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--ink);
+    padding: 0.4rem 0.9rem;
+    border-radius: 100px;
+    z-index: 10;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--plum);
+  }
+  body[data-theme="dark"] .stage-info {
+    background: rgba(5,5,7,0.8);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    border-radius: 4px;
+  }
+  .stage-info strong { color: var(--ink); }
+  body[data-theme="dark"] .stage-info strong { color: var(--neon-cyan); }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    position: relative;
+    cursor: grab;
+  }
+  #canvas-container:active { cursor: grabbing; }
+  #canvas-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+
+  .stage-bottom {
+    padding: 1.5rem 2rem 2rem;
+    border-top: 4px solid var(--ink);
+    background: var(--cream);
+    transition: all 0.4s;
+  }
+  body[data-theme="dark"] .stage-bottom {
+    background: rgba(5,5,7,0.8);
+    border-top-color: var(--neon-pink);
+  }
+
+  .turn-info {
+    text-align: center;
+    margin-bottom: 1.2rem;
+  }
+  .turn-info .l { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; color: var(--plum); }
+  body[data-theme="dark"] .turn-info .l {
+    color: var(--neon-cyan);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .turn-info .nm {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--hot-pink);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-top: 0.3rem;
+  }
+  body[data-theme="dark"] .turn-info .nm {
+    font-family: 'Unbounded', sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 20px var(--neon-pink);
+    font-style: normal;
+  }
+
+  .ctrl-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .roll-btn {
+    background: var(--ink);
+    color: var(--cream);
+    border: 3px solid var(--ink);
+    border-radius: 100px;
+    padding: 1.1rem 2.2rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    box-shadow: 5px 5px 0 var(--hot-pink);
+    transition: all 0.15s;
+  }
+  .roll-btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--hot-pink); }
+  .roll-btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--hot-pink); }
+  .roll-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  body[data-theme="dark"] .roll-btn {
+    background: var(--neon-pink);
+    color: var(--neon-bg);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 30px rgba(255,0,122,0.6);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    border-radius: 4px;
+  }
+  body[data-theme="dark"] .roll-btn:hover {
+    background: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 50px rgba(0,240,255,0.8);
+  }
+
+  .ctrl {
+    background: white;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    padding: 0.7rem 1.3rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: all 0.15s;
+  }
+  .ctrl:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+  body[data-theme="dark"] .ctrl {
+    background: transparent;
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0,240,255,0.3);
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 4px;
+  }
+
+  /* result */
+  .result {
+    margin-top: 1.5rem;
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    padding: 1.2rem 2rem;
+    box-shadow: 4px 4px 0 var(--ink);
+    text-align: center;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+  .result.show { transform: scale(1); opacity: 1; }
+
+  body[data-theme="dark"] .result {
+    background: var(--neon-bg);
+    border-color: var(--neon-cyan);
+    color: #f0eee8;
+    box-shadow: 0 0 30px rgba(0,240,255,0.4);
+    border-radius: 4px;
+  }
+
+  .result .stamp {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    background: var(--hot-pink);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    padding: 0.25rem 0.9rem;
+    font-family: 'Bagel Fat One', cursive;
+    font-size: 0.75rem;
+    color: white;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  body[data-theme="dark"] .result .stamp {
+    background: var(--neon-pink);
+    color: var(--neon-bg);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 20px rgba(255,0,122,0.6);
+    transform: translateX(-50%);
+    border-radius: 4px;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+  }
+
+  .result .text {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--ink);
+    margin-top: 0.5rem;
+    line-height: 1.15;
+  }
+  body[data-theme="dark"] .result .text {
+    font-family: 'Unbounded', sans-serif;
+    color: #f0eee8;
+  }
+  .result .text em { color: var(--hot-pink); font-style: italic; }
+  body[data-theme="dark"] .result .text em {
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink);
+    font-style: normal;
+  }
+  .result .text .underline {
+    background: var(--mustard);
+    padding: 0 6px;
+    border-radius: 4px;
+    color: var(--ink);
+    font-style: normal;
+  }
+  body[data-theme="dark"] .result .text .underline {
+    background: transparent;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+  }
+
+  /* ======== INFO BLOCK ======== */
+  .info {
+    margin-top: 3rem;
+    background: var(--mustard);
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+  body[data-theme="dark"] .info {
+    background: var(--neon-bg);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: 0 0 30px rgba(0,240,255,0.3);
+  }
+  .info h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: 1.6rem;
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+  }
+  body[data-theme="dark"] .info h3 {
+    font-family: 'Unbounded', sans-serif;
+    color: #f0eee8;
+  }
+  .info p {
+    color: var(--ink);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+  }
+  body[data-theme="dark"] .info p {
+    color: #f0eee8;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+  }
+  .info .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .info .cell {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 1rem;
+  }
+  body[data-theme="dark"] .info .cell {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--neon-cyan);
+    border-radius: 4px;
+  }
+  .info .cell h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+  body[data-theme="dark"] .info .cell h4 {
+    color: var(--neon-cyan);
+    font-family: 'Unbounded', sans-serif;
+  }
+  .info .cell .v {
+    font-family: 'Bagel Fat One', cursive;
+    color: var(--hot-pink);
+    font-size: 1.4rem;
+    line-height: 1;
+    margin: 0.3rem 0;
+  }
+  body[data-theme="dark"] .info .cell .v {
+    color: var(--neon-pink);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    text-shadow: 0 0 10px var(--neon-pink);
+  }
+  .info .cell .d {
+    font-size: 0.78rem;
+    color: var(--plum);
+    line-height: 1.4;
+  }
+  body[data-theme="dark"] .info .cell .d {
+    color: #aaa;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  @media (max-width: 700px) {
+    body { padding: 1.5rem 1rem; }
+    .info .grid { grid-template-columns: 1fr; }
+    .stage-tag, .stage-info { font-size: 0.6rem; padding: 0.3rem 0.6rem; }
+  }
+</style>
+</head>
+<body data-theme="light">
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="top-header">
+    <div class="top-bar">
+      <span class="pill"><span class="dot"></span>Three.js · 3D réel</span>
+      <button class="theme-toggle" id="themeToggle">🌙 Dark mode</button>
+    </div>
+    <h1>Vrais dés <em>3D</em><br>avec <span class="pop">Three.js</span></h1>
+    <p>WebGL, vraies ombres, vraies textures. Tu peux faire glisser pour tourner la caméra. Comparable à ce qu'on aura dans la vraie app Next.js.</p>
+  </div>
+
+  <!-- STAGE -->
+  <div class="stage">
+    <span class="stage-tag">🎲 WebGL Stage</span>
+    <div class="stage-info">FPS : <strong id="fps">--</strong> · <strong id="theme-label">Light</strong></div>
+
+    <div id="canvas-container"></div>
+
+    <div class="stage-bottom">
+      <div class="turn-info">
+        <div class="l">À toi de jouer</div>
+        <div class="nm">Camille</div>
+      </div>
+
+      <div class="ctrl-row">
+        <button class="roll-btn" id="rollBtn">🎲 Lancer les dés</button>
+        <button class="ctrl" id="resetCam">↻ Recadrer</button>
+        <button class="ctrl" id="autoOrbit">🔄 Auto-rotation</button>
+      </div>
+
+      <div class="result" id="result">
+        <span class="stamp">Action !</span>
+        <div class="text" id="resultText">Clique sur "Lancer les dés" pour commencer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div class="info">
+    <h3>📊 Three.js vs CSS — coût technique</h3>
+    <p>Le rendu 3D Three.js coûte plus cher que les animations CSS, mais offre un niveau de polish inatteignable autrement. Voici les chiffres concrets pour aider à décider :</p>
+
+    <div class="grid">
+      <div class="cell">
+        <h4>📦 Poids Three.js</h4>
+        <div class="v">~150 ko</div>
+        <div class="d">Gzippé. Lazy-loadable uniquement quand on entre dans une partie. Cache après 1ère visite.</div>
+      </div>
+      <div class="cell">
+        <h4>⚡ Perfs mobile</h4>
+        <div class="v">60 fps</div>
+        <div class="d">Sur tout iPhone ≥ 2017 et Android moyen-haut. Ombres soft activables/désactivables.</div>
+      </div>
+      <div class="cell">
+        <h4>🎨 Wow factor</h4>
+        <div class="v">★★★★★</div>
+        <div class="d">Vraies ombres, matériaux PBR, caméra interactive. Sensation produit "premium".</div>
+      </div>
+    </div>
+
+    <p style="margin-top:1.5rem;"><strong>Ma reco :</strong> on part sur Three.js (via React Three Fiber dans Next.js) pour le wow factor. On ajoute un fallback CSS automatique pour les vieux téléphones (détection WebGL au démarrage). Best of both worlds.</p>
+  </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- ===== THREE.JS SCENE ====================== -->
+<!-- ============================================ -->
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+// ---- DATA ----
+const ACTIONS = [
+  { em: '👅', lbl: 'Lécher' },
+  { em: '💋', lbl: 'Embrasser' },
+  { em: '✋', lbl: 'Caresser' },
+  { em: '🦷', lbl: 'Mordiller' },
+  { em: '💆', lbl: 'Masser' },
+  { em: '🌬️', lbl: 'Souffler' },
+];
+const ZONES = [
+  { em: '👂', lbl: "L'oreille" },
+  { em: '💋', lbl: 'Les lèvres' },
+  { em: '🤲', lbl: 'Le cou' },
+  { em: '🦴', lbl: 'Le dos' },
+  { em: '🫦', lbl: 'La nuque' },
+  { em: '🤚', lbl: 'Les mains' },
+];
+
+const THEMES = {
+  light: {
+    bg: 0xfdf3e7,
+    die1Bg: '#ffffff',
+    die1Border: '#ff3d8b',
+    die1Text: '#1a0510',
+    die2Bg: '#e8b835',
+    die2Border: '#e85a3c',
+    die2Text: '#1a0510',
+    ambient: 0xffffff,
+    ambientI: 0.6,
+    dirI: 1.2,
+    dirColor: 0xffffff,
+    rim: null,
+  },
+  dark: {
+    bg: 0x050507,
+    die1Bg: '#0a0a0e',
+    die1Border: '#ff007a',
+    die1Text: '#ff007a',
+    die2Bg: '#0a0a0e',
+    die2Border: '#00f0ff',
+    die2Text: '#00f0ff',
+    ambient: 0x4a0e3a,
+    ambientI: 0.5,
+    dirI: 0.8,
+    dirColor: 0xff007a,
+    rim: { color: 0x00f0ff, intensity: 1.5 },
+  },
+};
+
+let currentTheme = 'light';
+
+// ---- SCENE SETUP ----
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(38, 16/10, 0.1, 100);
+const defaultCamPos = { x: 0, y: 4, z: 8 };
+camera.position.set(defaultCamPos.x, defaultCamPos.y, defaultCamPos.z);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+container.appendChild(renderer.domElement);
+
+function resize() {
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+resize();
+new ResizeObserver(resize).observe(container);
+
+// ---- LIGHTS ----
+const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambient);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+dirLight.position.set(5, 10, 5);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.set(2048, 2048);
+dirLight.shadow.camera.left = -6;
+dirLight.shadow.camera.right = 6;
+dirLight.shadow.camera.top = 6;
+dirLight.shadow.camera.bottom = -6;
+dirLight.shadow.camera.near = 0.5;
+dirLight.shadow.camera.far = 30;
+dirLight.shadow.radius = 6;
+scene.add(dirLight);
+
+let rimLight = null;
+
+// ---- FLOOR (catches shadows) ----
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(30, 30),
+  new THREE.ShadowMaterial({ opacity: 0.25 })
+);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -1.2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+// ---- TEXTURE FACTORY ----
+function makeFaceTexture(emoji, label, bg, textColor, isDark) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 512;
+  const ctx = c.getContext('2d');
+
+  // background
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 512, 512);
+
+  if (isDark) {
+    // neon mode: glow gradient
+    const grad = ctx.createRadialGradient(256, 256, 50, 256, 256, 320);
+    grad.addColorStop(0, textColor + '33');
+    grad.addColorStop(1, bg);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 512, 512);
+
+    // neon border
+    ctx.strokeStyle = textColor;
+    ctx.lineWidth = 6;
+    ctx.shadowColor = textColor;
+    ctx.shadowBlur = 30;
+    ctx.strokeRect(20, 20, 472, 472);
+    ctx.shadowBlur = 0;
+  } else {
+    // pop: thick black border + colored inner
+    ctx.strokeStyle = '#1a0510';
+    ctx.lineWidth = 32;
+    ctx.strokeRect(16, 16, 480, 480);
+  }
+
+  // emoji
+  ctx.font = '180px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  if (isDark) {
+    ctx.shadowColor = textColor;
+    ctx.shadowBlur = 30;
+  }
+  ctx.fillText(emoji, 256, 220);
+  ctx.shadowBlur = 0;
+
+  // label
+  ctx.fillStyle = textColor;
+  ctx.font = isDark
+    ? 'bold 56px Unbounded, sans-serif'
+    : '900 64px Fraunces, Georgia, serif';
+  if (isDark) {
+    ctx.shadowColor = textColor;
+    ctx.shadowBlur = 20;
+  }
+  ctx.fillText(label, 256, 380);
+  ctx.shadowBlur = 0;
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return tex;
+}
+
+// ---- DIE FACTORY ----
+// BoxGeometry face order: +X, -X, +Y, -Y, +Z, -Z (right, left, top, bottom, front, back)
+function createDie(faces, theme, dieKey) {
+  const isDark = currentTheme === 'dark';
+  const bg = theme[dieKey + 'Bg'];
+  const border = theme[dieKey + 'Border'];
+  const text = theme[dieKey + 'Text'];
+
+  const materials = faces.map(f =>
+    new THREE.MeshStandardMaterial({
+      map: makeFaceTexture(f.em, f.lbl, bg, isDark ? border : text, isDark),
+      roughness: 0.4,
+      metalness: isDark ? 0.3 : 0.05,
+      emissive: isDark ? new THREE.Color(border) : new THREE.Color(0x000000),
+      emissiveIntensity: isDark ? 0.15 : 0,
+    })
+  );
+
+  const geom = new RoundedBoxGeometry(2, 2, 2, 4, 0.18);
+  const mesh = new THREE.Mesh(geom, materials);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+let die1 = createDie(ACTIONS, THEMES.light, 'die1');
+let die2 = createDie(ZONES, THEMES.light, 'die2');
+die1.position.x = -1.7;
+die2.position.x = 1.7;
+scene.add(die1);
+scene.add(die2);
+
+// ---- ROLLING ANIMATION ----
+// Rotation that puts a given face index (in box geometry order) facing UP (+Y)
+const FACE_UP_ROT = [
+  { x: 0, y: 0, z: -Math.PI / 2 },          // +X face up
+  { x: 0, y: 0, z: Math.PI / 2 },           // -X face up
+  { x: 0, y: 0, z: 0 },                      // +Y face up (default top)
+  { x: Math.PI, y: 0, z: 0 },                // -Y face up
+  { x: -Math.PI / 2, y: 0, z: 0 },          // +Z face up
+  { x: Math.PI / 2, y: 0, z: 0 },           // -Z face up
+];
+
+let isRolling = false;
+let rollState = null;
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function startRoll() {
+  if (isRolling) return;
+  isRolling = true;
+  document.getElementById('rollBtn').disabled = true;
+  document.getElementById('result').classList.remove('show');
+
+  if (navigator.vibrate) navigator.vibrate([30, 20, 30, 20, 50]);
+
+  const i1 = Math.floor(Math.random() * 6);
+  const i2 = Math.floor(Math.random() * 6);
+
+  const target1 = FACE_UP_ROT[i1];
+  const target2 = FACE_UP_ROT[i2];
+
+  rollState = {
+    startTime: performance.now(),
+    duration: 1800,
+    die1Start: { x: die1.rotation.x, y: die1.rotation.y, z: die1.rotation.z },
+    die2Start: { x: die2.rotation.x, y: die2.rotation.y, z: die2.rotation.z },
+    die1End: {
+      x: target1.x + Math.PI * 2 * 4,
+      y: Math.PI * 2 * 3,
+      z: target1.z + Math.PI * 2 * 2,
+    },
+    die2End: {
+      x: target2.x + Math.PI * 2 * 5,
+      y: Math.PI * 2 * 2,
+      z: target2.z + Math.PI * 2 * 3,
+    },
+    i1, i2,
+  };
+}
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function easeOutBounce(t) {
+  const n1 = 7.5625, d1 = 2.75;
+  if (t < 1/d1) return n1 * t * t;
+  if (t < 2/d1) return n1 * (t -= 1.5/d1) * t + 0.75;
+  if (t < 2.5/d1) return n1 * (t -= 2.25/d1) * t + 0.9375;
+  return n1 * (t -= 2.625/d1) * t + 0.984375;
+}
+
+function updateRoll(now) {
+  if (!rollState) return;
+  const t = Math.min((now - rollState.startTime) / rollState.duration, 1);
+  const eased = easeOutCubic(t);
+
+  die1.rotation.x = rollState.die1Start.x + (rollState.die1End.x - rollState.die1Start.x) * eased;
+  die1.rotation.y = rollState.die1Start.y + (rollState.die1End.y - rollState.die1Start.y) * eased;
+  die1.rotation.z = rollState.die1Start.z + (rollState.die1End.z - rollState.die1Start.z) * eased;
+
+  die2.rotation.x = rollState.die2Start.x + (rollState.die2End.x - rollState.die2Start.x) * eased;
+  die2.rotation.y = rollState.die2Start.y + (rollState.die2End.y - rollState.die2Start.y) * eased;
+  die2.rotation.z = rollState.die2Start.z + (rollState.die2End.z - rollState.die2Start.z) * eased;
+
+  // Y bounce
+  const bounceT = Math.min(t * 1.2, 1);
+  const bounce = Math.sin(bounceT * Math.PI) * 1.8;
+  die1.position.y = bounce;
+  die2.position.y = bounce * 0.92 + Math.sin(bounceT * Math.PI * 1.3) * 0.3;
+
+  if (t >= 1) {
+    die1.position.y = 0;
+    die2.position.y = 0;
+    // normalize rotations to face values for clean math next time
+    die1.rotation.set(FACE_UP_ROT[rollState.i1].x, 0, FACE_UP_ROT[rollState.i1].z);
+    die2.rotation.set(FACE_UP_ROT[rollState.i2].x, 0, FACE_UP_ROT[rollState.i2].z);
+
+    // show result
+    const action = ACTIONS[rollState.i1];
+    const zone = ZONES[rollState.i2];
+    const txt = `Camille doit <em>${action.lbl.toLowerCase()}</em><br><span class="underline">${zone.lbl.toLowerCase()}</span> de Léon`;
+    document.getElementById('resultText').innerHTML = txt;
+    document.getElementById('result').classList.add('show');
+
+    if (navigator.vibrate) navigator.vibrate(150);
+
+    isRolling = false;
+    rollState = null;
+    document.getElementById('rollBtn').disabled = false;
+  }
+}
+
+// ---- DRAG TO ROTATE CAMERA ----
+let dragging = false;
+let dragStart = { x: 0, y: 0 };
+let camAngle = { theta: 0, phi: 0 };
+let baseAngle = { theta: 0, phi: 0 };
+let autoOrbit = false;
+
+container.addEventListener('pointerdown', (e) => {
+  dragging = true;
+  dragStart = { x: e.clientX, y: e.clientY };
+  baseAngle = { ...camAngle };
+  autoOrbit = false;
+});
+window.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  const dx = (e.clientX - dragStart.x) / container.clientWidth;
+  const dy = (e.clientY - dragStart.y) / container.clientHeight;
+  camAngle.theta = baseAngle.theta + dx * Math.PI;
+  camAngle.phi = Math.max(-0.5, Math.min(0.7, baseAngle.phi + dy));
+});
+window.addEventListener('pointerup', () => { dragging = false; });
+
+function updateCamera() {
+  if (autoOrbit) camAngle.theta += 0.003;
+  const r = 9;
+  const theta = camAngle.theta;
+  const phi = camAngle.phi;
+  camera.position.x = Math.sin(theta) * r * Math.cos(phi);
+  camera.position.z = Math.cos(theta) * r * Math.cos(phi);
+  camera.position.y = 4 + phi * 4;
+  camera.lookAt(0, 0, 0);
+}
+
+// ---- THEME SWITCH ----
+function applyTheme(name) {
+  currentTheme = name;
+  const th = THEMES[name];
+  scene.background = null;
+  ambient.color.setHex(th.ambient);
+  ambient.intensity = th.ambientI;
+  dirLight.color.setHex(th.dirColor);
+  dirLight.intensity = th.dirI;
+
+  if (rimLight) { scene.remove(rimLight); rimLight = null; }
+  if (th.rim) {
+    rimLight = new THREE.DirectionalLight(th.rim.color, th.rim.intensity);
+    rimLight.position.set(-5, 4, -5);
+    scene.add(rimLight);
+  }
+
+  // rebuild dice with new textures
+  scene.remove(die1); scene.remove(die2);
+  die1.geometry.dispose();
+  die1.material.forEach(m => { m.map.dispose(); m.dispose(); });
+  die2.geometry.dispose();
+  die2.material.forEach(m => { m.map.dispose(); m.dispose(); });
+
+  die1 = createDie(ACTIONS, th, 'die1');
+  die2 = createDie(ZONES, th, 'die2');
+  die1.position.x = -1.7;
+  die2.position.x = 1.7;
+  scene.add(die1);
+  scene.add(die2);
+
+  document.body.dataset.theme = name;
+  document.getElementById('themeToggle').innerHTML =
+    name === 'light' ? '🌙 Dark mode' : '☀️ Light mode';
+  document.getElementById('theme-label').textContent =
+    name === 'light' ? 'Light' : 'Dark';
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+});
+
+// detect system preference
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  applyTheme('dark');
+}
+
+// ---- BUTTONS ----
+document.getElementById('rollBtn').addEventListener('click', startRoll);
+document.getElementById('resetCam').addEventListener('click', () => {
+  camAngle = { theta: 0, phi: 0 };
+  autoOrbit = false;
+});
+document.getElementById('autoOrbit').addEventListener('click', () => {
+  autoOrbit = !autoOrbit;
+});
+
+// ---- ANIMATION LOOP ----
+let lastFps = performance.now();
+let frames = 0;
+
+function animate(now) {
+  requestAnimationFrame(animate);
+  if (rollState) updateRoll(now);
+  // idle tilt animation (when not rolling)
+  if (!isRolling) {
+    die1.rotation.y += 0.005;
+    die2.rotation.y -= 0.004;
+  }
+  updateCamera();
+  renderer.render(scene, camera);
+
+  // FPS
+  frames++;
+  if (now - lastFps >= 1000) {
+    document.getElementById('fps').textContent = frames;
+    frames = 0;
+    lastFps = now;
+  }
+}
+requestAnimationFrame(animate);
+</script>
+
+</body>
+</html>

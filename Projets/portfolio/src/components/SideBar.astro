@@ -1,0 +1,28 @@
+---
+import SideBarFooter from "./SideBarFooter.astro";
+import { Image } from "astro:assets";
+import SideBarMenu from "./SideBarMenu.astro";
+const { sideBarActiveItemID } = Astro.props;
+---
+
+<div class="drawer-side z-40">
+  <label for="my-drawer" class="drawer-overlay"></label>
+  <aside class="px-2 pt-2 h-auto min-h-full w-[19rem] bg-base-200/60 backdrop-blur-xl text-base-content flex flex-col border-r border-base-content/5">
+    <div class="w-fit mx-auto mt-6 mb-6 relative">
+      <a href="/">
+        <div class="avatar transition-all duration-300 hover:scale-[103%] block m-auto relative">
+          <div class="w-[8.5rem] rounded-full ring-2 ring-[rgba(0,240,255,0.15)] ring-offset-2 ring-offset-base-200">
+            <Image class="mask mask-circle" format="webp" width={300} height={300} src="/profile.webp" alt="Profile image" />
+          </div>
+          <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#00f0ff] border-2 border-base-200 animate-pulse"></div>
+        </div>
+      </a>
+    </div>
+    <div class="text-center -mt-2 mb-4">
+      <p class="text-sm font-heading font-semibold">Ariel BOKO</p>
+      <p class="text-xs text-base-content/40 font-body">Développeur</p>
+    </div>
+    <SideBarMenu sideBarActiveItemID={sideBarActiveItemID} />
+    <SideBarFooter />
+  </aside>
+</div>

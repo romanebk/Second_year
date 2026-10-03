@@ -1,0 +1,61 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { Image } from "astro:assets";
+import type { ProjectSchema } from "../content/config";
+
+export interface Props extends Omit<ProjectSchema, 'heroImage'> {
+  heroImage?: string;
+}
+
+const { title, description, heroImage, badge, tags = [], category, github, demo } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={heroImage}>
+  <article class="max-w-[750px] mx-auto">
+    <div class="mb-6 reveal reveal-delay-1">
+      {category && (
+        <div class="text-sm font-body text-base-content/40 mb-2">
+          <a href="/projects" class="link link-hover hover:text-[#00f0ff]">← Retour aux projets</a>
+          <span class="mx-2">/</span>
+          <span>{category}</span>
+        </div>
+      )}
+      <h1 class="text-4xl md:text-5xl font-heading font-bold mt-4">{title}</h1>
+      {badge && <div class="badge badge-secondary border-0 bg-secondary/20 text-secondary font-medium mt-3">{badge}</div>}
+    </div>
+
+    {heroImage && (
+      <div class="rounded-xl overflow-hidden mb-8 reveal reveal-delay-2 glass">
+        <Image width={750} height={422} format="webp" src={heroImage} alt={title} class="w-full" />
+      </div>
+    )}
+
+    <div class="prose prose-lg max-w-none prose-invert reveal reveal-delay-3 font-body leading-relaxed text-base-content/70">
+      <slot />
+    </div>
+
+    <div class="flex flex-wrap gap-3 mt-10 reveal reveal-delay-4">
+      {github && (
+        <a href={github} target="_blank" class="btn btn-outline rounded-full px-6 font-heading border-base-content/20 hover:border-[#00f0ff] hover:text-[#00f0ff]">
+          Voir sur GitHub
+        </a>
+      )}
+      {demo && (
+        <a href={demo} target="_blank" class="btn btn-primary rounded-full px-6 font-heading">
+          Démo en ligne
+        </a>
+      )}
+    </div>
+
+    {tags.length > 0 && (
+      <div class="mt-10 pt-6 border-t border-base-content/10 reveal reveal-delay-5">
+        <h3 class="text-sm font-heading font-semibold text-base-content/40 mb-3">Tags</h3>
+        <div class="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span class="badge badge-outline border-base-content/20 text-base-content/50 text-xs">{tag}</span>
+          ))}
+        </div>
+      </div>
+    )}
+  </article>
+</BaseLayout>

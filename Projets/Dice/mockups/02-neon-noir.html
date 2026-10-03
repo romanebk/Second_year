@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposition 2 — Néon Noir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400;500;700;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #050507;
+    --void: #0a0a0e;
+    --char: #14141a;
+    --magenta: #ff007a;
+    --magenta-glow: #ff3399;
+    --cyan: #00f0ff;
+    --cyan-dim: #00b8c4;
+    --acid: #d4ff00;
+    --red: #ff1240;
+    --bone: #f0eee8;
+    --grey: #6b6b78;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--bone);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* CRT scanlines */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(255,255,255,0.015) 1px,
+      transparent 2px,
+      transparent 3px
+    );
+  }
+
+  /* noise */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 998;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.95' numOctaves='2' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+  }
+
+  .display {
+    font-family: 'Unbounded', sans-serif;
+    letter-spacing: -0.04em;
+    line-height: 0.85;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  .neon-text {
+    color: var(--magenta);
+    text-shadow:
+      0 0 5px var(--magenta),
+      0 0 20px var(--magenta-glow),
+      0 0 40px rgba(255,0,122,0.4);
+  }
+  .neon-cyan {
+    color: var(--cyan);
+    text-shadow:
+      0 0 5px var(--cyan),
+      0 0 15px var(--cyan-dim),
+      0 0 30px rgba(0,240,255,0.3);
+  }
+
+  section {
+    min-height: 100vh;
+    padding: 4rem 3rem;
+    position: relative;
+    border-bottom: 2px dashed rgba(255,0,122,0.15);
+  }
+
+  .section-tag {
+    position: absolute;
+    top: 2rem;
+    right: 3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+    z-index: 5;
+    border-left: 2px solid var(--cyan);
+    padding-left: 0.8rem;
+  }
+  .section-tag .blink::after {
+    content: '_';
+    animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ==== SCENE 1 — HERO ==== */
+  .hero {
+    background:
+      radial-gradient(ellipse 100% 80% at 30% 100%, rgba(255,0,122,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 80% 20%, rgba(0,240,255,0.08) 0%, transparent 60%),
+      var(--black);
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    padding-top: 5rem;
+  }
+
+  .hero-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,0,122,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,0,122,0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 80%);
+    pointer-events: none;
+  }
+
+  .header-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,0,122,0.2);
+    background: rgba(5,5,7,0.5);
+    backdrop-filter: blur(10px);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--grey);
+    z-index: 10;
+  }
+  .header-bar .logo {
+    color: var(--magenta);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    text-shadow: 0 0 10px var(--magenta-glow);
+  }
+  .header-bar .stat {
+    display: flex;
+    gap: 2rem;
+  }
+  .header-bar .stat span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .header-bar .stat .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--magenta);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--magenta);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    50% { opacity: 0.3; }
+  }
+
+  .hero-content {
+    z-index: 2;
+    position: relative;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  .hero-meta .live {
+    color: var(--magenta);
+    text-shadow: 0 0 10px var(--magenta-glow);
+  }
+
+  .hero h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(4.5rem, 10vw, 9rem);
+    font-weight: 900;
+    letter-spacing: -0.06em;
+    line-height: 0.85;
+    margin-bottom: 1.5rem;
+    color: var(--bone);
+  }
+  .hero h1 .glitch {
+    color: var(--magenta);
+    text-shadow:
+      3px 0 var(--cyan),
+      -3px 0 var(--magenta-glow),
+      0 0 30px var(--magenta-glow);
+    animation: glitch 4s infinite;
+    position: relative;
+  }
+  @keyframes glitch {
+    0%, 92%, 100% { transform: translate(0); }
+    93% { transform: translate(-3px, 1px); }
+    94% { transform: translate(2px, -1px); }
+    95% { transform: translate(-1px, 2px); }
+    96% { transform: translate(1px, -2px); }
+  }
+
+  .hero h1 .strike {
+    text-decoration: line-through;
+    text-decoration-thickness: 8px;
+    text-decoration-color: var(--magenta);
+    color: var(--bone);
+  }
+
+  .hero .tagline {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--grey);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 2rem 0 3rem;
+    border-left: 2px solid var(--magenta);
+    padding-left: 1.5rem;
+  }
+  .hero .tagline .h { color: var(--cyan); }
+  .hero .tagline em { color: var(--magenta); font-style: normal; text-shadow: 0 0 6px var(--magenta-glow); }
+
+  .player-block {
+    background: var(--char);
+    border: 1px solid rgba(255,0,122,0.3);
+    padding: 0;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    position: relative;
+  }
+  .player-block::before {
+    content: 'PLAYERS.config';
+    position: absolute;
+    top: -10px;
+    left: 1rem;
+    background: var(--black);
+    padding: 0 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+  }
+
+  .player-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,0,122,0.1);
+    padding: 1.2rem 1.5rem;
+  }
+  .player-row:last-child { border-bottom: none; }
+  .player-row .pkey {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--magenta);
+    letter-spacing: 0.2em;
+  }
+  .player-row input {
+    background: transparent;
+    border: none;
+    color: var(--bone);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    outline: none;
+    width: 100%;
+  }
+  .player-row input::placeholder { color: var(--grey); }
+
+  .cta-row {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .btn-primary {
+    flex: 1;
+    background: var(--magenta);
+    border: none;
+    color: var(--black);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 1.5rem 2rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    box-shadow:
+      0 0 20px rgba(255,0,122,0.5),
+      inset 0 0 0 0 var(--cyan);
+  }
+  .btn-primary:hover {
+    background: var(--cyan);
+    box-shadow:
+      0 0 40px rgba(0,240,255,0.7),
+      0 0 80px rgba(0,240,255,0.4);
+  }
+  .btn-primary::after {
+    content: '▶';
+    margin-left: 1rem;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--grey);
+    color: var(--grey);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .age-stamp {
+    margin-top: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    border: 2px solid var(--red);
+    padding: 0.6rem 1.2rem;
+    color: var(--red);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    transform: rotate(-2deg);
+    box-shadow: 0 0 20px rgba(255,18,64,0.3);
+  }
+  .age-stamp .num {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .age-stamp .txt {
+    font-size: 0.7rem;
+  }
+
+  .hero-art {
+    position: relative;
+    aspect-ratio: 1;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .hero-art-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ==== SCENE 2 — MODES ==== */
+  .modes {
+    background:
+      linear-gradient(180deg, var(--black) 0%, var(--void) 100%);
+    padding-top: 6rem;
+  }
+
+  .modes-header {
+    margin-bottom: 4rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 3rem;
+  }
+  .modes-header h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+    color: var(--bone);
+  }
+  .modes-header h2 .neon-text { display: block; }
+  .modes-header .meta {
+    text-align: right;
+    color: var(--grey);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+  .modes-header .meta .arrow { color: var(--magenta); }
+
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+  }
+
+  .mode-card {
+    background: var(--char);
+    border: 1px solid rgba(255,0,122,0.2);
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s;
+    aspect-ratio: 0.7;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .mode-card:hover {
+    border-color: var(--magenta);
+    background: rgba(255,0,122,0.06);
+    box-shadow:
+      inset 0 0 20px rgba(255,0,122,0.15),
+      0 0 30px rgba(255,0,122,0.3);
+  }
+  .mode-card:hover .mode-id { color: var(--magenta); text-shadow: 0 0 10px var(--magenta-glow); }
+  .mode-card:hover .mode-icon { transform: scale(1.1); filter: brightness(1.2); }
+
+  .mode-card.active {
+    border-color: var(--cyan);
+    background: rgba(0,240,255,0.05);
+    box-shadow:
+      inset 0 0 30px rgba(0,240,255,0.1),
+      0 0 40px rgba(0,240,255,0.2);
+  }
+
+  .mode-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--grey);
+    letter-spacing: 0.3em;
+    margin-bottom: auto;
+  }
+
+  .mode-icon {
+    font-size: 4rem;
+    margin: 1.5rem 0;
+    transition: all 0.4s;
+  }
+
+  .mode-name {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--bone);
+    letter-spacing: -0.03em;
+    line-height: 0.9;
+    margin-bottom: 0.5rem;
+  }
+
+  .mode-name .acid { color: var(--acid); text-shadow: 0 0 10px var(--acid); }
+
+  .mode-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--grey);
+    line-height: 1.5;
+    margin: 0.6rem 0 1.2rem;
+    flex: 1;
+  }
+
+  .mode-bar {
+    display: flex;
+    gap: 2px;
+    margin-top: auto;
+  }
+  .mode-bar span {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,0,122,0.15);
+  }
+  .mode-bar span.fill {
+    background: var(--magenta);
+    box-shadow: 0 0 10px var(--magenta-glow);
+  }
+  .mode-bar.fill-cyan span.fill { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+  .mode-bar.fill-acid span.fill { background: var(--acid); box-shadow: 0 0 10px var(--acid); }
+
+  .mode-tag {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--magenta);
+    border: 1px solid var(--magenta);
+    padding: 2px 6px;
+    letter-spacing: 0.15em;
+  }
+
+  /* ==== SCENE 3 — JEU ==== */
+  .game {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,0,122,0.18) 0%, transparent 60%),
+      var(--black);
+    padding-top: 6rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .game::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(45deg, transparent 49%, rgba(255,0,122,0.05) 49%, rgba(255,0,122,0.05) 51%, transparent 51%);
+    background-size: 30px 30px;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .game-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: var(--char);
+    border: 1px solid var(--magenta);
+    padding: 0.7rem 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--bone);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 30px rgba(255,0,122,0.3);
+    position: relative;
+    z-index: 2;
+  }
+  .game-status .ico { color: var(--magenta); }
+  .game-status .level { color: var(--acid); }
+
+  .game-turn-display {
+    margin-bottom: 4rem;
+    position: relative;
+    z-index: 2;
+  }
+  .game-turn-display .label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--grey);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .game-turn-display .name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 900;
+    color: var(--magenta);
+    text-shadow:
+      0 0 20px var(--magenta),
+      0 0 60px var(--magenta-glow),
+      0 0 100px rgba(255,0,122,0.4);
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+  }
+  .game-turn-display .name::before {
+    content: '> ';
+    color: var(--cyan);
+  }
+
+  .dice-arena {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5rem;
+    margin: 3rem 0;
+    perspective: 1200px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .die-3d {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    background: var(--void);
+    border: 2px solid var(--magenta);
+    box-shadow:
+      inset 0 0 30px rgba(255,0,122,0.3),
+      0 0 50px rgba(255,0,122,0.5),
+      0 0 100px rgba(255,0,122,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: rotateX(-12deg) rotateY(15deg);
+    animation: hover3d 5s ease-in-out infinite;
+  }
+  .die-3d.cyan {
+    border-color: var(--cyan);
+    box-shadow:
+      inset 0 0 30px rgba(0,240,255,0.3),
+      0 0 50px rgba(0,240,255,0.5),
+      0 0 100px rgba(0,240,255,0.2);
+    transform: rotateX(-12deg) rotateY(-15deg);
+    animation: hover3d2 5s ease-in-out infinite;
+  }
+  @keyframes hover3d {
+    0%, 100% { transform: rotateX(-12deg) rotateY(15deg) translateY(0); }
+    50% { transform: rotateX(-8deg) rotateY(20deg) translateY(-15px); }
+  }
+  @keyframes hover3d2 {
+    0%, 100% { transform: rotateX(-12deg) rotateY(-15deg) translateY(0); }
+    50% { transform: rotateX(-8deg) rotateY(-20deg) translateY(-15px); }
+  }
+
+  .die-3d::before, .die-3d::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .die-3d::before {
+    background: linear-gradient(135deg, transparent 40%, rgba(255,0,122,0.1) 50%, transparent 60%);
+    animation: shimmer 3s infinite;
+  }
+  .die-3d.cyan::before {
+    background: linear-gradient(135deg, transparent 40%, rgba(0,240,255,0.1) 50%, transparent 60%);
+  }
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .die-3d .die-tag {
+    position: absolute;
+    top: -25px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--cyan);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+
+  .die-3d .die-val {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--bone);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-shadow: 0 0 20px var(--magenta-glow);
+  }
+  .die-3d.cyan .die-val { text-shadow: 0 0 20px var(--cyan); }
+
+  .die-3d .die-emoji {
+    font-size: 3rem;
+    margin-bottom: 0.6rem;
+    filter: drop-shadow(0 0 10px var(--magenta));
+  }
+  .die-3d.cyan .die-emoji { filter: drop-shadow(0 0 10px var(--cyan)); }
+
+  .die-3d .corner-bracket {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: var(--magenta);
+  }
+  .die-3d.cyan .corner-bracket { border-color: var(--cyan); }
+  .die-3d .cb-tl { top: 8px; left: 8px; border-top: 2px solid; border-left: 2px solid; }
+  .die-3d .cb-tr { top: 8px; right: 8px; border-top: 2px solid; border-right: 2px solid; }
+  .die-3d .cb-bl { bottom: 8px; left: 8px; border-bottom: 2px solid; border-left: 2px solid; }
+  .die-3d .cb-br { bottom: 8px; right: 8px; border-bottom: 2px solid; border-right: 2px solid; }
+
+  .game-action {
+    margin: 4rem auto 0;
+    max-width: 800px;
+    background: var(--char);
+    border: 2px solid var(--magenta);
+    padding: 3rem 2rem;
+    position: relative;
+    box-shadow: 0 0 60px rgba(255,0,122,0.3);
+    z-index: 2;
+  }
+  .game-action .corner-bracket {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--cyan);
+  }
+  .game-action .cb-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+  .game-action .cb-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+  .game-action .cb-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+  .game-action .cb-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+  .game-action .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+  .game-action .text {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    color: var(--bone);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  .game-action .text em {
+    color: var(--magenta);
+    font-style: normal;
+    text-shadow: 0 0 20px var(--magenta-glow);
+  }
+
+  .timer-bar {
+    margin-top: 2rem;
+    background: var(--void);
+    height: 6px;
+    border: 1px solid var(--cyan);
+    overflow: hidden;
+    position: relative;
+  }
+  .timer-bar .fill {
+    height: 100%;
+    width: 60%;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    box-shadow: 0 0 20px var(--cyan);
+  }
+  .timer-text {
+    margin-top: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--grey);
+    letter-spacing: 0.3em;
+    text-align: right;
+  }
+  .timer-text .v { color: var(--cyan); }
+
+  .game-controls {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+  }
+  .ctrl {
+    background: var(--char);
+    border: 1px solid var(--grey);
+    color: var(--bone);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    padding: 1rem 1.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ctrl:hover {
+    border-color: var(--magenta);
+    color: var(--magenta);
+    text-shadow: 0 0 10px var(--magenta-glow);
+  }
+  .ctrl.next {
+    background: var(--magenta);
+    border-color: var(--magenta);
+    color: var(--black);
+    font-weight: 700;
+    box-shadow: 0 0 30px rgba(255,0,122,0.5);
+  }
+
+  /* ==== SCENE 4 — KAMASUTRA ==== */
+  .kama {
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 70%, rgba(0,240,255,0.1) 0%, transparent 60%),
+      var(--black);
+    padding-top: 6rem;
+  }
+
+  .kama-header {
+    margin-bottom: 4rem;
+  }
+  .kama-header .top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .kama-header .top .l1 { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--cyan); letter-spacing: 0.3em; }
+  .kama-header .top .l2 { flex: 1; height: 1px; background: var(--cyan); opacity: 0.3; }
+  .kama-header h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+  }
+  .kama-header h2 .neon-cyan { display: block; }
+
+  .kama-stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .kama-info {
+    color: var(--bone);
+  }
+  .kama-info .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .kama-info h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--bone);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    margin-bottom: 1.5rem;
+  }
+  .kama-info h3 .neon-text { display: block; }
+
+  .kama-info p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    color: var(--grey);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+  .kama-info ul {
+    list-style: none;
+    margin-top: 2rem;
+  }
+  .kama-info li {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--bone);
+    padding-left: 1.5rem;
+    position: relative;
+    margin-bottom: 0.8rem;
+  }
+  .kama-info li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--magenta);
+    text-shadow: 0 0 8px var(--magenta-glow);
+  }
+
+  .kama-card {
+    aspect-ratio: 0.7;
+    background: var(--char);
+    border: 2px solid var(--magenta);
+    padding: 2.5rem;
+    position: relative;
+    box-shadow:
+      inset 0 0 60px rgba(255,0,122,0.1),
+      0 0 60px rgba(255,0,122,0.4),
+      0 0 120px rgba(255,0,122,0.15);
+    overflow: hidden;
+  }
+
+  .kama-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(0,240,255,0.02) 2px,
+      transparent 4px
+    );
+    pointer-events: none;
+  }
+
+  .kama-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,0,122,0.2);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+  .kama-card-header .id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.3em;
+  }
+  .kama-card-header .lvl {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    color: var(--magenta);
+    text-shadow: 0 0 8px var(--magenta-glow);
+    letter-spacing: 0.1em;
+  }
+
+  .kama-illust {
+    aspect-ratio: 1.1;
+    background: var(--void);
+    border: 1px solid rgba(0,240,255,0.3);
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .kama-illust::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255,0,122,0.15) 0%, transparent 70%),
+      linear-gradient(180deg, transparent 0%, rgba(0,240,255,0.05) 100%);
+  }
+
+  .kama-illust svg {
+    width: 80%;
+    height: 80%;
+    z-index: 2;
+    filter: drop-shadow(0 0 20px var(--magenta-glow)) drop-shadow(0 0 40px rgba(255,0,122,0.3));
+  }
+
+  .kama-name-box {
+    margin-top: 1.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(0,240,255,0.2);
+    border-bottom: 1px solid rgba(0,240,255,0.2);
+  }
+  .kama-card .kama-name {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 2.2rem;
+    color: var(--bone);
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    margin-bottom: 0.4rem;
+  }
+  .kama-card .kama-name .glow { color: var(--magenta); text-shadow: 0 0 12px var(--magenta-glow); }
+  .kama-card .kama-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--cyan);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .kama-card .kama-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--grey);
+    line-height: 1.6;
+    margin: 1.2rem 0;
+  }
+
+  .kama-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .kama-stat {
+    background: var(--void);
+    padding: 0.8rem 0.6rem;
+    text-align: center;
+  }
+  .kama-stat .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--grey);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .kama-stat .v {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--cyan);
+    text-shadow: 0 0 8px var(--cyan);
+    margin-top: 0.3rem;
+  }
+
+  /* style marker badge */
+  .style-marker {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--char);
+    border: 1px solid var(--magenta);
+    padding: 1rem 1.5rem;
+    z-index: 100;
+    box-shadow: 0 0 30px rgba(255,0,122,0.4);
+  }
+  .style-marker .num {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    color: var(--magenta);
+    text-shadow: 0 0 10px var(--magenta-glow);
+    font-size: 1.5rem;
+  }
+  .style-marker .name {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    color: var(--bone);
+    font-size: 1rem;
+    margin: 0.2rem 0;
+    letter-spacing: -0.02em;
+  }
+  .style-marker .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1100px) {
+    .modes-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero { grid-template-columns: 1fr; padding-top: 8rem; }
+    .kama-stage { grid-template-columns: 1fr; }
+    .modes-header { grid-template-columns: 1fr; }
+    .modes-header .meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Style marker -->
+<div class="style-marker">
+  <div class="num">// 02</div>
+  <div class="name">NÉON NOIR</div>
+  <div class="tag">Cyber · SVG line art · Brutalist</div>
+</div>
+
+<!-- ===== SCENE 1 — HERO ===== -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+
+  <header class="header-bar">
+    <div class="logo">DICE.AFTER.DARK</div>
+    <div class="stat">
+      <span><span class="dot"></span>SESSION/ACTIVE</span>
+      <span>OFFLINE.MODE</span>
+      <span>v 0.1.0</span>
+    </div>
+  </header>
+
+  <div class="section-tag">SYS://INIT<span class="blink"></span></div>
+
+  <div class="hero-content">
+    <div class="hero-meta">
+      <span class="live">● LIVE</span>
+      <span>// PRIVATE.SESSION</span>
+      <span>// ENCRYPTED</span>
+    </div>
+
+    <h1>
+      <span class="strike">Bonsoir.</span><br>
+      Ce soir,<br>
+      vous <span class="glitch">brûlez</span>.
+    </h1>
+
+    <p class="tagline">
+      <span class="h">// </span>Deux dés. Un mode. Aucune limite.<br>
+      L'application qui transforme votre nuit en <em>terrain de jeu</em>.<br>
+      <span class="h">// </span>100% offline. 100% privé. Pour adultes.
+    </p>
+
+    <div class="player-block">
+      <div class="player-row">
+        <span class="pkey">P1 ::</span>
+        <input type="text" value="Léon" placeholder="prénom du joueur 1" />
+      </div>
+      <div class="player-row">
+        <span class="pkey">P2 ::</span>
+        <input type="text" value="Camille" placeholder="prénom du joueur 2" />
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn-primary">ENTER.SESSION</button>
+      <button class="btn-secondary">⚙ CONFIG</button>
+    </div>
+
+    <div class="age-stamp">
+      <span class="num">18+</span>
+      <span class="txt">CONTENU<br>EXPLICITE</span>
+    </div>
+  </div>
+
+  <div class="hero-art">
+    <svg class="hero-art-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff007a" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#00f0ff" stop-opacity="0.5"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Big neon dice arrangement -->
+      <g filter="url(#glow)">
+        <!-- die 1 -->
+        <g transform="translate(80,120) rotate(-8)">
+          <rect x="0" y="0" width="140" height="140" fill="none" stroke="#ff007a" stroke-width="3"/>
+          <rect x="0" y="0" width="140" height="140" fill="rgba(255,0,122,0.05)"/>
+          <circle cx="35" cy="35" r="8" fill="#ff007a"/>
+          <circle cx="105" cy="35" r="8" fill="#ff007a"/>
+          <circle cx="35" cy="105" r="8" fill="#ff007a"/>
+          <circle cx="105" cy="105" r="8" fill="#ff007a"/>
+          <circle cx="70" cy="70" r="8" fill="#ff007a"/>
+        </g>
+        <!-- die 2 -->
+        <g transform="translate(200,180) rotate(12)">
+          <rect x="0" y="0" width="140" height="140" fill="none" stroke="#00f0ff" stroke-width="3"/>
+          <rect x="0" y="0" width="140" height="140" fill="rgba(0,240,255,0.05)"/>
+          <circle cx="35" cy="35" r="8" fill="#00f0ff"/>
+          <circle cx="105" cy="105" r="8" fill="#00f0ff"/>
+          <circle cx="70" cy="70" r="8" fill="#00f0ff"/>
+        </g>
+      </g>
+
+      <!-- crosshair / scan -->
+      <g stroke="#00f0ff" stroke-width="0.8" fill="none" opacity="0.4">
+        <circle cx="200" cy="200" r="180"/>
+        <circle cx="200" cy="200" r="120" stroke-dasharray="4 4"/>
+        <line x1="0" y1="200" x2="20" y2="200"/>
+        <line x1="380" y1="200" x2="400" y2="200"/>
+        <line x1="200" y1="0" x2="200" y2="20"/>
+        <line x1="200" y1="380" x2="200" y2="400"/>
+      </g>
+
+      <!-- corner brackets -->
+      <g stroke="#ff007a" stroke-width="2" fill="none">
+        <path d="M 10 30 L 10 10 L 30 10"/>
+        <path d="M 390 30 L 390 10 L 370 10"/>
+        <path d="M 10 370 L 10 390 L 30 390"/>
+        <path d="M 390 370 L 390 390 L 370 390"/>
+      </g>
+
+      <!-- text -->
+      <text x="200" y="375" text-anchor="middle" fill="#ff007a" font-family="JetBrains Mono" font-size="9" letter-spacing="3">PROBABILITY: ∞</text>
+    </svg>
+  </div>
+</section>
+
+
+<!-- ===== SCENE 2 — MODES ===== -->
+<section class="modes">
+  <div class="section-tag">SYS://SELECT.MODE<span class="blink"></span></div>
+
+  <div class="modes-header">
+    <h2>
+      Choisis<br>
+      ton<br>
+      <span class="neon-text">arène.</span>
+    </h2>
+    <div class="meta">
+      <div>// 5 modes disponibles</div>
+      <div>// Chaque mode a son ambiance</div>
+      <div><span class="arrow">▸</span> Tap pour entrer</div>
+    </div>
+  </div>
+
+  <div class="modes-grid">
+    <div class="mode-card">
+      <span class="mode-tag">SOFT</span>
+      <span class="mode-id">// 01</span>
+      <div class="mode-icon">🌙</div>
+      <h3 class="mode-name">Warm<br>Up</h3>
+      <p class="mode-desc">Caresses, baisers, tension qui monte tranquillement.</p>
+      <div class="mode-bar fill-cyan">
+        <span class="fill"></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="mode-card">
+      <span class="mode-tag">MID</span>
+      <span class="mode-id">// 02</span>
+      <div class="mode-icon">⚡</div>
+      <h3 class="mode-name">Sensuel</h3>
+      <p class="mode-desc">Langue, dents, peau. Le tempo s'accélère.</p>
+      <div class="mode-bar">
+        <span class="fill"></span><span class="fill"></span><span class="fill"></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="mode-card active">
+      <span class="mode-tag" style="color:var(--cyan); border-color:var(--cyan);">HOT</span>
+      <span class="mode-id">// 03</span>
+      <div class="mode-icon">🔥</div>
+      <h3 class="mode-name">Brûlure<br><span class="acid">.</span></h3>
+      <p class="mode-desc">Sans tabou. Sans filtre. Sans retenue. Tout est permis.</p>
+      <div class="mode-bar">
+        <span class="fill"></span><span class="fill"></span><span class="fill"></span><span class="fill"></span><span class="fill"></span>
+      </div>
+    </div>
+
+    <div class="mode-card">
+      <span class="mode-tag">XXX</span>
+      <span class="mode-id">// 04</span>
+      <div class="mode-icon">🪷</div>
+      <h3 class="mode-name">Kama<br>Sutra</h3>
+      <p class="mode-desc">Positions illustrées. Niveaux de difficulté.</p>
+      <div class="mode-bar fill-cyan">
+        <span class="fill"></span><span class="fill"></span><span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="mode-card">
+      <span class="mode-tag" style="color:var(--acid); border-color:var(--acid);">AUTO</span>
+      <span class="mode-id">// 05</span>
+      <div class="mode-icon">📈</div>
+      <h3 class="mode-name">Cresc.</h3>
+      <p class="mode-desc">Le jeu monte tout seul. Du soft à l'extrême.</p>
+      <div class="mode-bar fill-acid">
+        <span class="fill"></span><span class="fill"></span><span class="fill"></span><span class="fill"></span><span class="fill"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== SCENE 3 — JEU ===== -->
+<section class="game">
+  <div class="section-tag">SYS://ROLL.READY<span class="blink"></span></div>
+
+  <div class="game-status">
+    <span class="ico">▣</span>
+    <span>MODE</span>
+    <span class="level">BRÛLURE</span>
+    <span>·</span>
+    <span>TURN 04</span>
+    <span>·</span>
+    <span>00:42</span>
+  </div>
+
+  <div class="game-turn-display">
+    <span class="label">// player turn ::</span>
+    <div class="name">Camille</div>
+  </div>
+
+  <div class="dice-arena">
+    <div class="die-3d">
+      <span class="cb-tl corner-bracket"></span>
+      <span class="cb-tr corner-bracket"></span>
+      <span class="cb-bl corner-bracket"></span>
+      <span class="cb-br corner-bracket"></span>
+      <span class="die-tag">[ action ]</span>
+      <div class="die-emoji">💋</div>
+      <div class="die-val">Mordiller</div>
+    </div>
+    <div class="die-3d cyan">
+      <span class="cb-tl corner-bracket"></span>
+      <span class="cb-tr corner-bracket"></span>
+      <span class="cb-bl corner-bracket"></span>
+      <span class="cb-br corner-bracket"></span>
+      <span class="die-tag">[ zone ]</span>
+      <div class="die-emoji">⚡</div>
+      <div class="die-val">L'oreille</div>
+    </div>
+  </div>
+
+  <div class="game-action">
+    <span class="cb-tl corner-bracket"></span>
+    <span class="cb-tr corner-bracket"></span>
+    <span class="cb-bl corner-bracket"></span>
+    <span class="cb-br corner-bracket"></span>
+    <div class="label">▶ EXECUTE</div>
+    <div class="text">Camille doit <em>mordiller</em><br>l'oreille de Léon</div>
+    <div class="timer-bar"><div class="fill"></div></div>
+    <div class="timer-text">TIMER :: <span class="v">00:54</span> / 01:30</div>
+  </div>
+
+  <div class="game-controls">
+    <button class="ctrl">↻ RE-ROLL</button>
+    <button class="ctrl">⏸ PAUSE</button>
+    <button class="ctrl next">NEXT TURN ▶</button>
+    <button class="ctrl">✕ EXIT</button>
+  </div>
+</section>
+
+
+<!-- ===== SCENE 4 — KAMASUTRA ===== -->
+<section class="kama">
+  <div class="section-tag">SYS://KAMA.LIB<span class="blink"></span></div>
+
+  <div class="kama-header">
+    <div class="top">
+      <span class="l1">// MODE 04 :: KAMA.SUTRA</span>
+      <span class="l2"></span>
+    </div>
+    <h2>
+      Une carte<br>
+      <span class="neon-cyan">tirée.</span>
+    </h2>
+  </div>
+
+  <div class="kama-stage">
+    <div class="kama-info">
+      <span class="label">// option B :: SVG line.art</span>
+      <h3>
+        Lignes<br>
+        <span class="neon-text">néon</span>
+      </h3>
+      <p>// Silhouettes vectorielles abstraites en line art SVG. Glow néon contextuel selon le mode actif. Léger, performant, infiniment scalable.</p>
+      <p>// Aucun fichier image lourd. Tout est généré en code, animable, modifiable. L'esthétique reste suggestive mais non vulgaire — c'est de l'art graphique, pas de la photo.</p>
+      <ul>
+        <li>Format vectoriel (SVG), poids minimal</li>
+        <li>Couleurs adaptées au mode (magenta/cyan/acid)</li>
+        <li>Animations CSS possibles (pulse, glow)</li>
+        <li>Style assumé : graphique, moderne, urbain</li>
+      </ul>
+    </div>
+
+    <div class="kama-card">
+      <div class="kama-card-header">
+        <span class="id">// 07 / 18</span>
+        <span class="lvl">LVL.02</span>
+      </div>
+
+      <div class="kama-illust">
+        <svg viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="kg1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff007a"/>
+              <stop offset="100%" stop-color="#ff3399"/>
+            </linearGradient>
+            <linearGradient id="kg2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00f0ff"/>
+              <stop offset="100%" stop-color="#00b8c4"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Two abstract intertwined figures, line art -->
+          <g fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Figure 1 (magenta) - seated, supporting -->
+            <g stroke="url(#kg1)">
+              <!-- head -->
+              <circle cx="55" cy="60" r="14"/>
+              <!-- spine / torso curve -->
+              <path d="M 55 75 Q 60 100, 70 120 Q 75 130, 85 135"/>
+              <!-- legs crossed -->
+              <path d="M 70 130 Q 50 140, 40 155 Q 35 165, 45 170"/>
+              <path d="M 85 135 Q 100 145, 110 160"/>
+              <!-- arms wrapped -->
+              <path d="M 65 90 Q 95 95, 120 105"/>
+              <path d="M 70 95 Q 95 110, 115 120"/>
+            </g>
+
+            <!-- Figure 2 (cyan) - facing/embracing -->
+            <g stroke="url(#kg2)">
+              <!-- head -->
+              <circle cx="135" cy="55" r="14"/>
+              <!-- torso -->
+              <path d="M 135 70 Q 130 95, 125 115 Q 122 125, 115 130"/>
+              <!-- back -->
+              <path d="M 145 75 Q 155 100, 160 125"/>
+              <!-- legs around -->
+              <path d="M 125 130 Q 120 145, 115 160 Q 112 168, 120 170"/>
+              <path d="M 145 130 Q 160 140, 170 155"/>
+              <!-- arms back -->
+              <path d="M 130 80 Q 110 90, 95 100"/>
+              <path d="M 145 90 Q 155 100, 165 110"/>
+            </g>
+
+            <!-- connection line -->
+            <path d="M 70 60 Q 95 50, 120 55" stroke="rgba(255,255,255,0.3)" stroke-dasharray="2 3"/>
+          </g>
+
+          <!-- accent dots -->
+          <g>
+            <circle cx="55" cy="55" r="2" fill="#ff007a"/>
+            <circle cx="135" cy="50" r="2" fill="#00f0ff"/>
+            <circle cx="95" cy="100" r="3" fill="#d4ff00" opacity="0.8"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="kama-name-box">
+        <h3 class="kama-name">L'<span class="glow">Étreinte</span><br>du Lotus</h3>
+        <div class="kama-sub">// PADMASANA :: tantric.embrace</div>
+      </div>
+
+      <p class="kama-desc">Assise face à lui, jambes croisées autour de sa taille. Front contre front, souffles synchronisés. Connexion totale — physique et intime.</p>
+
+      <div class="kama-stats">
+        <div class="kama-stat">
+          <div class="k">DIFF</div>
+          <div class="v">02</div>
+        </div>
+        <div class="kama-stat">
+          <div class="k">INTIM</div>
+          <div class="v">05</div>
+        </div>
+        <div class="kama-stat">
+          <div class="k">DURÉE</div>
+          <div class="v">∞</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

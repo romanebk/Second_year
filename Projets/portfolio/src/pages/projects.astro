@@ -1,0 +1,183 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HorizontalCard from "../components/HorizontalCard.astro";
+---
+
+<BaseLayout title="Projects" sideBarActiveItemID="projects">
+  <div class="reveal reveal-delay-1">
+    <div class="text-3xl w-full font-heading font-bold mb-5">Tous mes projets</div>
+    <p class="text-lg mb-8 font-body text-base-content/60">Une sélection de projets réalisés à EPITECH et en freelance.</p>
+  </div>
+
+  <div class="flex items-center gap-3 mt-10 mb-6 reveal reveal-delay-2">
+    <h2 class="text-2xl font-heading font-bold">AIA</h2>
+    <span class="text-sm text-base-content/40 font-heading">Intelligence Artificielle</span>
+    <div class="h-px flex-1 bg-gradient-to-r from-[rgba(0,240,255,0.2)] to-transparent"></div>
+  </div>
+
+  <div class="flex flex-col gap-5">
+    <HorizontalCard
+      title="Startrek"
+      img="/projects/startrek.webp"
+      desc="Apprentissage par renforcement (DQN) pour atterrissage lunaire. Entraînement d'un agent sur LunarLander-v3 avec PyTorch et Gymnasium. Politique epsilon-greedy, réseaux de neurones, visualisation des performances."
+      url="/projects/startrek"
+      badge="Python/PyTorch"
+    />
+    <HorizontalCard
+      title="Codename"
+      img="/projects/codename.webp"
+      desc="Prompt engineering : attaque et défense de LLM. Utilisation de granite3.1-moe via Ollama pour tester les injections de prompts, jailbreaks et mécanismes de défense."
+      url="/projects/codename"
+      badge="LLM"
+    />
+    <HorizontalCard
+      title="Persona (n8n)"
+      img="/projects/n8n.webp"
+      desc="Plateforme d'automatisation n8n avec PostgreSQL et Mistral AI. Workflows automatisés, intégration IA, pipeline de données."
+      url="/projects/n8n"
+      badge="n8n/IA"
+    />
+    <HorizontalCard
+      title="Level Up RPG"
+      img="/projects/levelup.webp"
+      desc="Jeu éducatif RPG avec React 19/Electron/TailwindCSS. Combats par défis (mathématiques, lecture, culture générale), système de niveaux et d'XP."
+      url="/projects/levelup"
+      badge="React/Electron"
+    />
+  </div>
+
+  <div class="flex items-center gap-3 mt-14 mb-6 reveal reveal-delay-1">
+    <h2 class="text-2xl font-heading font-bold">OOP</h2>
+    <span class="text-sm text-base-content/40 font-heading">Programmation Orientée Objet</span>
+    <div class="h-px flex-1 bg-gradient-to-r from-[rgba(255,0,229,0.2)] to-transparent"></div>
+  </div>
+
+  <div class="flex flex-col gap-5">
+    <HorizontalCard
+      title="Arcade"
+      img="/projects/arcade.webp"
+      desc="Plateforme de jeux dynamique avec plugins .so partagés. 3 jeux (Snake/Nibbler/Minesweeper), 3 bibliothèques graphiques (NCurses/SDL2/SFML). Architecture modulaire en C++."
+      url="/projects/arcade"
+      badge="C++"
+    />
+    <HorizontalCard
+      title="Raytracer"
+      img="/projects/raytracer.webp"
+      desc="Moteur de rendu 3D supportant sphères, plans, cylindres, cônes et lumières. Multithreading, parsing de scènes .cfg, sauvegarde BMP. Architecture orientée objet en C++."
+      url="/projects/raytracer"
+      badge="C++"
+    />
+    <HorizontalCard
+      title="Nanotekspice"
+      img="/projects/nanotekspice.webp"
+      desc="Simulateur de circuits numériques. Portes AND/OR/XOR/NOT/NAND/NOR, tristate, CLI interactif. Parsing de fichiers .nts, simulation pas à pas."
+      url="/projects/nanotekspice"
+      badge="C++"
+    />
+  </div>
+
+  <div class="flex items-center gap-3 mt-14 mb-6 reveal reveal-delay-2">
+    <h2 class="text-2xl font-heading font-bold">CCP</h2>
+    <span class="text-sm text-base-content/40 font-heading">Programmation Concurrente</span>
+    <div class="h-px flex-1 bg-gradient-to-r from-[rgba(139,92,246,0.2)] to-transparent"></div>
+  </div>
+
+  <div class="flex flex-col gap-5">
+    <HorizontalCard
+      title="Panoramix"
+      img="/projects/panoramix.webp"
+      desc="Simulation Astérix avec threads pthread, mutex et sémaphores. Druide, villageois, gestion de la potion magique — synchronisation avancée en C."
+      url="/projects/panoramix"
+      badge="C/Threads"
+    />
+    <HorizontalCard
+      title="Plazza"
+      img="/projects/plazza.webp"
+      desc="Pizzéria multithreadée en C++17. Processus, pipes nommés, thread pool, 12 design patterns (Singleton, Factory, Observer, etc.). Architecture modulaire."
+      url="/projects/plazza"
+      badge="C++17"
+    />
+  </div>
+
+  <div class="flex items-center gap-3 mt-14 mb-6 reveal reveal-delay-1">
+    <h2 class="text-2xl font-heading font-bold">NTW</h2>
+    <span class="text-sm text-base-content/40 font-heading">Réseau</span>
+    <div class="h-px flex-1 bg-gradient-to-r from-[rgba(0,240,255,0.2)] to-transparent"></div>
+  </div>
+
+  <div class="flex flex-col gap-5">
+    <HorizontalCard
+      title="myFTP"
+      img="/projects/myftp.webp"
+      desc="Serveur FTP conforme RFC 959. Implémentation avec poll + fork, transferts de fichiers, authentification, commandes standards (LIST, RETR, STOR, etc.)."
+      url="/projects/myftp"
+      badge="C/Réseau"
+    />
+    <HorizontalCard
+      title="myTeams"
+      img="/projects/myteams.webp"
+      desc="Plateforme collaborative Teams-like : users, teams, channels, threads, comments, messaging. Protocole JSON/TCP, sauvegarde persistante, events push."
+      url="/projects/myteams"
+      badge="C/Réseau"
+    />
+  </div>
+
+  <div class="flex items-center gap-3 mt-14 mb-6 reveal reveal-delay-2">
+    <h2 class="text-2xl font-heading font-bold">MATH</h2>
+    <span class="text-sm text-base-content/40 font-heading">Mathématiques & Signal</span>
+    <div class="h-px flex-1 bg-gradient-to-r from-[rgba(255,0,229,0.2)] to-transparent"></div>
+  </div>
+
+  <div class="flex flex-col gap-5">
+    <HorizontalCard
+      title="StoneAnalysis"
+      img="/projects/stoneanalysis.webp"
+      desc="Analyse fréquentielle audio avec FFT (Cooley-Tukey + Bluestein). Stéganographie dans fichiers WAV. Traitement du signal en C++."
+      url="/projects/stoneanalysis"
+      badge="C++/DSP"
+    />
+    <HorizontalCard
+      title="Interstonar"
+      img="/projects/interstonar.webp"
+      desc="Simulation 3D de trajectoire spatiale. Gravitation Newtonienne, ray marching SDF, intégration Euler. Visualisation graphique des orbites."
+      url="/projects/interstonar"
+      badge="C++/3D"
+    />
+  </div>
+
+  <div class="flex items-center gap-3 mt-14 mb-6 reveal reveal-delay-1">
+    <h2 class="text-2xl font-heading font-bold">SEC</h2>
+    <span class="text-sm text-base-content/40 font-heading">Sécurité</span>
+    <div class="h-px flex-1 bg-gradient-to-r from-[rgba(139,92,246,0.2)] to-transparent"></div>
+  </div>
+
+  <HorizontalCard
+    title="CTF Bug Bounty - ECorp"
+    img="/projects/ecorp.webp"
+    desc="11 challenges d'exploitation binaire avec write-ups et PoCs : stack overflow, variable overwrite, ret2func, shellcode, ASLR bypass, heap overflow (function pointer/GOT overwrite), Use-After-Free (tcache)."
+    url="/projects/ecorp"
+    badge="Python/C"
+  />
+
+  <div class="flex items-center gap-3 mt-14 mb-6 reveal reveal-delay-2">
+    <h2 class="text-2xl font-heading font-bold">Autres projets</h2>
+    <div class="h-px flex-1 bg-gradient-to-r from-[rgba(0,240,255,0.2)] to-transparent"></div>
+  </div>
+
+  <div class="flex flex-col gap-5">
+    <HorizontalCard
+      title="Serveur TCP Chat"
+      img="/projects/chat.webp"
+      desc="Serveur TCP chat en C avec poll(). Gestion non-bloquante de multiples clients, buffers de lecture/écriture, Makefile, max 100 clients."
+      url="/projects/chat"
+      badge="C"
+    />
+    <HorizontalCard
+      title="ShieldAI"
+      img="/projects/shieldai.webp"
+      desc="Pitch deck startup — cybersécurité IA pour PME africaines. Analyse de marché, business model, stratégie de déploiement."
+      url="/projects/shieldai"
+      badge="Startup"
+    />
+  </div>
+</BaseLayout>

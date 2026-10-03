@@ -1,0 +1,54 @@
+# Dépendances
+node_modules/
+
+# Build
+dist/
+build/
+.expo/
+.metro-cache/
+
+# Variables d'environnement (ne jamais commiter)
+.env
+.env.local
+.env.*.local
+*.local.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Tests
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Outils
+.turbo/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# React Native — artefacts de build (garder le projet android/ versionné)
+**/android/build/
+**/android/.gradle/
+**/android/local.properties
+**/android/app/build/
+**/android/.cxx/
+**/android/app/.cxx/
+ios/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Expo
+.expo-shared/

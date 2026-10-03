@@ -1,0 +1,50 @@
+# AANID — Infrastructure as Code (Render Blueprint)
+# Docs : AANID/docs/DEPLOY.md
+
+services:
+  - type: web
+    name: aanid-api
+    runtime: node
+    rootDir: AANID
+    plan: free
+    buildCommand: >-
+      npm install &&
+      npm run prisma:generate -w backend &&
+      if [ -n "$DATABASE_URL" ]; then npm run prisma:setup -w backend; else echo "DATABASE_URL absent — skip prisma setup"; fi
+    startCommand: npm start -w backend
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AANID_AUTO_VERIFY_EMAIL
+        value: "true"
+      - key: DATABASE_URL
+        sync: false
+      - key: AANID_ACCESS_SECRET
+        generateValue: true
+      - key: AANID_REFRESH_SECRET
+        generateValue: true
+      - key: API_PUBLIC_URL
+        value: https://aanid-api.onrender.com
+      - key: OAUTH_APP_REDIRECT_URIS
+        value: aanid://oauth/callback
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FACEBOOK_APP_ID
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false
+      - key: FACEBOOK_GRAPH_VERSION
+        value: v23.0
+      - key: X_CLIENT_ID
+        sync: false
+      - key: X_CLIENT_SECRET
+        sync: false
+      - key: FEDAPAY_SECRET_KEY
+        sync: false
+      - key: FEDAPAY_ENVIRONMENT
+        value: sandbox
+      - key: PORT
+        value: 10000

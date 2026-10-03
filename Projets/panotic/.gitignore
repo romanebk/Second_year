@@ -1,0 +1,19 @@
+backend/.env
+mobile/node_modules
+backend/node_modules
+backend/dist
+node_modules
+
+# Android signing / builds
+mobile/android/
+mobile/build/
+*.apk
+*.aab
+*.hprof
+
+# macOS
+.DS_Store
+
+# HTML maquettes de référence
+AANID/bryan-fanou/*.html
+AANID/frontend/etats-des-lieux.html

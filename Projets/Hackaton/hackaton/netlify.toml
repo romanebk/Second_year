@@ -1,0 +1,19 @@
+[build]
+  command = "cd frontend && npm run build"
+  publish = "frontend/dist"
+
+[functions]
+  directory = "netlify/functions"
+  included_files = ["node_modules/sql.js/dist/sql-wasm.wasm"]
+
+# Rediriger les appels API vers la Netlify Function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# SPA fallback - toutes les routes → index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

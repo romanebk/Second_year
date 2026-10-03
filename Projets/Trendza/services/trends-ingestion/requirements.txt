@@ -1,0 +1,12 @@
+# ⚠️ pytrends est archivé depuis avril 2025 et n'est plus maintenu.
+# Voir trends_source.py : c'est le seul module à réécrire pour en changer.
+pytrends==4.9.2
+
+# pytrends impose urllib3<2 ; sans cette borne, pip installe urllib3 2.x
+# et les requêtes échouent avec une erreur de `method_whitelist`.
+urllib3==1.26.20
+
+supabase==2.15.1
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-dotenv==1.0.1

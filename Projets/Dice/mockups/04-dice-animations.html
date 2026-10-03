@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dice Désir — Animations des dés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..900,0..100;1,9..144,400..900,0..100&family=Bagel+Fat+One&family=Outfit:wght@300;400;500;600;700;900&family=Unbounded:wght@300;400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf3e7;
+    --cream-deep: #f5e8d4;
+    --peach: #ffd4b0;
+    --terracotta: #e85a3c;
+    --hot-pink: #ff3d8b;
+    --pink-deep: #d92668;
+    --magenta: #b8276f;
+    --plum: #5a1535;
+    --mustard: #e8b835;
+    --ink: #2a0a18;
+    --black: #1a0510;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background:
+      radial-gradient(circle 800px at 90% 10%, var(--peach) 0%, transparent 60%),
+      radial-gradient(circle 700px at 10% 90%, rgba(255,61,139,0.15) 0%, transparent 60%),
+      var(--cream);
+    color: var(--ink);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    padding: 3rem 2rem;
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  .wrap { max-width: 1300px; margin: 0 auto; }
+
+  /* ---------- HEADER ---------- */
+  .top-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  .top-header .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0.5rem 1.2rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .top-header .pill .dot {
+    width: 8px; height: 8px;
+    background: var(--hot-pink);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 50% { transform: scale(1.5); opacity: 0.5; } }
+
+  .top-header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+  }
+  .top-header h1 em { color: var(--hot-pink); font-style: italic; }
+  .top-header h1 .pop {
+    color: var(--terracotta);
+    font-family: 'Bagel Fat One', cursive;
+    font-style: normal;
+    font-weight: normal;
+    font-variation-settings: normal;
+  }
+  .top-header p {
+    font-size: 1.1rem;
+    color: var(--plum);
+    margin-top: 1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ---------- DEMO BLOCKS ---------- */
+  .demo-block {
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 32px;
+    padding: 2.5rem;
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 3rem;
+    position: relative;
+  }
+
+  .demo-block.dark {
+    background: var(--black);
+    color: #f0eee8;
+    border-color: #ff007a;
+    box-shadow: 8px 8px 0 #ff007a;
+  }
+
+  .demo-tag {
+    position: absolute;
+    top: -16px;
+    left: 30px;
+    background: var(--hot-pink);
+    color: white;
+    border: 2px solid var(--ink);
+    padding: 0.3rem 1rem;
+    border-radius: 100px;
+    font-family: 'Bagel Fat One', cursive;
+    font-size: 0.95rem;
+    box-shadow: 3px 3px 0 var(--ink);
+    transform: rotate(-3deg);
+  }
+  .demo-block.dark .demo-tag {
+    background: #ff007a;
+    border-color: #ff007a;
+    color: white;
+    box-shadow: 0 0 20px rgba(255,0,122,0.6);
+    transform: none;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+  }
+
+  .demo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .demo-header h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: 2.2rem;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+  }
+  .demo-block.dark .demo-header h2 {
+    font-family: 'Unbounded', sans-serif;
+    color: #f0eee8;
+    letter-spacing: -0.04em;
+  }
+  .demo-header h2 em { color: var(--hot-pink); font-style: italic; }
+  .demo-block.dark .demo-header h2 em {
+    color: #ff007a;
+    text-shadow: 0 0 10px #ff007a;
+    font-style: normal;
+  }
+
+  .demo-header p {
+    font-size: 0.9rem;
+    color: var(--plum);
+    max-width: 400px;
+  }
+  .demo-block.dark .demo-header p {
+    color: #00f0ff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+  }
+
+  /* ---------- DICE STAGE ---------- */
+  .stage {
+    background: var(--cream);
+    border: 3px dashed var(--ink);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .demo-block.dark .stage {
+    background: #050507;
+    border-color: rgba(255,0,122,0.3);
+  }
+
+  .stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(42,10,24,0.06) 1px, transparent 1px);
+    background-size: 14px 14px;
+    pointer-events: none;
+  }
+  .demo-block.dark .stage::before {
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,0,122,0.08) 1px, transparent 1px);
+  }
+
+  .roll-btn {
+    background: var(--ink);
+    color: var(--cream);
+    border: 3px solid var(--ink);
+    border-radius: 100px;
+    padding: 1rem 2rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--hot-pink);
+    transition: all 0.15s;
+    z-index: 5;
+    position: relative;
+  }
+  .roll-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--hot-pink); }
+  .roll-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--hot-pink); }
+
+  .demo-block.dark .roll-btn {
+    background: #ff007a;
+    color: var(--black);
+    border-color: #ff007a;
+    box-shadow: 0 0 20px rgba(255,0,122,0.6);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    border-radius: 4px;
+  }
+  .demo-block.dark .roll-btn:hover {
+    background: #00f0ff;
+    border-color: #00f0ff;
+    box-shadow: 0 0 30px rgba(0,240,255,0.8);
+  }
+
+  /* ============================================ */
+  /* ===== DICE V1 — 3D CUBE (CSS preserve-3d) === */
+  /* ============================================ */
+  .dice-3d-container {
+    perspective: 1200px;
+    display: flex;
+    gap: 4rem;
+    z-index: 5;
+  }
+
+  .die3d {
+    width: 130px;
+    height: 130px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .die3d.rolling {
+    animation: rollDice 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .die3d.rolling-2 {
+    animation: rollDice2 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes rollDice {
+    0%   { transform: rotateX(0) rotateY(0) translateY(0); }
+    20%  { transform: rotateX(-360deg) rotateY(180deg) translateY(-90px); }
+    50%  { transform: rotateX(-720deg) rotateY(540deg) translateY(-50px); }
+    80%  { transform: rotateX(-1080deg) rotateY(900deg) translateY(-20px); }
+    100% { transform: rotateX(-1440deg) rotateY(1080deg) translateY(0); }
+  }
+  @keyframes rollDice2 {
+    0%   { transform: rotateX(0) rotateY(0) translateY(0); }
+    25%  { transform: rotateX(360deg) rotateY(-180deg) translateY(-100px); }
+    55%  { transform: rotateX(720deg) rotateY(-540deg) translateY(-60px); }
+    85%  { transform: rotateX(1080deg) rotateY(-900deg) translateY(-15px); }
+    100% { transform: rotateX(1440deg) rotateY(-1080deg) translateY(0); }
+  }
+
+  .die3d .face {
+    position: absolute;
+    inset: 0;
+    background: white;
+    border: 4px solid var(--ink);
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem;
+    box-shadow: inset 0 0 0 4px white, inset 0 0 0 6px var(--hot-pink);
+    backface-visibility: hidden;
+  }
+  .die3d.yellow .face {
+    background: var(--mustard);
+    box-shadow: inset 0 0 0 4px var(--mustard), inset 0 0 0 6px var(--terracotta);
+  }
+  .die3d .face .em { font-size: 2.5rem; line-height: 1; }
+  .die3d .face .lbl {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin-top: 0.3rem;
+    line-height: 1;
+  }
+
+  /* the 6 cube faces */
+  .face-front  { transform: translateZ(65px); }
+  .face-back   { transform: rotateY(180deg) translateZ(65px); }
+  .face-right  { transform: rotateY(90deg) translateZ(65px); }
+  .face-left   { transform: rotateY(-90deg) translateZ(65px); }
+  .face-top    { transform: rotateX(90deg) translateZ(65px); }
+  .face-bottom { transform: rotateX(-90deg) translateZ(65px); }
+
+  /* result */
+  .result-display {
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    padding: 1.2rem 1.8rem;
+    box-shadow: 4px 4px 0 var(--ink);
+    text-align: center;
+    z-index: 5;
+    position: relative;
+    min-width: 280px;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+  }
+  .result-display.show { transform: scale(1); opacity: 1; }
+  .result-display .label {
+    font-size: 0.65rem;
+    color: var(--terracotta);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .result-display .text {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--ink);
+    margin-top: 0.3rem;
+    line-height: 1.1;
+  }
+  .result-display .text em { color: var(--hot-pink); font-style: italic; }
+  .result-display .text .underline {
+    background: var(--mustard);
+    padding: 0 4px;
+    border-radius: 4px;
+    color: var(--ink);
+    font-style: normal;
+  }
+
+  .demo-block.dark .result-display {
+    background: var(--black);
+    border-color: #00f0ff;
+    color: #f0eee8;
+    box-shadow: 0 0 20px rgba(0,240,255,0.4);
+  }
+  .demo-block.dark .result-display .label {
+    color: #00f0ff;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .demo-block.dark .result-display .text {
+    font-family: 'Unbounded', sans-serif;
+    color: #f0eee8;
+  }
+  .demo-block.dark .result-display .text em {
+    color: #ff007a;
+    text-shadow: 0 0 10px #ff007a;
+    font-style: normal;
+  }
+  .demo-block.dark .result-display .text .underline {
+    background: transparent;
+    color: #00f0ff;
+    text-shadow: 0 0 10px #00f0ff;
+  }
+
+  /* dark variant of dice */
+  .demo-block.dark .die3d .face {
+    background: var(--black);
+    border-color: #ff007a;
+    box-shadow: inset 0 0 30px rgba(255,0,122,0.3), 0 0 30px rgba(255,0,122,0.5);
+    border-radius: 4px;
+  }
+  .demo-block.dark .die3d.yellow .face {
+    background: var(--black);
+    border-color: #00f0ff;
+    box-shadow: inset 0 0 30px rgba(0,240,255,0.3), 0 0 30px rgba(0,240,255,0.5);
+  }
+  .demo-block.dark .die3d .face .em { filter: drop-shadow(0 0 10px #ff007a); }
+  .demo-block.dark .die3d.yellow .face .em { filter: drop-shadow(0 0 10px #00f0ff); }
+  .demo-block.dark .die3d .face .lbl {
+    font-family: 'Unbounded', sans-serif;
+    color: #f0eee8;
+    text-shadow: 0 0 10px #ff007a;
+  }
+  .demo-block.dark .die3d.yellow .face .lbl {
+    text-shadow: 0 0 10px #00f0ff;
+  }
+
+  /* ============================================ */
+  /* ===== DICE V2 — STICKER FLIP (2D pop) ====== */
+  /* ============================================ */
+  .dice-flip-container {
+    display: flex;
+    gap: 3rem;
+    z-index: 5;
+    perspective: 1000px;
+  }
+
+  .die-flip {
+    width: 130px;
+    height: 130px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s;
+  }
+
+  .die-flip.shake {
+    animation: shake 0.6s ease-in-out;
+  }
+  .die-flip.flipped { transform: rotateY(180deg); }
+
+  @keyframes shake {
+    0%, 100% { transform: rotate(0); }
+    10% { transform: rotate(-15deg); }
+    20% { transform: rotate(15deg); }
+    30% { transform: rotate(-12deg); }
+    40% { transform: rotate(12deg); }
+    50% { transform: rotate(-8deg); }
+    60% { transform: rotate(8deg); }
+    70% { transform: rotate(-4deg); }
+    80% { transform: rotate(4deg); }
+    90% { transform: rotate(-2deg); }
+  }
+
+  .die-flip-side {
+    position: absolute;
+    inset: 0;
+    background: white;
+    border: 4px solid var(--ink);
+    border-radius: 28px;
+    box-shadow:
+      6px 6px 0 var(--ink),
+      inset 0 0 0 4px white,
+      inset 0 0 0 6px var(--hot-pink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+  }
+  .die-flip-side.back {
+    background: var(--mustard);
+    box-shadow:
+      6px 6px 0 var(--ink),
+      inset 0 0 0 4px var(--mustard),
+      inset 0 0 0 6px var(--terracotta);
+    transform: rotateY(180deg);
+  }
+  .die-flip-side .em { font-size: 3rem; line-height: 1; }
+  .die-flip-side .lbl {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin-top: 0.4rem;
+    line-height: 1;
+  }
+  .die-flip-side.front .qm {
+    font-family: 'Bagel Fat One', cursive;
+    font-size: 5rem;
+    color: var(--hot-pink);
+    line-height: 1;
+  }
+
+  /* ============================================ */
+  /* ===== DICE V3 — SLOT MACHINE (vertical) ===== */
+  /* ============================================ */
+  .dice-slot-container {
+    display: flex;
+    gap: 3rem;
+    z-index: 5;
+  }
+  .die-slot {
+    width: 140px;
+    height: 130px;
+    background: white;
+    border: 4px solid var(--ink);
+    border-radius: 24px;
+    box-shadow:
+      6px 6px 0 var(--ink),
+      inset 0 0 0 4px white,
+      inset 0 0 0 6px var(--hot-pink);
+    overflow: hidden;
+    position: relative;
+  }
+  .die-slot.yellow {
+    background: var(--mustard);
+    box-shadow:
+      6px 6px 0 var(--ink),
+      inset 0 0 0 4px var(--mustard),
+      inset 0 0 0 6px var(--terracotta);
+  }
+
+  .slot-track {
+    display: flex;
+    flex-direction: column;
+    transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .slot-cell {
+    height: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .slot-cell .em { font-size: 2.6rem; line-height: 1; }
+  .slot-cell .lbl {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin-top: 0.3rem;
+    line-height: 1;
+  }
+  .die-slot::before, .die-slot::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 30px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .die-slot::before {
+    top: 0;
+    background: linear-gradient(to bottom, white 0%, transparent 100%);
+  }
+  .die-slot.yellow::before {
+    background: linear-gradient(to bottom, var(--mustard) 0%, transparent 100%);
+  }
+  .die-slot::after {
+    bottom: 0;
+    background: linear-gradient(to top, white 0%, transparent 100%);
+  }
+  .die-slot.yellow::after {
+    background: linear-gradient(to top, var(--mustard) 0%, transparent 100%);
+  }
+
+  /* ============================================ */
+  /* ===== EMOJI RAIN ===========================*/
+  /* ============================================ */
+  .emoji-rain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 3;
+  }
+  .emoji-particle {
+    position: absolute;
+    font-size: 1.8rem;
+    animation: fall 2s ease-in forwards;
+    opacity: 0;
+  }
+  @keyframes fall {
+    0% {
+      opacity: 0;
+      transform: translateY(-50px) scale(0) rotate(0);
+    }
+    20% {
+      opacity: 1;
+      transform: translateY(0px) scale(1.2) rotate(45deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(400px) scale(0.5) rotate(720deg);
+    }
+  }
+
+  /* ============================================ */
+  /* ===== INFO ===========================*/
+  /* ============================================ */
+  .info-block {
+    background: var(--mustard);
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 6px 6px 0 var(--ink);
+    margin-bottom: 3rem;
+  }
+  .info-block h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: 1.5rem;
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+  }
+  .info-block p {
+    color: var(--ink);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .info-block ul {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+  }
+  .info-block li {
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+    font-size: 0.9rem;
+  }
+  .info-block strong { background: var(--ink); color: var(--mustard); padding: 1px 6px; border-radius: 4px; }
+
+  @media (max-width: 700px) {
+    .dice-3d-container, .dice-flip-container, .dice-slot-container {
+      gap: 1.5rem;
+    }
+    .die3d, .die-flip, .die-slot { width: 100px; height: 100px; }
+    .face-front  { transform: translateZ(50px); }
+    .face-back   { transform: rotateY(180deg) translateZ(50px); }
+    .face-right  { transform: rotateY(90deg) translateZ(50px); }
+    .face-left   { transform: rotateY(-90deg) translateZ(50px); }
+    .face-top    { transform: rotateX(90deg) translateZ(50px); }
+    .face-bottom { transform: rotateX(-90deg) translateZ(50px); }
+    .die3d .face .em, .die-flip-side .em, .slot-cell .em { font-size: 1.8rem; }
+    .die3d .face .lbl, .die-flip-side .lbl, .slot-cell .lbl { font-size: 0.85rem; }
+    .die-slot { height: 100px; }
+    .slot-cell { height: 100px; }
+    .demo-block { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="top-header">
+    <span class="pill"><span class="dot"></span>Animations · 3 styles à choisir</span>
+    <h1>Comment <em>roulent</em><br>les <span class="pop">dés</span> ?</h1>
+    <p>Clique sur "Lancer les dés" dans chaque démo pour voir l'animation. Choisis ton préféré.</p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- DEMO 1 — 3D CUBE (preserve-3d, real cube)    -->
+  <!-- ============================================ -->
+  <div class="demo-block">
+    <span class="demo-tag">№ 1 · Cube 3D</span>
+
+    <div class="demo-header">
+      <h2>Cube <em>3D</em> qui tourne dans l'espace</h2>
+      <p>Vrai cube CSS 3D avec 6 faces. Le dé fait plusieurs rotations puis se pose. Le plus fidèle aux "vrais" dés physiques.</p>
+    </div>
+
+    <div class="stage" id="stage-cube">
+      <div class="dice-3d-container">
+        <div class="die3d" id="die-cube-1">
+          <div class="face face-front"><div class="em">👅</div><div class="lbl">Lécher</div></div>
+          <div class="face face-back"><div class="em">💋</div><div class="lbl">Embrasser</div></div>
+          <div class="face face-right"><div class="em">✋</div><div class="lbl">Caresser</div></div>
+          <div class="face face-left"><div class="em">🦷</div><div class="lbl">Mordiller</div></div>
+          <div class="face face-top"><div class="em">💆</div><div class="lbl">Masser</div></div>
+          <div class="face face-bottom"><div class="em">🌬️</div><div class="lbl">Souffler</div></div>
+        </div>
+        <div class="die3d yellow" id="die-cube-2">
+          <div class="face face-front"><div class="em">👂</div><div class="lbl">L'oreille</div></div>
+          <div class="face face-back"><div class="em">💋</div><div class="lbl">Les lèvres</div></div>
+          <div class="face face-right"><div class="em">🤲</div><div class="lbl">Le cou</div></div>
+          <div class="face face-left"><div class="em">🦴</div><div class="lbl">Le dos</div></div>
+          <div class="face face-top"><div class="em">🫦</div><div class="lbl">La nuque</div></div>
+          <div class="face face-bottom"><div class="em">🤚</div><div class="lbl">Les mains</div></div>
+        </div>
+      </div>
+
+      <div class="result-display" id="result-cube">
+        <div class="label">★ Action ★</div>
+        <div class="text" id="result-cube-text">Camille doit <em>lécher</em><br><span class="underline">l'oreille</span> de Léon</div>
+      </div>
+
+      <button class="roll-btn" onclick="rollCube()">🎲 Lancer les dés</button>
+    </div>
+  </div>
+
+
+  <!-- ============================================ -->
+  <!-- DEMO 2 — STICKER FLIP                        -->
+  <!-- ============================================ -->
+  <div class="demo-block">
+    <span class="demo-tag">№ 2 · Carte qui flip</span>
+
+    <div class="demo-header">
+      <h2>Cartes qui <em>secouent</em> et se retournent</h2>
+      <p>Style sticker pop. Les cartes vibrent comme dans un cup à dés, puis se retournent pour révéler le résultat. Plus ludique, plus rapide.</p>
+    </div>
+
+    <div class="stage" id="stage-flip">
+      <div class="dice-flip-container">
+        <div class="die-flip" id="die-flip-1">
+          <div class="die-flip-side front">
+            <div class="qm">?</div>
+          </div>
+          <div class="die-flip-side back" id="flip-back-1">
+            <div class="em">💋</div>
+            <div class="lbl">Embrasser</div>
+          </div>
+        </div>
+        <div class="die-flip" id="die-flip-2">
+          <div class="die-flip-side front">
+            <div class="qm">?</div>
+          </div>
+          <div class="die-flip-side back" id="flip-back-2">
+            <div class="em">🫦</div>
+            <div class="lbl">La nuque</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-display" id="result-flip">
+        <div class="label">★ Action ★</div>
+        <div class="text" id="result-flip-text">Camille doit <em>embrasser</em><br><span class="underline">la nuque</span> de Léon</div>
+      </div>
+
+      <button class="roll-btn" onclick="rollFlip()">🎲 Lancer les dés</button>
+    </div>
+  </div>
+
+
+  <!-- ============================================ -->
+  <!-- DEMO 3 — SLOT MACHINE                        -->
+  <!-- ============================================ -->
+  <div class="demo-block">
+    <span class="demo-tag">№ 3 · Slot machine</span>
+
+    <div class="demo-header">
+      <h2>Roulette <em>style</em> machine à sous</h2>
+      <p>Les valeurs défilent verticalement façon casino, puis ralentissent et s'arrêtent. Très satisfaisant visuellement, super pour le mode "Crescendo".</p>
+    </div>
+
+    <div class="stage" id="stage-slot">
+      <div class="dice-slot-container">
+        <div class="die-slot">
+          <div class="slot-track" id="slot-1">
+            <div class="slot-cell"><div class="em">👅</div><div class="lbl">Lécher</div></div>
+            <div class="slot-cell"><div class="em">💋</div><div class="lbl">Embrasser</div></div>
+            <div class="slot-cell"><div class="em">✋</div><div class="lbl">Caresser</div></div>
+            <div class="slot-cell"><div class="em">🦷</div><div class="lbl">Mordiller</div></div>
+            <div class="slot-cell"><div class="em">💆</div><div class="lbl">Masser</div></div>
+            <div class="slot-cell"><div class="em">🌬️</div><div class="lbl">Souffler</div></div>
+          </div>
+        </div>
+        <div class="die-slot yellow">
+          <div class="slot-track" id="slot-2">
+            <div class="slot-cell"><div class="em">👂</div><div class="lbl">L'oreille</div></div>
+            <div class="slot-cell"><div class="em">💋</div><div class="lbl">Les lèvres</div></div>
+            <div class="slot-cell"><div class="em">🤲</div><div class="lbl">Le cou</div></div>
+            <div class="slot-cell"><div class="em">🦴</div><div class="lbl">Le dos</div></div>
+            <div class="slot-cell"><div class="em">🫦</div><div class="lbl">La nuque</div></div>
+            <div class="slot-cell"><div class="em">🤚</div><div class="lbl">Les mains</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-display" id="result-slot">
+        <div class="label">★ Action ★</div>
+        <div class="text" id="result-slot-text">Camille doit <em>caresser</em><br><span class="underline">le cou</span> de Léon</div>
+      </div>
+
+      <button class="roll-btn" onclick="rollSlot()">🎲 Lancer les dés</button>
+    </div>
+  </div>
+
+
+  <!-- ============================================ -->
+  <!-- DEMO 4 — DARK MODE (Néon Noir variant)       -->
+  <!-- ============================================ -->
+  <div class="demo-block dark">
+    <span class="demo-tag">// Dark mode preview</span>
+
+    <div class="demo-header">
+      <h2>Le même cube 3D en <em>NÉON NOIR</em></h2>
+      <p>// Même mécanique, autre univers visuel. Activé auto si le système est en dark mode.</p>
+    </div>
+
+    <div class="stage" id="stage-dark">
+      <div class="dice-3d-container">
+        <div class="die3d" id="die-dark-1">
+          <div class="face face-front"><div class="em">👅</div><div class="lbl">Lécher</div></div>
+          <div class="face face-back"><div class="em">💋</div><div class="lbl">Embrasser</div></div>
+          <div class="face face-right"><div class="em">✋</div><div class="lbl">Caresser</div></div>
+          <div class="face face-left"><div class="em">🦷</div><div class="lbl">Mordiller</div></div>
+          <div class="face face-top"><div class="em">💆</div><div class="lbl">Masser</div></div>
+          <div class="face face-bottom"><div class="em">🌬️</div><div class="lbl">Souffler</div></div>
+        </div>
+        <div class="die3d yellow" id="die-dark-2">
+          <div class="face face-front"><div class="em">👂</div><div class="lbl">L'oreille</div></div>
+          <div class="face face-back"><div class="em">💋</div><div class="lbl">Les lèvres</div></div>
+          <div class="face face-right"><div class="em">🤲</div><div class="lbl">Le cou</div></div>
+          <div class="face face-left"><div class="em">🦴</div><div class="lbl">Le dos</div></div>
+          <div class="face face-top"><div class="em">🫦</div><div class="lbl">La nuque</div></div>
+          <div class="face face-bottom"><div class="em">🤚</div><div class="lbl">Les mains</div></div>
+        </div>
+      </div>
+
+      <div class="result-display" id="result-dark">
+        <div class="label">// EXECUTE</div>
+        <div class="text" id="result-dark-text">Camille doit <em>mordiller</em><br><span class="underline">l'oreille</span> de Léon</div>
+      </div>
+
+      <button class="roll-btn" onclick="rollDark()">▶ ROLL DICE</button>
+    </div>
+  </div>
+
+
+  <!-- INFO -->
+  <div class="info-block">
+    <h3>📌 Note technique</h3>
+    <p>Ces 3 animations sont en <strong>CSS pur</strong> (zéro dépendance, fonctionnent partout, super légères). Pour la version finale en Next.js, on peut soit garder le CSS, soit passer à <strong>React Three Fiber + @react-three/drei</strong> pour des dés vraiment 3D avec ombres réalistes, matériaux PBR, particules — encore plus impressionnant mais plus lourd.</p>
+    <ul>
+      <li><strong>Cube 3D CSS</strong> = bon compromis poids/qualité, parfait pour PWA mobile</li>
+      <li><strong>Carte flip</strong> = la plus rapide visuellement, idéale si on enchaîne des tours</li>
+      <li><strong>Slot machine</strong> = la plus "casino", parfaite pour le mode Crescendo qui monte en intensité</li>
+      <li><strong>React Three Fiber</strong> = à envisager si on veut "wow" max sur desktop, mais peut être lourd sur vieux téléphones</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  // ===== DATA POOLS =====
+  const ACTIONS = [
+    { em: '👅', word: 'Lécher' },
+    { em: '💋', word: 'Embrasser' },
+    { em: '✋', word: 'Caresser' },
+    { em: '🦷', word: 'Mordiller' },
+    { em: '💆', word: 'Masser' },
+    { em: '🌬️', word: 'Souffler sur' },
+  ];
+  const ZONES = [
+    { em: '👂', word: "l'oreille" },
+    { em: '💋', word: 'les lèvres' },
+    { em: '🤲', word: 'le cou' },
+    { em: '🦴', word: 'le dos' },
+    { em: '🫦', word: 'la nuque' },
+    { em: '🤚', word: 'les mains' },
+  ];
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function emojiRain(stage, emojis = ['💋','🌹','🔥','✨','💖']) {
+    const rain = document.createElement('div');
+    rain.className = 'emoji-rain';
+    stage.appendChild(rain);
+    for (let i = 0; i < 16; i++) {
+      const p = document.createElement('span');
+      p.className = 'emoji-particle';
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDelay = (Math.random() * 0.4) + 's';
+      p.style.fontSize = (1.2 + Math.random() * 1.8) + 'rem';
+      rain.appendChild(p);
+    }
+    setTimeout(() => rain.remove(), 2500);
+  }
+
+  function vibrate(pattern = [50, 30, 50]) {
+    if ('vibrate' in navigator) navigator.vibrate(pattern);
+  }
+
+  // ===== DEMO 1 : CUBE 3D =====
+  function rollCube() {
+    const d1 = document.getElementById('die-cube-1');
+    const d2 = document.getElementById('die-cube-2');
+    const result = document.getElementById('result-cube');
+    const stage = document.getElementById('stage-cube');
+
+    vibrate([30, 20, 30, 20, 50]);
+    result.classList.remove('show');
+
+    d1.classList.remove('rolling'); d2.classList.remove('rolling-2');
+    void d1.offsetWidth;
+    d1.classList.add('rolling'); d2.classList.add('rolling-2');
+
+    setTimeout(() => emojiRain(stage), 200);
+
+    setTimeout(() => {
+      const action = pick(ACTIONS);
+      const zone = pick(ZONES);
+      document.getElementById('result-cube-text').innerHTML =
+        `Camille doit <em>${action.word.toLowerCase()}</em><br><span class="underline">${zone.word}</span> de Léon`;
+      result.classList.add('show');
+      vibrate(150);
+    }, 1700);
+  }
+
+  // ===== DEMO 2 : FLIP =====
+  let flipState = false;
+  function rollFlip() {
+    const d1 = document.getElementById('die-flip-1');
+    const d2 = document.getElementById('die-flip-2');
+    const result = document.getElementById('result-flip');
+    const stage = document.getElementById('stage-flip');
+
+    vibrate([30, 20, 30]);
+    result.classList.remove('show');
+
+    // reset to front
+    d1.classList.remove('flipped'); d2.classList.remove('flipped');
+    d1.classList.remove('shake'); d2.classList.remove('shake');
+    void d1.offsetWidth;
+
+    // shake
+    d1.classList.add('shake'); d2.classList.add('shake');
+
+    setTimeout(() => {
+      const action = pick(ACTIONS);
+      const zone = pick(ZONES);
+
+      // update card backs
+      document.getElementById('flip-back-1').innerHTML =
+        `<div class="em">${action.em}</div><div class="lbl">${action.word}</div>`;
+      document.getElementById('flip-back-2').innerHTML =
+        `<div class="em">${zone.em}</div><div class="lbl">${zone.word}</div>`;
+
+      d1.classList.add('flipped');
+      setTimeout(() => d2.classList.add('flipped'), 200);
+
+      setTimeout(() => {
+        document.getElementById('result-flip-text').innerHTML =
+          `Camille doit <em>${action.word.toLowerCase()}</em><br><span class="underline">${zone.word}</span> de Léon`;
+        result.classList.add('show');
+        emojiRain(stage);
+        vibrate(150);
+      }, 900);
+    }, 600);
+  }
+
+  // ===== DEMO 3 : SLOT =====
+  function rollSlot() {
+    const slot1 = document.getElementById('slot-1');
+    const slot2 = document.getElementById('slot-2');
+    const result = document.getElementById('result-slot');
+    const stage = document.getElementById('stage-slot');
+
+    vibrate([30, 20, 30, 20, 30, 20, 50]);
+    result.classList.remove('show');
+
+    const i1 = Math.floor(Math.random() * ACTIONS.length);
+    const i2 = Math.floor(Math.random() * ZONES.length);
+
+    // animate downwards: ~ 4 full cycles + final position
+    const cellH = window.innerWidth < 700 ? 100 : 130;
+    const targetY1 = -(i1 + ACTIONS.length * 4) * cellH;
+    const targetY2 = -(i2 + ZONES.length * 4) * cellH;
+
+    // reset to top
+    slot1.style.transition = 'none';
+    slot2.style.transition = 'none';
+    slot1.style.transform = 'translateY(0)';
+    slot2.style.transform = 'translateY(0)';
+    void slot1.offsetWidth;
+
+    // animate
+    slot1.style.transition = 'transform 1.6s cubic-bezier(0.22, 1, 0.36, 1)';
+    slot2.style.transition = 'transform 1.8s cubic-bezier(0.22, 1, 0.36, 1)';
+    slot1.style.transform = `translateY(${targetY1}px)`;
+    slot2.style.transform = `translateY(${targetY2}px)`;
+
+    setTimeout(() => emojiRain(stage), 400);
+
+    setTimeout(() => {
+      const action = ACTIONS[i1];
+      const zone = ZONES[i2];
+      document.getElementById('result-slot-text').innerHTML =
+        `Camille doit <em>${action.word.toLowerCase()}</em><br><span class="underline">${zone.word}</span> de Léon`;
+      result.classList.add('show');
+      vibrate(150);
+    }, 1900);
+  }
+
+  // ===== DEMO 4 : DARK CUBE =====
+  function rollDark() {
+    const d1 = document.getElementById('die-dark-1');
+    const d2 = document.getElementById('die-dark-2');
+    const result = document.getElementById('result-dark');
+    const stage = document.getElementById('stage-dark');
+
+    vibrate([30, 20, 30, 20, 50]);
+    result.classList.remove('show');
+
+    d1.classList.remove('rolling'); d2.classList.remove('rolling-2');
+    void d1.offsetWidth;
+    d1.classList.add('rolling'); d2.classList.add('rolling-2');
+
+    setTimeout(() => emojiRain(stage, ['⚡','🔥','💀','💎','✦']), 200);
+
+    setTimeout(() => {
+      const action = pick(ACTIONS);
+      const zone = pick(ZONES);
+      document.getElementById('result-dark-text').innerHTML =
+        `Camille doit <em>${action.word.toLowerCase()}</em><br><span class="underline">${zone.word}</span> de Léon`;
+      result.classList.add('show');
+      vibrate(150);
+    }, 1700);
+  }
+</script>
+
+</body>
+</html>

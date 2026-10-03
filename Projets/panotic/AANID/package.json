@@ -1,0 +1,40 @@
+{
+  "name": "aanid",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "beni-momo-adnan/*",
+    "bryan-fanou/*",
+    "rayann/*",
+    "w-d/*",
+    "undef/*",
+    "backend",
+    "frontend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "build": "npm run build -w shared && npm run build -w backend",
+    "test": "npm run test -w backend",
+    "prisma:generate": "npm run prisma:generate -w backend",
+    "prisma:push": "npm run prisma:push -w backend",
+    "prisma:setup": "npm run prisma:setup -w backend",
+    "prisma:seed": "npm run prisma:seed -w backend",
+    "setup:android": "bash scripts/setup-android.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "tailwindcss": "^4.3.1"
+  },
+  "allowScripts": {
+    "@prisma/client@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "bcrypt@5.1.1": true,
+    "prisma@5.22.0": true,
+    "esbuild@0.21.5": true
+  }
+}

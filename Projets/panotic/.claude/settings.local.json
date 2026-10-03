@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --no-install playwright --version)",
+      "Bash(npx --no-install puppeteer --version)",
+      "Bash(find / -maxdepth 6 -iname \"*.chromium*\" -o -iname \"chrome-linux\")",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh auth *)",
+      "Bash(git config --get credential.helper 2>&1 *)",
+      "Read(//home/ariel/.ssh/**)"
+    ]
+  }
+}

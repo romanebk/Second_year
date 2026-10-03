@@ -1,0 +1,294 @@
+/* =====================================================================
+   Portail d'authentification — panneau coulissant (login / inscription)
+   Piloté par les tokens du design system (globals.css) : aucune couleur
+   en dur, le light/dark fonctionne automatiquement.
+   ===================================================================== */
+
+.auth-container {
+  /* Rythme partagé par toutes les transitions du portail */
+  --portal-duration: 0.7s;
+  --portal-ease: cubic-bezier(0.76, 0, 0.24, 1); /* easeInOutQuart : départ doux, arrivée amortie */
+
+  position: relative;
+  width: 1040px;
+  max-width: 100%;
+  min-height: 680px;
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) + 6px);
+  overflow: hidden;
+  box-shadow: 0 24px 60px hsl(222 47% 11% / 0.18);
+}
+
+/* ------------------------------------------------------------------ */
+/* Formulaires                                                         */
+/* ------------------------------------------------------------------ */
+
+.auth-container .form-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 56px 64px;
+  transition:
+    transform var(--portal-duration) var(--portal-ease),
+    opacity calc(var(--portal-duration) * 0.55) ease;
+  will-change: transform, opacity;
+}
+
+.auth-container .login-form {
+  z-index: 2;
+}
+.auth-container .signup-form {
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Bascule : les deux formulaires glissent vers la droite, l'inscription
+   prend le relais avec un léger différé pour un croisement fluide. */
+.auth-container.active .login-form {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.auth-container.active .signup-form {
+  transform: translateX(100%);
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
+  transition-delay: 0.08s;
+}
+
+/* Entrée en cascade du contenu du formulaire qui devient visible */
+@keyframes portal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-container:not(.active) .login-form > *,
+.auth-container.active .signup-form > * {
+  animation: portal-rise 0.5s var(--portal-ease) backwards;
+}
+.auth-container:not(.active) .login-form > *:nth-child(1),
+.auth-container.active .signup-form > *:nth-child(1) { animation-delay: 0.25s; }
+.auth-container:not(.active) .login-form > *:nth-child(2),
+.auth-container.active .signup-form > *:nth-child(2) { animation-delay: 0.32s; }
+.auth-container:not(.active) .login-form > *:nth-child(3),
+.auth-container.active .signup-form > *:nth-child(3) { animation-delay: 0.39s; }
+.auth-container:not(.active) .login-form > *:nth-child(4),
+.auth-container.active .signup-form > *:nth-child(4) { animation-delay: 0.46s; }
+
+/* ------------------------------------------------------------------ */
+/* Panneau coulissant (desktop)                                        */
+/* ------------------------------------------------------------------ */
+
+.auth-container .overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform var(--portal-duration) var(--portal-ease);
+  z-index: 100;
+  will-change: transform;
+}
+.auth-container.active .overlay-container {
+  transform: translateX(-100%);
+}
+
+.auth-container .overlay {
+  position: relative;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  display: flex;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  color: hsl(var(--primary-foreground));
+  transform: translateX(0);
+  transition: transform var(--portal-duration) var(--portal-ease);
+  will-change: transform;
+}
+.auth-container.active .overlay {
+  transform: translateX(50%);
+}
+
+.auth-container .overlay-panel {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+/* Léger parallaxe : le contenu des panneaux glisse un peu moins vite
+   que le panneau lui-même, ce qui adoucit le mouvement. */
+.auth-container .overlay-panel > * {
+  transform: translateX(0);
+  transition: transform var(--portal-duration) var(--portal-ease);
+}
+.auth-container .overlay-left > * {
+  transform: translateX(-12%);
+}
+.auth-container.active .overlay-left > * {
+  transform: translateX(0);
+}
+.auth-container.active .overlay-right > * {
+  transform: translateX(12%);
+}
+
+.auth-container .overlay-panel h2 {
+  color: hsl(var(--primary-foreground));
+  font-size: 1.9rem;
+  line-height: 1.25;
+  max-width: 18ch;
+}
+.auth-container .overlay-panel p {
+  margin: 14px 0 26px;
+  font-size: 1rem;
+  opacity: 0.9;
+  max-width: 34ch;
+}
+
+/* Champs et titres plus généreux à l'échelle du portail */
+.auth-container .form-box h2 {
+  font-size: 1.9rem;
+}
+.auth-container .form-box input {
+  height: 3rem;
+  font-size: 1rem;
+}
+
+.auth-container .ghost-btn {
+  padding: 10px 32px;
+  border-radius: 999px;
+  border: 2px solid hsl(var(--primary-foreground));
+  background: transparent;
+  color: hsl(var(--primary-foreground));
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s var(--portal-ease);
+}
+.auth-container .ghost-btn:hover {
+  background: hsl(var(--primary-foreground) / 0.14);
+  transform: translateY(-1px);
+}
+.auth-container .ghost-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ------------------------------------------------------------------ */
+/* Onglets (mobile uniquement)                                         */
+/* ------------------------------------------------------------------ */
+
+.auth-tabs {
+  display: none;
+  position: relative;
+  margin: 18px 18px 0;
+  padding: 4px;
+  background: hsl(var(--muted));
+  border-radius: 999px;
+}
+
+/* Pastille glissante derrière l'onglet actif */
+.auth-tabs::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: hsl(var(--card));
+  border-radius: 999px;
+  box-shadow: 0 2px 8px hsl(222 47% 11% / 0.14);
+  transition: transform 0.45s var(--portal-ease);
+}
+.auth-container.active .auth-tabs::before {
+  transform: translateX(100%);
+}
+
+.auth-tab {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.auth-tab[aria-selected="true"] {
+  color: hsl(var(--foreground));
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive : bascule verticale en dessous de 600px                  */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 599px) {
+  .auth-container {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-height: 0;
+  }
+
+  /* Le panneau coulissant cède la place aux onglets */
+  .auth-container .overlay-container {
+    display: none;
+  }
+  .auth-tabs {
+    display: flex;
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  /* Les deux formulaires occupent la même cellule et se croisent
+     en fondu vertical au lieu de glisser horizontalement. */
+  .auth-container .form-box {
+    position: static;
+    grid-row: 2;
+    grid-column: 1;
+    width: 100%;
+    height: auto;
+    padding: 26px 22px 34px;
+    transform: translateY(12px);
+    transition:
+      transform 0.45s var(--portal-ease),
+      opacity 0.35s ease;
+  }
+  .auth-container .login-form {
+    transform: translateY(0);
+  }
+  .auth-container.active .login-form {
+    transform: translateY(-12px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .auth-container.active .signup-form {
+    transform: translateY(0);
+    transition-delay: 0.05s;
+  }
+}

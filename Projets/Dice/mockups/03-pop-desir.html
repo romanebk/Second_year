@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposition 3 — Pop Désir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..900,0..100;1,9..144,400..900,0..100&family=Bagel+Fat+One&family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf3e7;
+    --cream-deep: #f5e8d4;
+    --peach: #ffd4b0;
+    --terracotta: #e85a3c;
+    --terracotta-deep: #c44525;
+    --hot-pink: #ff3d8b;
+    --pink-deep: #d92668;
+    --magenta: #b8276f;
+    --plum: #5a1535;
+    --mustard: #e8b835;
+    --olive: #6b7d3c;
+    --ink: #2a0a18;
+    --black: #1a0510;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+  }
+
+  /* halftone bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(42,10,24,0.04) 1px, transparent 1px);
+    background-size: 12px 12px;
+  }
+
+  .display {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-variation-settings: "SOFT" 50, "opsz" 144;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+  }
+
+  .fat {
+    font-family: 'Bagel Fat One', cursive;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+  }
+
+  section {
+    min-height: 100vh;
+    padding: 4rem 3rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .label {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  /* ==== SCENE 1 — HERO ==== */
+  .hero {
+    background: var(--cream);
+    overflow: hidden;
+    padding-top: 5rem;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 3rem;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+  }
+  .nav .brand {
+    font-family: 'Bagel Fat One', cursive;
+    font-size: 1.6rem;
+    color: var(--hot-pink);
+  }
+  .nav .brand span { color: var(--terracotta); }
+  .nav .nav-r {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .nav .nav-r a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .nav .nav-r .login {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0.5rem 1.2rem;
+    border-radius: 100px;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    margin-top: 3rem;
+  }
+
+  .hero-content {
+    position: relative;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--peach);
+    border: 2px solid var(--ink);
+    padding: 0.5rem 1.2rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .pill .dot {
+    width: 8px; height: 8px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    50% { transform: scale(1.5); opacity: 0.5; }
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: clamp(4rem, 9vw, 8rem);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 .pink {
+    color: var(--hot-pink);
+    font-style: italic;
+    position: relative;
+    display: inline-block;
+  }
+  .hero h1 .pink::after {
+    content: '';
+    position: absolute;
+    bottom: 0.05em;
+    left: -0.05em;
+    right: -0.05em;
+    height: 0.15em;
+    background: var(--mustard);
+    z-index: -1;
+    border-radius: 4px;
+  }
+  .hero h1 .terra {
+    color: var(--terracotta);
+    font-family: 'Bagel Fat One', cursive;
+    font-style: normal;
+    font-weight: normal;
+    font-variation-settings: normal;
+  }
+
+  .hero .tagline {
+    font-size: 1.25rem;
+    color: var(--ink);
+    line-height: 1.5;
+    max-width: 520px;
+    margin-bottom: 2.5rem;
+    opacity: 0.8;
+  }
+
+  .player-stage {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+    margin-bottom: 2rem;
+    max-width: 600px;
+  }
+
+  .player-input {
+    flex: 1;
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    padding: 1rem 1.3rem;
+    box-shadow: 6px 6px 0 var(--ink);
+    position: relative;
+  }
+  .player-input.f2 {
+    background: var(--peach);
+    box-shadow: 6px 6px 0 var(--terracotta);
+  }
+  .player-input .pico {
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+  }
+  .player-input .plabel {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--terracotta);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .player-input.f2 .plabel { color: var(--magenta); }
+  .player-input input {
+    background: transparent;
+    border: none;
+    color: var(--ink);
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    width: 100%;
+    outline: none;
+    margin-top: 0.2rem;
+  }
+
+  .heart-x {
+    font-family: 'Bagel Fat One', cursive;
+    font-size: 3.5rem;
+    color: var(--hot-pink);
+    align-self: center;
+    transform: rotate(8deg);
+  }
+
+  .cta-area {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-pop {
+    background: var(--hot-pink);
+    color: white;
+    border: 3px solid var(--ink);
+    border-radius: 100px;
+    padding: 1.2rem 2.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    box-shadow: 6px 6px 0 var(--ink);
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .btn-pop:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .btn-pop:active {
+    transform: translate(4px, 4px);
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .btn-pop .arr {
+    background: white;
+    color: var(--hot-pink);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1rem;
+  }
+
+  .badge-18 {
+    background: var(--mustard);
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-12deg);
+    font-family: 'Bagel Fat One', cursive;
+    color: var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .badge-18 .num {
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+  .badge-18 .plus { font-size: 0.7rem; letter-spacing: 0.15em; }
+
+  /* hero illustration */
+  .hero-illust {
+    position: relative;
+    aspect-ratio: 1;
+    max-width: 520px;
+    margin-left: auto;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+  }
+  .blob-1 {
+    width: 90%;
+    height: 90%;
+    background: var(--hot-pink);
+    top: 5%; left: 5%;
+    border: 3px solid var(--ink);
+  }
+  .blob-2 {
+    width: 50%;
+    height: 50%;
+    background: var(--mustard);
+    top: 0; left: 0;
+    border: 3px solid var(--ink);
+  }
+  .blob-3 {
+    width: 40%;
+    height: 40%;
+    background: var(--terracotta);
+    bottom: 5%; right: 5%;
+    border: 3px solid var(--ink);
+  }
+
+  .hero-svg {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-3deg);
+    animation: floatBig 6s ease-in-out infinite;
+  }
+  @keyframes floatBig {
+    0%, 100% { transform: rotate(-3deg) translateY(0); }
+    50% { transform: rotate(-1deg) translateY(-15px); }
+  }
+
+  /* sticker shapes around hero */
+  .sticker {
+    position: absolute;
+    background: var(--cream);
+    border: 3px solid var(--ink);
+    padding: 0.5rem 1rem;
+    font-family: 'Bagel Fat One', cursive;
+    color: var(--ink);
+    z-index: 6;
+  }
+  .sticker.s1 {
+    top: -10px; right: 30px;
+    background: var(--mustard);
+    transform: rotate(8deg);
+    border-radius: 100px;
+    font-size: 0.95rem;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .sticker.s2 {
+    bottom: 30px; left: -20px;
+    background: var(--terracotta);
+    color: white;
+    transform: rotate(-12deg);
+    border-radius: 16px;
+    font-size: 0.9rem;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .sticker.s3 {
+    bottom: -10px; right: 60px;
+    background: var(--peach);
+    transform: rotate(5deg);
+    border-radius: 100px;
+    font-size: 0.85rem;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  /* ==== SCENE 2 — MODES ==== */
+  .modes {
+    background: var(--peach);
+    padding-top: 5rem;
+    border-top: 3px solid var(--ink);
+  }
+
+  .modes-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+  }
+  .modes-header .pill {
+    background: white;
+    margin: 0 auto 1.5rem;
+    display: inline-flex;
+  }
+  .modes-header h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+  }
+  .modes-header h2 em {
+    color: var(--hot-pink);
+    font-style: italic;
+  }
+  .modes-header p {
+    font-size: 1.2rem;
+    color: var(--plum);
+    margin-top: 1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .mode-card {
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 28px;
+    padding: 1.8rem 1.5rem;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 6px 6px 0 var(--ink);
+    transition: all 0.2s;
+    aspect-ratio: 0.7;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .mode-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--ink);
+  }
+
+  .mode-card .ribbon {
+    position: absolute;
+    top: 12px;
+    right: -8px;
+    background: var(--ink);
+    color: white;
+    padding: 0.2rem 0.8rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transform: rotate(8deg);
+    border-radius: 4px;
+  }
+
+  .mode-num {
+    font-family: 'Bagel Fat One', cursive;
+    font-size: 2rem;
+    color: var(--cream-deep);
+    line-height: 0.9;
+    margin-bottom: -0.5rem;
+  }
+
+  .mode-emoji-big {
+    font-size: 3.5rem;
+    text-align: center;
+    margin: 0.5rem 0;
+    line-height: 1;
+  }
+
+  .mode-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  .mode-name em { color: var(--hot-pink); font-style: italic; }
+
+  .mode-desc {
+    font-size: 0.85rem;
+    color: var(--plum);
+    line-height: 1.5;
+    text-align: center;
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+
+  .mode-foot {
+    border-top: 2px dashed var(--cream-deep);
+    padding-top: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mode-foot .lvl {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .mode-foot .stars {
+    color: var(--mustard);
+    letter-spacing: -2px;
+  }
+  .mode-foot .stars .empty { color: var(--cream-deep); }
+
+  /* mode color variants */
+  .mode-card[data-c="1"] { background: var(--cream); }
+  .mode-card[data-c="1"] .mode-num { color: var(--peach); }
+  .mode-card[data-c="2"] { background: #ffe5d0; }
+  .mode-card[data-c="2"] .mode-num { color: var(--terracotta); opacity: 0.5; }
+  .mode-card[data-c="3"] { background: var(--hot-pink); color: white; }
+  .mode-card[data-c="3"] .mode-name { color: white; }
+  .mode-card[data-c="3"] .mode-name em { color: var(--mustard); }
+  .mode-card[data-c="3"] .mode-desc { color: rgba(255,255,255,0.85); }
+  .mode-card[data-c="3"] .mode-num { color: var(--pink-deep); }
+  .mode-card[data-c="3"] .mode-foot { border-color: var(--pink-deep); }
+  .mode-card[data-c="3"] .mode-foot .lvl { color: white; }
+  .mode-card[data-c="4"] { background: var(--mustard); }
+  .mode-card[data-c="4"] .mode-num { color: rgba(0,0,0,0.15); }
+  .mode-card[data-c="5"] {
+    background: linear-gradient(135deg, var(--terracotta) 0%, var(--hot-pink) 100%);
+    color: white;
+  }
+  .mode-card[data-c="5"] .mode-name { color: white; }
+  .mode-card[data-c="5"] .mode-name em { color: var(--mustard); }
+  .mode-card[data-c="5"] .mode-desc { color: rgba(255,255,255,0.85); }
+  .mode-card[data-c="5"] .mode-num { color: rgba(0,0,0,0.15); }
+  .mode-card[data-c="5"] .mode-foot { border-color: rgba(255,255,255,0.3); }
+  .mode-card[data-c="5"] .mode-foot .lvl { color: white; }
+
+  /* ==== SCENE 3 — JEU ==== */
+  .game {
+    background: var(--cream);
+    padding-top: 5rem;
+    border-top: 3px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .game::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle 600px at 80% 20%, var(--peach) 0%, transparent 70%),
+      radial-gradient(circle 500px at 20% 80%, rgba(255,61,139,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .game-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .game-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .game-pill-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--hot-pink);
+    color: white;
+    border: 3px solid var(--ink);
+    padding: 0.6rem 1.2rem;
+    border-radius: 100px;
+    font-weight: 700;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .game-pill-mode .ico { font-size: 1.2rem; }
+
+  .game-stats {
+    display: flex;
+    gap: 1rem;
+  }
+  .stat-mini {
+    background: white;
+    border: 2px solid var(--ink);
+    padding: 0.4rem 0.9rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .stat-mini strong { color: var(--terracotta); margin-right: 0.3rem; }
+
+  .game-turn-area {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .game-turn-area .label-turn {
+    display: inline-block;
+    background: var(--mustard);
+    border: 2px solid var(--ink);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 0.85rem;
+    transform: rotate(-2deg);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .game-turn-area .name-big {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: clamp(4rem, 9vw, 8rem);
+    color: var(--hot-pink);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    margin-top: 1rem;
+    font-style: italic;
+  }
+  .game-turn-area .arrow-down {
+    font-size: 2.5rem;
+    color: var(--terracotta);
+    margin-top: 0.5rem;
+    animation: bounce 1.5s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+  }
+
+  .dice-pop-arena {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4rem;
+    margin: 2rem 0 3rem;
+    flex-wrap: wrap;
+  }
+
+  .die-pop {
+    width: 200px;
+    height: 200px;
+    background: white;
+    border: 4px solid var(--ink);
+    border-radius: 32px;
+    box-shadow:
+      8px 8px 0 var(--ink),
+      inset 0 0 0 6px white,
+      inset 0 0 0 8px var(--hot-pink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transform: rotate(-5deg);
+    animation: wiggle1 3s ease-in-out infinite;
+  }
+  .die-pop.die-2 {
+    background: var(--mustard);
+    box-shadow:
+      8px 8px 0 var(--ink),
+      inset 0 0 0 6px var(--mustard),
+      inset 0 0 0 8px var(--terracotta);
+    transform: rotate(8deg);
+    animation: wiggle2 3s ease-in-out infinite;
+  }
+  @keyframes wiggle1 {
+    0%, 100% { transform: rotate(-5deg) translateY(0); }
+    50% { transform: rotate(-3deg) translateY(-10px); }
+  }
+  @keyframes wiggle2 {
+    0%, 100% { transform: rotate(8deg) translateY(0); }
+    50% { transform: rotate(6deg) translateY(-10px); }
+  }
+
+  .die-pop .die-tag-pop {
+    position: absolute;
+    top: -18px;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0.2rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .die-pop .die-emoji-pop {
+    font-size: 3.5rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .die-pop .die-text {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1;
+    padding: 0 0.5rem;
+  }
+
+  .game-action-pop {
+    background: white;
+    border: 4px solid var(--ink);
+    border-radius: 32px;
+    padding: 2.5rem;
+    text-align: center;
+    box-shadow: 8px 8px 0 var(--ink);
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .game-action-pop .stamp {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    background: var(--hot-pink);
+    border: 3px solid var(--ink);
+    border-radius: 100px;
+    padding: 0.4rem 1.2rem;
+    font-family: 'Bagel Fat One', cursive;
+    color: white;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .game-action-pop .text-big {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    color: var(--ink);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-top: 1rem;
+  }
+  .game-action-pop .text-big em {
+    color: var(--hot-pink);
+    font-style: italic;
+  }
+  .game-action-pop .text-big .underline {
+    background: var(--mustard);
+    padding: 0.05em 0.3em;
+    border-radius: 8px;
+    color: var(--ink);
+    font-style: normal;
+  }
+
+  .timer-pop {
+    margin-top: 2rem;
+    background: var(--peach);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    padding: 0.5rem 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 600;
+  }
+  .timer-pop .ico { font-size: 1.2rem; }
+  .timer-pop .bar {
+    width: 100px;
+    height: 6px;
+    background: var(--cream-deep);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .timer-pop .bar .fill {
+    width: 60%;
+    height: 100%;
+    background: var(--terracotta);
+    border-radius: 100px;
+  }
+
+  .game-controls-pop {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .ctrl-pop {
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 100px;
+    padding: 0.9rem 1.6rem;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--ink);
+    transition: all 0.15s;
+  }
+  .ctrl-pop:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+  .ctrl-pop.next {
+    background: var(--ink);
+    color: var(--cream);
+  }
+
+  /* ==== SCENE 4 — KAMASUTRA ==== */
+  .kama {
+    background: var(--plum);
+    color: var(--cream);
+    padding-top: 5rem;
+    border-top: 3px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .kama::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle 500px at 20% 20%, rgba(255,61,139,0.3) 0%, transparent 60%),
+      radial-gradient(circle 400px at 80% 80%, rgba(232,184,53,0.2) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .kama-wrap {
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .kama-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  .kama-header .pill {
+    background: var(--hot-pink);
+    color: white;
+    border-color: var(--cream);
+  }
+  .kama-header .pill .dot { background: var(--mustard); }
+  .kama-header h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .kama-header h2 em {
+    color: var(--mustard);
+    font-style: italic;
+  }
+  .kama-header h2 .pop {
+    color: var(--hot-pink);
+    font-family: 'Bagel Fat One', cursive;
+    font-style: normal;
+    font-weight: normal;
+    font-variation-settings: normal;
+  }
+  .kama-header p {
+    font-size: 1.15rem;
+    margin-top: 1rem;
+    opacity: 0.85;
+  }
+
+  .kama-stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .kama-info {
+    color: var(--cream);
+  }
+  .kama-info .pill {
+    background: var(--mustard);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .kama-info .pill .dot { background: var(--terracotta); }
+  .kama-info h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: 4rem;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    margin: 1rem 0 1.5rem;
+  }
+  .kama-info h3 .pop {
+    color: var(--hot-pink);
+    font-family: 'Bagel Fat One', cursive;
+    font-weight: normal;
+    font-variation-settings: normal;
+  }
+  .kama-info h3 em {
+    color: var(--mustard);
+    font-style: italic;
+  }
+  .kama-info p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    opacity: 0.9;
+    margin-bottom: 1.2rem;
+  }
+  .kama-info ul {
+    list-style: none;
+    margin-top: 2rem;
+  }
+  .kama-info li {
+    background: rgba(255,255,255,0.05);
+    border-left: 4px solid var(--mustard);
+    padding: 0.8rem 1.2rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+    border-radius: 0 12px 12px 0;
+  }
+  .kama-info li strong { color: var(--mustard); display: block; font-family: 'Fraunces', serif; font-size: 1.1rem; margin-bottom: 0.2rem; }
+
+  .kama-card {
+    aspect-ratio: 0.72;
+    background: var(--cream);
+    border: 4px solid var(--ink);
+    border-radius: 32px;
+    padding: 2rem;
+    position: relative;
+    box-shadow:
+      10px 10px 0 var(--mustard),
+      14px 14px 0 var(--ink);
+    color: var(--ink);
+    overflow: hidden;
+    transform: rotate(2deg);
+  }
+
+  .kama-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px dashed var(--peach);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+  .kama-card-top .num {
+    font-family: 'Bagel Fat One', cursive;
+    color: var(--terracotta);
+    font-size: 1.4rem;
+  }
+  .kama-card-top .stamp-lvl {
+    background: var(--mustard);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    padding: 0.2rem 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.15em;
+  }
+
+  .kama-illust-pop {
+    aspect-ratio: 1.1;
+    background: var(--peach);
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .kama-illust-pop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.06) 1px, transparent 1px);
+    background-size: 8px 8px;
+  }
+
+  /* Pop art bold cartoon illustration */
+  .kama-illust-pop svg {
+    width: 90%;
+    height: 90%;
+    z-index: 2;
+    position: relative;
+  }
+
+  .kama-name-card {
+    margin-top: 1rem;
+  }
+  .kama-name-card .nm {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    font-size: 2.4rem;
+    color: var(--ink);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+  }
+  .kama-name-card .nm em { color: var(--hot-pink); font-style: italic; }
+  .kama-name-card .nm-fr {
+    background: var(--ink);
+    color: var(--cream);
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 100px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 0.6rem;
+  }
+
+  .kama-desc-pop {
+    font-size: 0.95rem;
+    color: var(--plum);
+    line-height: 1.5;
+    margin: 1rem 0;
+  }
+
+  .kama-meta-pop {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .meta-item {
+    background: var(--peach);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 0.6rem;
+    text-align: center;
+  }
+  .meta-item .ico-meta {
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+  .meta-item .lbl {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+  }
+  .meta-item .val {
+    font-family: 'Bagel Fat One', cursive;
+    color: var(--hot-pink);
+    font-size: 1.3rem;
+    margin-top: 0.2rem;
+  }
+
+  /* style marker */
+  .style-marker {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--hot-pink);
+    color: white;
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    padding: 1rem 1.5rem;
+    z-index: 100;
+    box-shadow: 6px 6px 0 var(--ink);
+    transform: rotate(-3deg);
+  }
+  .style-marker .num {
+    font-family: 'Bagel Fat One', cursive;
+    font-size: 1.5rem;
+    color: var(--mustard);
+  }
+  .style-marker .name {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    margin: 0.2rem 0;
+  }
+  .style-marker .tag {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+
+  @media (max-width: 1100px) {
+    .modes-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-grid { grid-template-columns: 1fr; }
+    .kama-stage { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Style marker badge -->
+<div class="style-marker">
+  <div class="num">№ 03</div>
+  <div class="name">Pop Désir</div>
+  <div class="tag">Maximaliste · Cartoon · Joyeux</div>
+</div>
+
+
+<!-- ===== SCENE 1 — HERO ===== -->
+<section class="hero">
+  <nav class="nav">
+    <div class="brand">dice<span>désir</span>°</div>
+    <div class="nav-r">
+      <a>Modes</a>
+      <a>Comment jouer</a>
+      <a class="login">Commencer</a>
+    </div>
+  </nav>
+
+  <div class="hero-grid">
+    <div class="hero-content">
+      <span class="pill"><span class="dot"></span>Nouvelle session · prête à lancer</span>
+
+      <h1>Vos <span class="pink">soirs</span><br>ne s'oublieront <br><span class="terra">jamais</span>.</h1>
+
+      <p class="tagline">Le jeu de dés pour couples qui assument. 5 modes, des centaines de combinaisons, zéro routine. À deux, c'est mieux.</p>
+
+      <div class="player-stage">
+        <div class="player-input">
+          <div class="pico">👨</div>
+          <div class="plabel">Joueur 1</div>
+          <input type="text" value="Léon" />
+        </div>
+        <div class="heart-x">×</div>
+        <div class="player-input f2">
+          <div class="pico">👩</div>
+          <div class="plabel">Joueuse 2</div>
+          <input type="text" value="Camille" />
+        </div>
+      </div>
+
+      <div class="cta-area">
+        <button class="btn-pop">
+          C'est parti !
+          <span class="arr">→</span>
+        </button>
+        <div class="badge-18">
+          <div class="num">18</div>
+          <div class="plus">PLUS</div>
+        </div>
+        <span style="font-size:0.85rem; opacity:0.7;">Adultes consentants uniquement</span>
+      </div>
+    </div>
+
+    <div class="hero-illust">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+
+      <span class="sticker s1">✨ ROLL!</span>
+      <span class="sticker s2">100% offline</span>
+      <span class="sticker s3">🔥 sans tabou</span>
+
+      <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- Two big cartoon dice -->
+        <g>
+          <!-- die 1 -->
+          <g transform="translate(70,90)">
+            <rect x="0" y="0" width="160" height="160" rx="28" fill="#fdf3e7" stroke="#1a0510" stroke-width="6"/>
+            <rect x="10" y="10" width="140" height="140" rx="20" fill="none" stroke="#ff3d8b" stroke-width="4"/>
+            <circle cx="40" cy="40" r="11" fill="#ff3d8b" stroke="#1a0510" stroke-width="3"/>
+            <circle cx="120" cy="40" r="11" fill="#ff3d8b" stroke="#1a0510" stroke-width="3"/>
+            <circle cx="80" cy="80" r="11" fill="#1a0510"/>
+            <circle cx="40" cy="120" r="11" fill="#ff3d8b" stroke="#1a0510" stroke-width="3"/>
+            <circle cx="120" cy="120" r="11" fill="#ff3d8b" stroke="#1a0510" stroke-width="3"/>
+          </g>
+          <!-- die 2 -->
+          <g transform="translate(180,200) rotate(15 80 80)">
+            <rect x="0" y="0" width="160" height="160" rx="28" fill="#e8b835" stroke="#1a0510" stroke-width="6"/>
+            <rect x="10" y="10" width="140" height="140" rx="20" fill="none" stroke="#1a0510" stroke-width="4"/>
+            <circle cx="80" cy="80" r="14" fill="#1a0510"/>
+            <circle cx="40" cy="40" r="14" fill="#e85a3c" stroke="#1a0510" stroke-width="3"/>
+            <circle cx="120" cy="120" r="14" fill="#e85a3c" stroke="#1a0510" stroke-width="3"/>
+          </g>
+        </g>
+
+        <!-- sparkles -->
+        <g fill="#1a0510">
+          <path d="M 50 50 L 55 60 L 65 55 L 55 50 L 50 40 L 45 50 L 35 55 L 45 60 Z" transform="scale(0.6) translate(60 60)"/>
+          <path d="M 350 80 L 355 90 L 365 85 L 355 80 L 350 70 L 345 80 L 335 85 L 345 90 Z" transform="scale(0.5)" />
+        </g>
+
+        <!-- hearts -->
+        <g fill="#ff3d8b" stroke="#1a0510" stroke-width="3">
+          <path d="M 350 280 Q 340 270, 345 260 Q 355 255, 360 270 Q 365 255, 375 260 Q 380 270, 370 280 L 360 290 Z"/>
+          <path d="M 50 320 Q 40 310, 45 300 Q 55 295, 60 310 Q 65 295, 75 300 Q 80 310, 70 320 L 60 330 Z" fill="#e8b835"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== SCENE 2 — MODES ===== -->
+<section class="modes">
+  <div class="modes-header">
+    <span class="pill"><span class="dot"></span>5 modes pour 5 ambiances</span>
+    <h2>Choisissez votre <em>menu</em><br>pour ce soir.</h2>
+    <p>Du tendre soft au franchement coquin. Chaque mode change l'ambiance, les actions, les zones et les illustrations.</p>
+  </div>
+
+  <div class="modes-grid">
+    <div class="mode-card" data-c="1">
+      <div class="mode-num">01</div>
+      <div class="mode-emoji-big">🌸</div>
+      <h3 class="mode-name">Échauffement</h3>
+      <p class="mode-desc">Caresses douces, premiers baisers, regards complices.</p>
+      <div class="mode-foot">
+        <span class="lvl">Soft</span>
+        <span class="stars">★<span class="empty">★★★★</span></span>
+      </div>
+    </div>
+
+    <div class="mode-card" data-c="2">
+      <div class="mode-num">02</div>
+      <div class="mode-emoji-big">🍒</div>
+      <h3 class="mode-name">Sensuel</h3>
+      <p class="mode-desc">La langue, les dents, la peau qui frissonne.</p>
+      <div class="mode-foot">
+        <span class="lvl">Medium</span>
+        <span class="stars">★★★<span class="empty">★★</span></span>
+      </div>
+    </div>
+
+    <div class="mode-card" data-c="3">
+      <span class="ribbon">Top 🔥</span>
+      <div class="mode-num">03</div>
+      <div class="mode-emoji-big">💋</div>
+      <h3 class="mode-name">Sans <em>tabou</em></h3>
+      <p class="mode-desc">Tout est permis, partout, pour tout le monde.</p>
+      <div class="mode-foot">
+        <span class="lvl">Hot</span>
+        <span class="stars">★★★★★</span>
+      </div>
+    </div>
+
+    <div class="mode-card" data-c="4">
+      <div class="mode-num">04</div>
+      <div class="mode-emoji-big">🪷</div>
+      <h3 class="mode-name">Kamasutra</h3>
+      <p class="mode-desc">Positions illustrées avec niveau de difficulté.</p>
+      <div class="mode-foot">
+        <span class="lvl">Visuel</span>
+        <span class="stars">★★★★<span class="empty">★</span></span>
+      </div>
+    </div>
+
+    <div class="mode-card" data-c="5">
+      <span class="ribbon">Auto ⚡</span>
+      <div class="mode-num">05</div>
+      <div class="mode-emoji-big">📈</div>
+      <h3 class="mode-name">Crescendo</h3>
+      <p class="mode-desc">Le jeu monte d'un cran tout seul. Tenez bon !</p>
+      <div class="mode-foot">
+        <span class="lvl">Évolutif</span>
+        <span class="stars">★★★★★</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== SCENE 3 — JEU ===== -->
+<section class="game">
+  <div class="game-wrap">
+
+    <div class="game-top">
+      <div class="game-pill-mode">
+        <span class="ico">💋</span>
+        Mode Sans Tabou
+      </div>
+      <div class="game-stats">
+        <div class="stat-mini"><strong>Tour</strong>04</div>
+        <div class="stat-mini"><strong>Temps</strong>00:42</div>
+      </div>
+    </div>
+
+    <div class="game-turn-area">
+      <span class="label-turn">À ton tour ! 🎯</span>
+      <div class="name-big">Camille</div>
+      <div class="arrow-down">↓</div>
+    </div>
+
+    <div class="dice-pop-arena">
+      <div class="die-pop">
+        <span class="die-tag-pop">Action</span>
+        <div class="die-emoji-pop">👅</div>
+        <div class="die-text">Lécher</div>
+      </div>
+      <div class="die-pop die-2">
+        <span class="die-tag-pop">Zone</span>
+        <div class="die-emoji-pop">⚡</div>
+        <div class="die-text">L'oreille</div>
+      </div>
+    </div>
+
+    <div class="game-action-pop">
+      <span class="stamp">Action !</span>
+      <div class="text-big">Camille doit <em>lécher</em><br><span class="underline">l'oreille</span> de Léon</div>
+
+      <div class="timer-pop">
+        <span class="ico">⏱</span>
+        <span><strong>54s</strong> restantes</span>
+        <div class="bar"><div class="fill"></div></div>
+      </div>
+
+      <div class="game-controls-pop">
+        <button class="ctrl-pop">↻ Re-tirer</button>
+        <button class="ctrl-pop">⏸ Pause</button>
+        <button class="ctrl-pop next">Suivant →</button>
+        <button class="ctrl-pop">✕ Quitter</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ===== SCENE 4 — KAMASUTRA ===== -->
+<section class="kama">
+  <div class="kama-wrap">
+
+    <div class="kama-header">
+      <span class="pill"><span class="dot"></span>Mode Kamasutra · carte tirée</span>
+      <h2>Une <em>position</em>,<br>une <span class="pop">aventure</span>.</h2>
+      <p>Illustrations cartoon stylisées · Description complète · Niveaux</p>
+    </div>
+
+    <div class="kama-stage">
+      <div class="kama-info">
+        <span class="pill"><span class="dot"></span>Option C · Cartoon illustré</span>
+        <h3>Cartoon <em>bold</em><br>& <span class="pop">colorful</span></h3>
+        <p>Illustrations dessinées dans un style cartoon contemporain — gros traits noirs, couleurs vives, formes simples mais expressives. Style Memphis / pop art moderne.</p>
+        <p>L'idée : assumer le côté ludique du jeu sans tomber dans le réaliste-cliché. C'est mignon, suggestif, et ça enlève toute gêne possible.</p>
+        <ul>
+          <li><strong>Style assumé</strong>Cartoon adulte type Spotify Wrapped, Notion, illustrations modernes</li>
+          <li><strong>Production</strong>Illustrations sur mesure (designer ou IA + retouches), exportées en PNG/SVG</li>
+          <li><strong>Avantage</strong>Aucune gêne, accessible, parfait pour le grand public couples</li>
+        </ul>
+      </div>
+
+      <div class="kama-card">
+        <div class="kama-card-top">
+          <span class="num">07/18</span>
+          <span class="stamp-lvl">Niveau 2</span>
+        </div>
+
+        <div class="kama-illust-pop">
+          <svg viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bgr" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff3d8b"/>
+                <stop offset="100%" stop-color="#e85a3c"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Pop cartoon style — two curvy figures embracing -->
+            <!-- background sun rays -->
+            <g opacity="0.3">
+              <path d="M 100 90 L 100 0" stroke="#e8b835" stroke-width="3"/>
+              <path d="M 100 90 L 200 90" stroke="#e8b835" stroke-width="3"/>
+              <path d="M 100 90 L 100 180" stroke="#e8b835" stroke-width="3"/>
+              <path d="M 100 90 L 0 90" stroke="#e8b835" stroke-width="3"/>
+              <path d="M 100 90 L 175 15" stroke="#e8b835" stroke-width="3"/>
+              <path d="M 100 90 L 25 15" stroke="#e8b835" stroke-width="3"/>
+              <path d="M 100 90 L 175 165" stroke="#e8b835" stroke-width="3"/>
+              <path d="M 100 90 L 25 165" stroke="#e8b835" stroke-width="3"/>
+            </g>
+
+            <!-- Big bold figures -->
+            <!-- Figure 1 — pink, leaning back -->
+            <g>
+              <!-- body curve -->
+              <path d="M 50 120 Q 35 100, 45 75 Q 50 55, 70 50 Q 90 50, 95 70 Q 95 90, 85 105 Q 80 115, 70 125 Q 60 130, 50 120 Z"
+                    fill="#ff3d8b" stroke="#1a0510" stroke-width="3"/>
+              <!-- head -->
+              <circle cx="65" cy="42" r="14" fill="#ffd4b0" stroke="#1a0510" stroke-width="3"/>
+              <!-- hair -->
+              <path d="M 51 38 Q 50 25, 60 22 Q 75 22, 80 35 Q 78 45, 75 38 Q 68 30, 58 35 Z" fill="#1a0510"/>
+              <!-- arm wrapping -->
+              <path d="M 80 70 Q 110 75, 130 80 Q 140 85, 135 95"
+                    fill="none" stroke="#1a0510" stroke-width="4" stroke-linecap="round"/>
+              <path d="M 80 70 Q 110 75, 130 80 Q 140 85, 135 95"
+                    fill="none" stroke="#ff3d8b" stroke-width="2" stroke-linecap="round"/>
+            </g>
+
+            <!-- Figure 2 — yellow, leaning in -->
+            <g>
+              <!-- body -->
+              <path d="M 150 130 Q 165 110, 155 85 Q 150 65, 130 60 Q 110 60, 105 80 Q 105 100, 115 115 Q 120 125, 130 135 Q 140 140, 150 130 Z"
+                    fill="#e8b835" stroke="#1a0510" stroke-width="3"/>
+              <!-- head -->
+              <circle cx="135" cy="52" r="14" fill="#e8a888" stroke="#1a0510" stroke-width="3"/>
+              <!-- hair -->
+              <path d="M 122 48 Q 121 38, 130 35 Q 145 35, 148 45 Q 146 50, 140 45 Q 132 42, 124 48 Z" fill="#3a1810"/>
+              <!-- arm -->
+              <path d="M 120 80 Q 90 85, 75 90 Q 65 95, 70 105"
+                    fill="none" stroke="#1a0510" stroke-width="4" stroke-linecap="round"/>
+              <path d="M 120 80 Q 90 85, 75 90 Q 65 95, 70 105"
+                    fill="none" stroke="#e8b835" stroke-width="2" stroke-linecap="round"/>
+            </g>
+
+            <!-- foreheads touching -->
+            <ellipse cx="100" cy="48" rx="3" ry="2" fill="#ff3d8b" opacity="0.6"/>
+
+            <!-- floating hearts -->
+            <g fill="#ff3d8b" stroke="#1a0510" stroke-width="2">
+              <path d="M 30 20 Q 25 15, 27 10 Q 32 8, 35 14 Q 38 8, 43 10 Q 45 15, 40 20 L 35 25 Z" transform="scale(0.7) translate(20 20)"/>
+              <path d="M 165 20 Q 160 15, 162 10 Q 167 8, 170 14 Q 173 8, 178 10 Q 180 15, 175 20 L 170 25 Z" transform="scale(0.6) translate(280 30)" fill="#e8b835"/>
+            </g>
+
+            <!-- sparkles -->
+            <g fill="#1a0510">
+              <text x="170" y="155" font-size="14" font-family="Bagel Fat One">✦</text>
+              <text x="20" y="155" font-size="12" font-family="Bagel Fat One">✧</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="kama-name-card">
+          <div class="nm">L'<em>Étreinte</em><br>du Lotus</div>
+          <span class="nm-fr">Padmasana · Tantric</span>
+        </div>
+
+        <p class="kama-desc-pop">Assise face à lui, jambes croisées autour de sa taille. Front contre front, vous respirez ensemble — connexion totale.</p>
+
+        <div class="kama-meta-pop">
+          <div class="meta-item">
+            <div class="ico-meta">💪</div>
+            <div class="lbl">Difficulté</div>
+            <div class="val">2/5</div>
+          </div>
+          <div class="meta-item">
+            <div class="ico-meta">💖</div>
+            <div class="lbl">Intimité</div>
+            <div class="val">5/5</div>
+          </div>
+          <div class="meta-item">
+            <div class="ico-meta">⏱</div>
+            <div class="lbl">Endurance</div>
+            <div class="val">3/5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>

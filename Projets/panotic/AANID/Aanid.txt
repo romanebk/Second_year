@@ -1,0 +1,46 @@
+Correction apportées:
+FONCTIONNALITÉS DE L'APPLICATION AANID
+
+1. VILLES (Hub central)
+   - Point d'entrée principal au lieu d'"Actualités"
+   - Sélection d'une ville → affiche ses 4 rubriques
+   - Accès aux infos d'autres villes via utilisateur connecté
+
+2. RELAIS PUBLICITAIRE
+   - Relayer les pubs (pas créer/montrer des pubs)
+   - Mise en relation annonceurs ↔ relais // (Ici c'et pour mettre l'accent sur comment se feront les relais)
+   - Géolocalisation des panneaux/publicités disponibles
+
+3. FORMATIONS
+   - Catalogue de formations (signalétique, environnement, santé, infrastructure) // (Ce sont des rubriques ou domaines pour les types de formation)
+   - Modules directement accessibles après clic sur "Commencer"
+   - Formations payantes (Mobile Money) et gratuites
+   - Suivi de progression
+
+4. ÉTATS DES LIEUX
+   - Renseignement en temps réel de l'état de la panotique par ville
+   - 3 types d'infos :
+     * Disponibilité de panneaux modernes / obsolètes
+     * Qualité de l'amenagement publicitaire
+   - Signalement photo/vidéo/géolocalisé (pour apporter un aperçue sur l'etat du lieu)
+
+5. POSTS / RÉSEAUX
+   - Fil social par ville
+   - Interaction (likes, commentaires)
+   - Thématiques : environnement, santé, famille, urbanisme
+
+6. CONSULTATION
+   - Cette partie concerne tout client potentiel désireux de commander une étude sur la panneautique ou en quête de reformer le secteur d'exploitation des panneaux publicitaires dans  sa       région ou Ville.
+   
+7. CARTE INTERACTIVE
+   (Ici c'est beaucoup plus pour permettre aux utilisateurs d'avoir des interactions avec la plateforme) où on leur montre une analyse de la ville ou de la zone
+   - Visualisation signalements, panneaux, zones
+   - Clustering et heatmap
+   - Filtres par ville
+
+8. AUTHENTIFICATION & PROFIL 
+   (Ici c'est en rapport avec d'autres fonctionnalités de l'appli) cela ne rejoins pas les fonctionnalités phares
+   - Inscription, connexion, vérification email
+   - Rôles : Citoyen, Professionnel, Régie, Formateur, Autorité, Admin
+   - Abonnements : Free, Premium, Professional, Enterprise
+Nous aimerions avoir vos retours pour de potentiels améliorations et suggestions.

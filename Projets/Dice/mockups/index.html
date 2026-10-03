@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dice — 3 propositions visuelles</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d0a0c;
+    color: #f5ebd6;
+    font-family: 'Fraunces', serif;
+    min-height: 100vh;
+    padding: 4rem 2rem;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  h1 em { color: #ff3d8b; font-style: italic; }
+  .sub {
+    font-family: 'JetBrains Mono', monospace;
+    color: #888;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 4rem;
+    text-transform: uppercase;
+  }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .card {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s;
+    aspect-ratio: 0.85;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover { transform: translateY(-6px); }
+
+  .c1 { background: linear-gradient(135deg, #2a0612 0%, #4a0e1f 100%); }
+  .c1:hover { box-shadow: 0 30px 60px rgba(201,166,97,0.2); }
+  .c1 .num { color: #c9a661; }
+  .c1 h2 { color: #f5ebd6; }
+  .c1 .tag { color: #d4a5a5; }
+
+  .c2 { background: linear-gradient(135deg, #050507 0%, #14141a 100%); position: relative; }
+  .c2::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 70%, rgba(255,0,122,0.15), transparent 60%);
+  }
+  .c2:hover { box-shadow: 0 30px 60px rgba(255,0,122,0.3); }
+  .c2 .num { color: #ff007a; text-shadow: 0 0 10px #ff007a; font-family: 'JetBrains Mono', monospace; }
+  .c2 h2 { color: #f0eee8; }
+  .c2 .tag { color: #00f0ff; font-family: 'JetBrains Mono', monospace; }
+
+  .c3 { background: #fdf3e7; color: #1a0510; }
+  .c3:hover { box-shadow: 8px 8px 0 #1a0510; }
+  .c3 .num { color: #ff3d8b; }
+  .c3 h2 { color: #1a0510; }
+  .c3 .tag { color: #e85a3c; }
+
+  .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .card h2 {
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    margin: 1rem 0;
+    position: relative;
+    z-index: 2;
+  }
+  .desc {
+    font-size: 1rem;
+    line-height: 1.5;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 2;
+  }
+  .open {
+    margin-top: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    border-top: 1px solid currentColor;
+    padding-top: 1rem;
+    opacity: 0.7;
+    position: relative;
+    z-index: 2;
+  }
+
+  .footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    border: 1px dashed #444;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #aaa;
+    line-height: 1.7;
+  }
+  .footer strong { color: #ff3d8b; }
+
+  .bonus-grid {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .bonus-card {
+    display: block;
+    padding: 2rem;
+    border: 1px solid #ff3d8b;
+    color: #1a0510;
+    text-decoration: none;
+    border-radius: 12px;
+  }
+  .bonus-card.b1 {
+    background: linear-gradient(135deg, #fdf3e7 0%, #ffd4b0 100%);
+  }
+  .bonus-card.b2 {
+    background: linear-gradient(135deg, #fdf3e7 0%, #ff3d8b 100%);
+  }
+  .bonus-card .bonus-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .bonus-card.b1 .bonus-num { color: #e85a3c; }
+  .bonus-card.b2 .bonus-num { color: #5a1535; }
+  .bonus-card h2 {
+    font-size: 2rem;
+    margin: 0.6rem 0;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+  }
+  .bonus-card.b2 h2,
+  .bonus-card.b2 p { color: white; }
+  .bonus-card.b1 p { opacity: 0.8; }
+  .bonus-card.b2 p { opacity: 0.95; }
+  .bonus-card.b3 {
+    background: #050507;
+    border-color: #00f0ff;
+    color: #f0eee8;
+    box-shadow: 0 0 30px rgba(0,240,255,0.3);
+    grid-column: span 2;
+  }
+  .bonus-card.b3 .bonus-num { color: #00f0ff; }
+  .bonus-card.b3 h2 { color: #ff007a; text-shadow: 0 0 20px rgba(255,0,122,0.6); }
+  .bonus-card.b3 p { color: #f0eee8; opacity: 0.9; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .bonus-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>3 directions visuelles<br>pour <em>Dice</em></h1>
+  <p class="sub">// clique sur une carte pour ouvrir la maquette complète</p>
+
+  <div class="grid">
+    <a href="01-velours.html" class="card c1">
+      <div>
+        <div class="num">№ 01</div>
+        <h2>Velours</h2>
+        <p class="desc">Boudoir parisien, art nouveau, dorures, ambiance feutrée luxueuse. Illustrations Kamasutra style aquarelle peinte à la main.</p>
+      </div>
+      <div>
+        <div class="tag">Élégant · Romantique · Watercolor</div>
+        <div class="open">Ouvrir →</div>
+      </div>
+    </a>
+
+    <a href="02-neon-noir.html" class="card c2">
+      <div>
+        <div class="num">// 02</div>
+        <h2>Néon Noir</h2>
+        <p class="desc">Cyberpunk, club berlinois, néons magenta et cyan, brutaliste. Illustrations Kamasutra en SVG line art néon.</p>
+      </div>
+      <div>
+        <div class="tag">Edgy · Moderne · SVG line art</div>
+        <div class="open">Ouvrir →</div>
+      </div>
+    </a>
+
+    <a href="03-pop-desir.html" class="card c3">
+      <div>
+        <div class="num">№ 03</div>
+        <h2>Pop Désir</h2>
+        <p class="desc">Pop art moderne, gros traits noirs, couleurs vives, ludique et joyeux. Illustrations Kamasutra cartoon stylisées.</p>
+      </div>
+      <div>
+        <div class="tag">Maximaliste · Ludique · Cartoon</div>
+        <div class="open">Ouvrir →</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="footer">
+    Chaque maquette montre <strong>4 écrans</strong> empilés (scroll) :<br>
+    <strong>I.</strong> Accueil avec saisie des prénoms + 18+ &nbsp;·&nbsp;
+    <strong>II.</strong> Sélection des 5 modes &nbsp;·&nbsp;
+    <strong>III.</strong> Écran de jeu avec dés + résultat &nbsp;·&nbsp;
+    <strong>IV.</strong> Carte Kamasutra (illustration différente par proposition)
+  </div>
+
+  <div class="bonus-grid">
+    <a href="03b-pop-desir-mobile.html" class="bonus-card b1">
+      <div class="bonus-num">→ Bonus 1</div>
+      <h2>Pop Désir mobile + PWA</h2>
+      <p>Aperçu mobile-first dans des phone frames + section sur les sources d'images Kamasutra et la PWA.</p>
+    </a>
+    <a href="04-dice-animations.html" class="bonus-card b2">
+      <div class="bonus-num">→ Bonus 2</div>
+      <h2>Animations CSS des dés</h2>
+      <p>3 styles d'animation au lancer (cube 3D, flip, slot machine) + variante dark mode. Léger, sans dépendance.</p>
+    </a>
+    <a href="05-three-dice.html" class="bonus-card b3">
+      <div class="bonus-num">→ Bonus 3 · Three.js (le vrai 3D)</div>
+      <h2>Vrais dés 3D Three.js</h2>
+      <p>WebGL + ombres + caméra interactive (drag pour tourner) + textures dynamiques + toggle light/dark mode. C'est ce qu'on aura dans la vraie app Next.js avec React Three Fiber.</p>
+    </a>
+  </div>
+</div>
+</body>
+</html>

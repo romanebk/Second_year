@@ -1,0 +1,33 @@
+venv/
+venv_of_me/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.pkl
+*.h5
+
+# Data
+data/raw/
+data/processed/
+
+# Node
+web/node_modules/
+web/dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+mlruns/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Fichiers générés
+Projet_Fraude_Bancaire_EPITECH.txt
+reports/

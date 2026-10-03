@@ -1,0 +1,10 @@
+{
+  "name": "@aanid/bryan-fanou-frontend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "react": "18.3.1",
+    "react-native": "^0.76.0"
+  }
+}

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: fraud-api
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn api.main:app --host 0.0.0.0 --port 8000"
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
+    
+    # Si besoin d'un dossier data ou models, ajoutez-les dans le repo ou via un volume
+    # - key: AUTRE_VAR
+    #   value: ...

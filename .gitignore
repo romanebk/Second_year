@@ -15,3 +15,12 @@ build/
 # Editor / OS junk
 .~lock.*#
 .DS_Store
+
+# Projets subtree
+.next/
+.vercel/
+.astro/
+coverage/
+*.tsbuildinfo
+supabase-start.log
+supabase/.temp/

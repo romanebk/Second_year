@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+
+  /* Surfaces — soft violet-tinted white for warmth and brand cohesion */
+  --color-background: #faf8ff;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f3f0ff;
+  --color-border: rgba(124, 58, 237, 0.1);
+  --color-border-strong: rgba(124, 58, 237, 0.2);
+
+  /* Text */
+  --color-foreground: #18181f;
+  --color-muted-foreground: #64748b;
+
+  /* Brand — violet kept as primary */
+  --color-primary: #7c3aed;
+  --color-primary-foreground: #ffffff;
+  --color-primary-end: #c026d3;
+  --color-primary-muted: rgba(124, 58, 237, 0.08);
+
+  /* Accent — warm orange for highlights / stars */
+  --color-accent: #f97316;
+  --color-accent-foreground: #1c0a02;
+
+  /* Success */
+  --color-success: #10b981;
+  --color-success-foreground: #052e22;
+
+  /* Destructive */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #2c0a0a;
+
+  --color-ring: #7c3aed;
+
+  --animate-gradient-x: gradient-x 6s ease infinite;
+  --animate-glow: glow 3s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-border-spin: border-spin 3.5s linear infinite;
+  --animate-shimmer: shimmer 2.5s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.6s ease-out both;
+
+  @keyframes gradient-x {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  @keyframes glow {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+  @keyframes border-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-sans text-base leading-relaxed antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading leading-tight;
+  }
+  p,
+  li,
+  label,
+  input,
+  textarea,
+  select,
+  button {
+    @apply font-sans;
+  }
+  ::selection {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border-radius: 9999px;
+  }
+}
+
+@layer utilities {
+  .bg-grid {
+    background-image: linear-gradient(
+        to right,
+        rgba(124, 58, 237, 0.04) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .bg-dot {
+    background-image: radial-gradient(
+      rgba(124, 58, 237, 0.12) 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+  }
+
+  .glass {
+    @apply border border-border bg-surface/80 backdrop-blur-xl;
+  }
+
+  .section-padding {
+    @apply px-6 py-20 sm:px-12 sm:py-24 md:px-16 lg:px-24 xl:px-32 2xl:px-40;
+  }
+
+  .section-inset {
+    @apply px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-fuchsia-500 to-primary-end bg-clip-text text-transparent;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
